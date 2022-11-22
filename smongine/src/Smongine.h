@@ -3,7 +3,7 @@
 // For use by Smongine applications
 
 #include "Smongine/App.h"
-#include <stdio.h>
+#include "Smongine/Log.h"
 
 // *** Entry Point **************
 #include "Smongine/EntryPoint.h"

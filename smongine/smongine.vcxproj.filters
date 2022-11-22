@@ -1,36 +1,63 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="Smongine">
+      <UniqueIdentifier>{A59A84E6-9167-DFF1-BA80-CD99A6AC1480}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="Smongine\Events">
+      <UniqueIdentifier>{E93AF795-55C6-645A-5ED7-E74ECAE1C05A}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Smongine\Platform">
+      <UniqueIdentifier>{99A0CF0C-05B7-CDA2-4E2E-59C4BA839E2A}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Smongine\Platform\Windows">
+      <UniqueIdentifier>{D3D3DC56-3F96-10E1-8846-9F6DF447E9BE}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Smongine.h" />
+    <ClInclude Include="src\Smongine\App.h">
+      <Filter>Smongine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Core.h">
+      <Filter>Smongine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\EntryPoint.h">
+      <Filter>Smongine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Events\AppEvent.h">
+      <Filter>Smongine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Events\Event.h">
+      <Filter>Smongine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Events\KeyEvent.h">
+      <Filter>Smongine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Events\MouseEvent.h">
+      <Filter>Smongine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Log.h">
+      <Filter>Smongine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Platform\Windows\WinWindow.h">
+      <Filter>Smongine\Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Window.h">
+      <Filter>Smongine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\smpch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Smongine\App.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Smongine</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\Smongine\App.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Smongine\Core.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Smongine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Smongine\EntryPoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClCompile Include="src\Smongine\Log.cpp">
+      <Filter>Smongine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Smongine\Platform\Windows\WinWindow.cpp">
+      <Filter>Smongine\Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="src\smpch.cpp" />
   </ItemGroup>
 </Project>

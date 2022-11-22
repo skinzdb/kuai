@@ -1,15 +1,24 @@
+#include "smpch.h"
 #include "App.h"
 
-App::App() {
+#include "Events/KeyEvent.h"
+#include "Log.h"
 
-}
+namespace Smong {
 
-App::~App() {
-
-}
-
-void App::Run() {
-	while (true) {
-		
+	App::App() {
+		window = std::unique_ptr<Window>(Window::Create());
+		running = true;
 	}
+
+	App::~App() {
+
+	}
+
+	void App::Run() {
+		while (running) {
+			window->Update();
+		}
+	}
+
 }

@@ -2,7 +2,7 @@
 
 #include <Smongine.h>
 
-class Sandbox : public App {
+class Sandbox : public Smong::App {
 public:
 	Sandbox() {
 
@@ -13,7 +13,7 @@ public:
 	}
 };
 
-App* CreateApp()
+Smong::App* Smong::CreateApp()
 {
 	return new Sandbox();
 }
