@@ -79,8 +79,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>smpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>SM_PLATFORM_WINDOWS;SM_BUILD_DLL;SM_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>SM_PLATFORM_WINDOWS;SM_BUILD_DLL;GLFW_INCLUDE_NONE;SM_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -102,8 +102,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>smpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>SM_PLATFORM_WINDOWS;SM_BUILD_DLL;SM_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>SM_PLATFORM_WINDOWS;SM_BUILD_DLL;GLFW_INCLUDE_NONE;SM_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -129,8 +129,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>smpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>SM_PLATFORM_WINDOWS;SM_BUILD_DLL;SM_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>SM_PLATFORM_WINDOWS;SM_BUILD_DLL;GLFW_INCLUDE_NONE;SM_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -160,22 +160,34 @@
     <ClInclude Include="src\Smongine\Events\Event.h" />
     <ClInclude Include="src\Smongine\Events\KeyEvent.h" />
     <ClInclude Include="src\Smongine\Events\MouseEvent.h" />
+    <ClInclude Include="src\Smongine\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\Smongine\Layer.h" />
     <ClInclude Include="src\Smongine\LayerStack.h" />
     <ClInclude Include="src\Smongine\Log.h" />
+    <ClInclude Include="src\Smongine\Platform\OpenGL\ImGuiOpenGLRenderer.h" />
     <ClInclude Include="src\Smongine\Platform\Windows\WinWindow.h" />
     <ClInclude Include="src\Smongine\Window.h" />
     <ClInclude Include="src\smpch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Smongine\App.cpp" />
+    <ClCompile Include="src\Smongine\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Smongine\Layer.cpp" />
     <ClCompile Include="src\Smongine\LayerStack.cpp" />
     <ClCompile Include="src\Smongine\Log.cpp" />
+    <ClCompile Include="src\Smongine\Platform\OpenGL\ImGuiOpenGLRenderer.cpp" />
     <ClCompile Include="src\Smongine\Platform\Windows\WinWindow.cpp" />
     <ClCompile Include="src\smpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="vendor\Glad\Glad.vcxproj">
+      <Project>{BDD6857C-A90D-870D-52FA-6C103E10030F}</Project>
+    </ProjectReference>
+    <ProjectReference Include="vendor\ImGui\ImGui.vcxproj">
+      <Project>{C0FF640D-2C14-8DBE-F595-301E616989EF}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -10,7 +10,8 @@ workspace "Smongine"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-IncludeDir = {}
+include "Smongine/vendor/Glad"
+include "Smongine/vendor/ImGui"
 
 project "Smongine"
 	location "Smongine"
@@ -33,7 +34,9 @@ project "Smongine"
 	{
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
-		"%{prj.name}/vendor/GLFW/include"
+		"%{prj.name}/vendor/GLFW/include",
+		"%{prj.name}/vendor/Glad/include",
+		"%{prj.name}/vendor/ImGui"
 	}
 
 	libdirs
@@ -44,6 +47,8 @@ project "Smongine"
 	links
 	{
 		"glfw3.lib",
+		"Glad",
+		"ImGui",
 		"opengl32.lib"
 	}
 
@@ -55,7 +60,8 @@ project "Smongine"
 		defines
 		{
 			"SM_PLATFORM_WINDOWS",
-			"SM_BUILD_DLL"
+			"SM_BUILD_DLL",
+			"GLFW_INCLUDE_NONE"
 		}
 
 		postbuildcommands
@@ -103,7 +109,7 @@ project "Sandbox"
 
 	filter "system:windows"
 		cppdialect "C++17"
-		staticruntime "On"
+		staticruntime "Off"
 		systemversion "latest"
 
 		defines

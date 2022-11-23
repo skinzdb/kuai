@@ -6,7 +6,6 @@
 #include "Smongine/Events/MouseEvent.h"
 #include "Smongine/Events/KeyEvent.h"
 
-
 namespace Smong {
 	static bool glfwInitialised = false;
 
@@ -41,13 +40,17 @@ namespace Smong {
 		if (!glfwInitialised)
 		{
 			int success = glfwInit();
-			SM_CORE_ASSERT(success, "Could not initialise GLFW");
+			SM_CORE_ASSERT(success, "Failed to initialise GLFW");
 			
 			glfwInitialised = true;
 		}
 
 		window = glfwCreateWindow((int)props.width, (int)props.height, props.title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(window);
+
+		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress); // Initialise Glad
+		SM_CORE_ASSERT(status, "Failed to initialise Glad");
+
 		glfwSetWindowUserPointer(window, &data); // We can store anything in this user pointer, set it to reference of WindowData struct
 		SetVSync(true);
 

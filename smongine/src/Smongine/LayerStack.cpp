@@ -16,11 +16,13 @@ namespace Smong {
 	void LayerStack::PushLayer(Layer* layer)
 	{
 		layerInsert = layers.emplace(layerInsert, layer);
+		layer->OnAttach();
 	}
 
 	void LayerStack::PushOverlay(Layer* overlay) 
 	{
 		layers.emplace_back(overlay); // Overlays get pushed to end (always dealt with last)
+		overlay->OnAttach();
 	}
 
 	void LayerStack::PopLayer(Layer* layer)
@@ -31,6 +33,7 @@ namespace Smong {
 			layers.erase(it);
 			layerInsert--;
 		}
+		layer->OnDetach();
 	}
 
 	void LayerStack::PopOverlay(Layer* overlay)

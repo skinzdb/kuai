@@ -1,15 +1,21 @@
-#include <GLFW/glfw3.h>
-
 #include "smpch.h"
 #include "App.h"
 #include "Log.h"
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 namespace Smong {
 
+	App* App::instance = nullptr;
+
 	App::App() {
+		SM_CORE_ASSERT(!instance, "Application already exists");
+		instance = this;
+
 		window = std::unique_ptr<Window>(Window::Create());
-		running = true;
 		window->SetEventCallback(std::bind(&App::OnEvent, this, std::placeholders::_1));
+		running = true;
 	}
 
 	App::~App() {
@@ -18,8 +24,8 @@ namespace Smong {
 
 	void App::Run() {
 		while (running) {
-			// glClearColor(1, 0, 0, 1);
-			// glClear(GL_COLOR_BUFFER_BIT);
+			glClearColor(1, 0, 0, 1);
+			glClear(GL_COLOR_BUFFER_BIT);
 
 			for (Layer* layer : layerStack)
 				layer->Update();
@@ -32,8 +38,6 @@ namespace Smong {
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(std::bind(&App::OnWindowClose, this, std::placeholders::_1));
-
-		SM_CORE_TRACE("{0}", e);
 
 		for (auto it = layerStack.end(); it != layerStack.begin(); ) // Start from end and go backwards through stack
 		{

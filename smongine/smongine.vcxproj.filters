@@ -7,8 +7,14 @@
     <Filter Include="Smongine\Events">
       <UniqueIdentifier>{E93AF795-55C6-645A-5ED7-E74ECAE1C05A}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Smongine\ImGui">
+      <UniqueIdentifier>{8FB76152-7B85-5558-6419-C67E508631BD}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Smongine\Platform">
       <UniqueIdentifier>{99A0CF0C-05B7-CDA2-4E2E-59C4BA839E2A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Smongine\Platform\OpenGL">
+      <UniqueIdentifier>{AD83B0E8-99A8-FF68-C2F3-E4F8AE77FE86}</UniqueIdentifier>
     </Filter>
     <Filter Include="Smongine\Platform\Windows">
       <UniqueIdentifier>{D3D3DC56-3F96-10E1-8846-9F6DF447E9BE}</UniqueIdentifier>
@@ -37,6 +43,9 @@
     <ClInclude Include="src\Smongine\Events\MouseEvent.h">
       <Filter>Smongine\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\Smongine\ImGui\ImGuiLayer.h">
+      <Filter>Smongine\ImGui</Filter>
+    </ClInclude>
     <ClInclude Include="src\Smongine\Layer.h">
       <Filter>Smongine</Filter>
     </ClInclude>
@@ -53,10 +62,14 @@
       <Filter>Smongine</Filter>
     </ClInclude>
     <ClInclude Include="src\smpch.h" />
+    <ClInclude Include="src\Smongine\Platform\OpenGL\ImGuiOpenGLRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Smongine\App.cpp">
       <Filter>Smongine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Smongine\ImGui\ImGuiLayer.cpp">
+      <Filter>Smongine\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\Smongine\Layer.cpp">
       <Filter>Smongine</Filter>
@@ -71,5 +84,6 @@
       <Filter>Smongine\Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\smpch.cpp" />
+    <ClCompile Include="src\Smongine\Platform\OpenGL\ImGuiOpenGLRenderer.cpp" />
   </ItemGroup>
 </Project>

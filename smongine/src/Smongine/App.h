@@ -19,12 +19,17 @@ namespace Smong {
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
+
+		inline static App& Get() { return *instance;  }
+		inline Window& GetWindow() { return *window; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 
 		std::unique_ptr<Window> window;
 		bool running;
 		LayerStack layerStack;
+
+		static App* instance;
 	};
 
 	App* CreateApp();

@@ -1,8 +1,9 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
-
 #include "Smongine/Window.h"
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 namespace Smong {
 	class WinWindow : public Window
