@@ -12,8 +12,6 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
 
-include "Smongine/vendor/GLFW"
-
 project "Smongine"
 	location "Smongine"
 	kind "SharedLib"
@@ -38,15 +36,20 @@ project "Smongine"
 		"%{prj.name}/vendor/GLFW/include"
 	}
 
+	libdirs
+	{
+		"%{prj.name}/vendor/GLFW/lib-vc2019"
+	}
+
 	links
 	{
-		"GLFW",
+		"glfw3.lib",
 		"opengl32.lib"
 	}
 
 	filter "system:windows"
 		cppdialect "C++17"
-		staticruntime "On"
+		staticruntime "Off"
 		systemversion "latest"
 
 		defines

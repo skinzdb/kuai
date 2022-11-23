@@ -37,6 +37,12 @@
     <ClInclude Include="src\Smongine\Events\MouseEvent.h">
       <Filter>Smongine\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\Smongine\Layer.h">
+      <Filter>Smongine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\LayerStack.h">
+      <Filter>Smongine</Filter>
+    </ClInclude>
     <ClInclude Include="src\Smongine\Log.h">
       <Filter>Smongine</Filter>
     </ClInclude>
@@ -50,6 +56,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Smongine\App.cpp">
+      <Filter>Smongine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Smongine\Layer.cpp">
+      <Filter>Smongine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Smongine\LayerStack.cpp">
       <Filter>Smongine</Filter>
     </ClCompile>
     <ClCompile Include="src\Smongine\Log.cpp">

@@ -41,7 +41,6 @@ namespace Smong {
 
 		inline bool IsInCategory(EventCategory category) { return GetCategoryFlags() & category; }
 
-	protected:
 		bool handled = false;
 	};
 
@@ -55,10 +54,10 @@ namespace Smong {
 		template<typename T>
 		bool Dispatch(EventFn<T> func)
 		{
-			if (event.GetEventType() == T::GetStaticType())
+			if (event.GetEventType() == T::GetStaticType()) // Check if passed event type matches event type of template argument
 			{ 
-				event.handled = func(*(T*)&event);
-				return true;
+				event.handled = func(*(T*)&event); // Call the function with that event as its argument
+				return true; // Indicate the event has been handled
 			}
 			return false;
 		}

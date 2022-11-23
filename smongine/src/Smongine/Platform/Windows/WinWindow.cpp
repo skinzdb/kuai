@@ -1,10 +1,19 @@
 #include "smpch.h"
 
 #include "WinWindow.h"
-#include "Smongine/Log.h"
+
+#include "Smongine/Events/AppEvent.h"
+#include "Smongine/Events/MouseEvent.h"
+#include "Smongine/Events/KeyEvent.h"
+
 
 namespace Smong {
 	static bool glfwInitialised = false;
+
+	static void GLFWErrorCallback(int error, const char* description)
+	{
+		SM_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
+	}
 
 	Window* Window::Create(const WindowProps& props)
 	{
@@ -39,8 +48,91 @@ namespace Smong {
 
 		window = glfwCreateWindow((int)props.width, (int)props.height, props.title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(window);
-		glfwSetWindowUserPointer(window, &data);
+		glfwSetWindowUserPointer(window, &data); // We can store anything in this user pointer, set it to reference of WindowData struct
 		SetVSync(true);
+
+		// ************************************************************
+		// Set GLFW callbacks		
+		// ************************************************************
+
+		glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			data.width = width;
+			data.height = height;
+
+			WindowResizeEvent event(width, height); 
+			data.eventCallback(event); // Dispatch event
+		});
+
+		glfwSetWindowCloseCallback(window, [](GLFWwindow* window)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			WindowCloseEvent event;
+			data.eventCallback(event);
+		});
+
+		glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+			switch (action)
+			{
+				case GLFW_PRESS:
+				{
+					KeyPressEvent event(key, 0);
+					data.eventCallback(event);
+					break;
+				}
+				case GLFW_RELEASE:
+				{
+					KeyReleaseEvent event(key);
+					data.eventCallback(event);
+					break;
+				}
+				case GLFW_REPEAT:
+				{
+					KeyPressEvent event(key, 1);
+					data.eventCallback(event);
+					break;
+				}
+			}
+		});
+
+		glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			
+			switch (action)
+			{
+				case GLFW_PRESS:
+				{
+					MouseBtnPressEvent event(button);
+					data.eventCallback(event);
+					break;
+				}
+				case GLFW_RELEASE:
+				{
+					MouseBtnReleaseEvent event(button);
+					data.eventCallback(event);
+					break;
+				}
+			}
+		});
+
+		glfwSetScrollCallback(window, [](GLFWwindow* window, double xoff, double yoff)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			MouseScrollEvent event((float)xoff, (float)yoff);
+			data.eventCallback(event);
+		});
+
+		glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			MouseMoveEvent event((float)xpos, (float)ypos);
+			data.eventCallback(event);
+		});
 	}
 
 	void WinWindow::Shutdown()
