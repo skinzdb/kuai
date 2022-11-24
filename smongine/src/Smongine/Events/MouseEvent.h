@@ -6,15 +6,15 @@ namespace Smong {
 	class SMONGINE_API MouseMoveEvent : public Event
 	{
 	public:
-		MouseMoveEvent(float x, float y) : mouseX(x), mouseY(y) {}
+		MouseMoveEvent(float x, float y) : xpos(x), ypos(y) {}
 
-		inline float GetX() const { return mouseX; }
-		inline float GetY() const { return mouseY; }
+		inline float GetX() const { return xpos; }
+		inline float GetY() const { return ypos; }
 
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "MouseMoveEvent: " << mouseX << ", " << mouseY;
+			ss << "MouseMoveEvent: " << xpos << ", " << ypos;
 			return ss.str();
 		}
 
@@ -22,23 +22,23 @@ namespace Smong {
 		EVENT_CLASS_CATEGORY(MouseEventCategory | InputEventCategory);
 
 	private:
-		float mouseX, mouseY;
+		float xpos, ypos;
 	};
 
 	class SMONGINE_API MouseScrollEvent : public Event
 	{
 	private:
-		float xOffset, yOffset;
+		float xoff, yoff;
 	public:
-		MouseScrollEvent(float xOff, float yOff) : xOffset(xOff), yOffset(yOff) {}
+		MouseScrollEvent(float xoff, float yoff) : xoff(xoff), yoff(yoff) {}
 
-		inline float GetXOffset() const { return xOffset; }
-		inline float GetYOffset() const { return yOffset; }
+		inline float GetXOffset() const { return xoff; }
+		inline float GetYOffset() const { return yoff; }
 
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "MouseScrollEvent: " << xOffset << ", " << yOffset;
+			ss << "MouseScrollEvent: " << xoff << ", " << yoff;
 			return ss.str();
 		}
 

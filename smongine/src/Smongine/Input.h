@@ -6,11 +6,11 @@ namespace Smong {
 	class SMONGINE_API Input
 	{
 	public:
-		static bool IsKeyPressed(int keycode) { return instance->IsKeyPressedImpl(keycode);  }
+		inline static bool IsKeyPressed(int keycode);
 
-	protected:
-		virtual bool IsKeyPressedImpl(int keycode) = 0;
-	private:
-		static Input* instance;
+		inline static bool IsMouseBtnPressed(int button);
+		inline static std::pair<float, float> GetMousePos();
+		inline static float GetMouseX();
+		inline static float GetMouseY();
 	};
 }

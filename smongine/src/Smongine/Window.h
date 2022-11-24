@@ -10,12 +10,12 @@ namespace Smong {
 	struct WindowProps
 	{
 		std::string title;
-		unsigned int width;
-		unsigned int height;
+		uint32_t width;
+		uint32_t height;
 
 		WindowProps(const std::string& title = "Smongine",
-			unsigned int width = 640,
-			unsigned int height = 480)
+			uint32_t width = 640,
+			uint32_t height = 480)
 		{
 			this->title = title;
 			this->width = width;
@@ -33,12 +33,14 @@ namespace Smong {
 
 		virtual void Update() = 0;
 
-		virtual unsigned int GetWidth() const = 0;
-		virtual unsigned int GetHeight() const = 0;
+		virtual uint32_t GetWidth() const = 0;
+		virtual uint32_t GetHeight() const = 0;
 
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
+
+		virtual void* GetNativeWindow() const = 0;
 
 		static Window* Create(const WindowProps& props = WindowProps());
 	};

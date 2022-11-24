@@ -63,6 +63,10 @@
     </ClInclude>
     <ClInclude Include="src\smpch.h" />
     <ClInclude Include="src\Smongine\Platform\OpenGL\ImGuiOpenGLRenderer.h" />
+    <ClInclude Include="src\Smongine\Input.h" />
+    <ClInclude Include="src\Smongine\Renderer\Renderer.h" />
+    <ClInclude Include="src\Smongine\Renderer\Shader.h" />
+    <ClInclude Include="src\Smongine\KeyCodes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Smongine\App.cpp">
@@ -85,5 +89,8 @@
     </ClCompile>
     <ClCompile Include="src\smpch.cpp" />
     <ClCompile Include="src\Smongine\Platform\OpenGL\ImGuiOpenGLRenderer.cpp" />
+    <ClCompile Include="src\Smongine\Platform\Windows\WinInput.cpp" />
+    <ClCompile Include="src\Smongine\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\Smongine\Renderer\Shader.cpp" />
   </ItemGroup>
 </Project>

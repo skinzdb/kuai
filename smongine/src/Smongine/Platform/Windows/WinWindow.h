@@ -24,6 +24,7 @@ namespace Smong {
 		virtual void SetVSync(bool enabled) override;
 		virtual bool IsVSync() const override;
 
+		virtual void* GetNativeWindow() const { return window; }
 	private:
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
@@ -33,7 +34,7 @@ namespace Smong {
 		struct WindowData
 		{
 			std::string title;
-			unsigned int width, height;
+			uint32_t width, height;
 			bool vSync;
 
 			EventCallbackFn eventCallback;

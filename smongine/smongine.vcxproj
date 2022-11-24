@@ -152,6 +152,9 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Smongine\KeyCodes.h" />
+    <ClInclude Include="src\Smongine\Renderer\Shader.h" />
+    <ClInclude Include="src\Smongine\Renderer\Renderer.h" />
     <ClInclude Include="src\Smongine.h" />
     <ClInclude Include="src\Smongine\App.h" />
     <ClInclude Include="src\Smongine\Core.h" />
@@ -161,6 +164,7 @@
     <ClInclude Include="src\Smongine\Events\KeyEvent.h" />
     <ClInclude Include="src\Smongine\Events\MouseEvent.h" />
     <ClInclude Include="src\Smongine\ImGui\ImGuiLayer.h" />
+    <ClInclude Include="src\Smongine\Input.h" />
     <ClInclude Include="src\Smongine\Layer.h" />
     <ClInclude Include="src\Smongine\LayerStack.h" />
     <ClInclude Include="src\Smongine\Log.h" />
@@ -170,6 +174,8 @@
     <ClInclude Include="src\smpch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Smongine\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Smongine\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Smongine\App.cpp" />
     <ClCompile Include="src\Smongine\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Smongine\Layer.cpp" />
@@ -180,6 +186,7 @@
     <ClCompile Include="src\smpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Smongine\Platform\Windows\WinInput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vendor\Glad\Glad.vcxproj">
