@@ -4,10 +4,10 @@ namespace Smong {
 	class SMONGINE_API Renderer
 	{
 	public:
-		void Init();
-		void Cleanup();
+		static void Init();
+		static void Cleanup();
 
-		void Render();
+		static void Render();
 	};
 }
 

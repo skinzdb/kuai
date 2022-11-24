@@ -6,9 +6,9 @@ namespace Smong {
 	class SMONGINE_API Shader
 	{
 	public:
+		Shader(const char* vertSrc, const char* fragSrc);
 		~Shader();
 
-		std::shared_ptr<Shader> Create(const char* vertSrc, const char* fragSrc);
 		void CreateUniform(std::string name);
 
 		void SetUniform(std::string name, int val);

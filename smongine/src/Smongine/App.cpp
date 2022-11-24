@@ -2,6 +2,8 @@
 #include "App.h"
 #include "Log.h"
 
+#include "Smongine/Renderer/Renderer.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -16,6 +18,8 @@ namespace Smong {
 		window = std::unique_ptr<Window>(Window::Create());
 		window->SetEventCallback(std::bind(&App::OnEvent, this, std::placeholders::_1));
 		running = true;
+
+		Renderer::Init();
 	}
 
 	App::~App() {
@@ -29,6 +33,8 @@ namespace Smong {
 
 			for (Layer* layer : layerStack)
 				layer->Update();
+
+			Renderer::Render();
 
 			window->Update();
 		}

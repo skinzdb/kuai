@@ -9,7 +9,7 @@ public:
 
 	void Update() override
 	{
-		SM_INFO("BaseLayer::Update");
+		
 	}
 
 	void OnEvent(Smong::Event& event) override
