@@ -3,8 +3,8 @@
 #include "Core.h"
 
 #include "LayerStack.h"
-#include "Events/Event.h"
-#include "Events/AppEvent.h"
+#include "Smongine/Events/Event.h"
+#include "Smongine/Events/AppEvent.h"
 #include "Window.h"
 
 namespace Smong {

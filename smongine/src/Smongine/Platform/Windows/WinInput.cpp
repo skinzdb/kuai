@@ -1,7 +1,7 @@
 #include "smpch.h"
-#include "Smongine/Input.h"
+#include "Smongine/Core/Input.h"
 
-#include "Smongine/App.h"
+#include "Smongine/Core/App.h"
 #include <GLFW/glfw3.h>
 
 namespace Smong {

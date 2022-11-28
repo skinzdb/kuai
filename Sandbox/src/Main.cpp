@@ -23,7 +23,6 @@ class Sandbox : public Smong::App {
 public:
 	Sandbox() {
 		PushLayer(new BaseLayer());
-		PushOverlay(new Smong::ImGuiLayer());
 	}
 
 	~Sandbox() {
@@ -35,3 +34,4 @@ Smong::App* Smong::CreateApp()
 {
 	return new Sandbox();
 }
+

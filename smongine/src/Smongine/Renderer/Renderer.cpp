@@ -1,38 +1,48 @@
 #include "smpch.h"
 #include "Renderer.h"
 
+#include "Smongine/Util/FileUtil.h"
 #include "Shader.h"
+#include "Mesh.h"
+#include "Texture.h"
 
 #include <glad/glad.h>
+#include <stb_image.h>
 
-float vertices[] = {
-     0.5f,  0.5f, 0.0f,  // top right
-     0.5f, -0.5f, 0.0f,  // bottom right
-    -0.5f, -0.5f, 0.0f,  // bottom left
-    -0.5f,  0.5f, 0.0f   // top left 
+float vertices[] =
+{
+    -1, -1, -1,
+    1, -1, -1,
+    1, 1, -1,
+    -1, 1, -1,
+    -1, -1, 1,
+    1, -1, 1,
+    1, 1, 1,
+    -1, 1, 1
 };
-unsigned int indices[] = {  // note that we start from 0
-    0, 1, 3,   // first triangle
-    1, 2, 3    // second triangle
+
+float texCoords[] =
+{
+    0, 0,
+    1, 0,
+    1, 1,
+    0, 1
 };
 
-const char* vertShaderSrc = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-const char* fragShaderSrc = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\n\0";
-
-unsigned int VBO, EBO, VAO;
+uint32_t indices[] =
+{
+    0, 1, 3, 3, 1, 2,
+    1, 5, 2, 2, 5, 6,
+    5, 4, 6, 6, 4, 7,
+    4, 0, 7, 7, 0, 3,
+    3, 2, 7, 7, 2, 6,
+    4, 5, 0, 0, 5, 1
+};
 
 namespace Smong {
-    std::shared_ptr<Shader> shader;
+    Mesh* mesh;
+    Texture* texture;
+    Shader* shader;
 
     void Renderer::Init()
     {
@@ -40,39 +50,39 @@ namespace Smong {
         //glEnable(GL_CULL_FACE);
         //glCullFace(GL_BACK);
 
-        //glEnable(GL_DEPTH_TEST);
+        glEnable(GL_DEPTH_TEST);
 
-        shader = std::make_shared<Shader>(vertShaderSrc, fragShaderSrc);
+        std::string vertShaderSrc = FileUtil::Load("C:/Users/David/source/repos/smongine/Smongine/src/Smongine/shader.vert");
+        std::string fragShaderSrc = FileUtil::Load("C:/Users/David/source/repos/smongine/Smongine/src/Smongine/shader.frag");
 
-        glGenBuffers(1, &VBO);
-        glGenBuffers(1, &EBO);
-        glGenVertexArrays(1, &VAO);
+        shader = new Shader(vertShaderSrc.c_str(), fragShaderSrc.c_str());
 
-        glBindVertexArray(VAO);
+        texture = new Texture("C:/Users/David/Pictures/adam_4.png");
 
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-     
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+        mesh = new Mesh(vertices, 12, texCoords, 8, indices, 6);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-        glEnableVertexAttribArray(0);
+        shader->CreateUniform("texSampler");
     }
 
     void Renderer::Cleanup()
     {
+        delete texture;
+        delete mesh;
+        delete shader;
     }
 
     void Renderer::Render()
     {
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         shader->Bind();
+        shader->SetUniform("texSampler", 0);
 
-        glBindVertexArray(VAO);
+        texture->Bind();
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-
+        mesh->Render();
+      
         shader->Unbind();
     }
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Smongine/Core.h"
+#include "Smongine/Core/Core.h"
 
 namespace Smong {
 	class SMONGINE_API Input

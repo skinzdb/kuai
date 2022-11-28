@@ -11,7 +11,8 @@ namespace Smong {
 
 	App* App::instance = nullptr;
 
-	App::App() {
+	App::App() 
+	{
 		SM_CORE_ASSERT(!instance, "Application already exists");
 		instance = this;
 
@@ -27,10 +28,8 @@ namespace Smong {
 	}
 
 	void App::Run() {
-		while (running) {
-			glClearColor(1, 0, 0, 1);
-			glClear(GL_COLOR_BUFFER_BIT);
-
+		while (running) 
+		{
 			for (Layer* layer : layerStack)
 				layer->Update();
 
@@ -38,6 +37,7 @@ namespace Smong {
 
 			window->Update();
 		}
+		Renderer::Cleanup();
 	}
 
 	void App::OnEvent(Event& e)

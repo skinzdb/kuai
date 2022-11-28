@@ -2,7 +2,7 @@
 
 #include <deque>
 
-#include "Smongine/Core.h"
+#include "Smongine/Core/Core.h"
 #include "Layer.h"
 
 namespace Smong {

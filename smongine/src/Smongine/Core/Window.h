@@ -2,7 +2,7 @@
 
 #include "smpch.h"
 
-#include "Smongine/Core.h"
+#include "Smongine/Core/Core.h"
 #include "Smongine/Events/Event.h"
 
 namespace Smong {
@@ -13,7 +13,7 @@ namespace Smong {
 		uint32_t width;
 		uint32_t height;
 
-		WindowProps(const std::string& title = "Smongine",
+		WindowProps(const std::string& title = "Demo",
 			uint32_t width = 640,
 			uint32_t height = 480)
 		{

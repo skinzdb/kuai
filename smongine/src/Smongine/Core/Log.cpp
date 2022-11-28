@@ -11,7 +11,7 @@ namespace Smong {
 	void Log::Init()
 	{
 		spdlog::set_pattern("%^[%T] %n: %v%$");
-		coreLogger = spdlog::stdout_color_mt("SMONGINE");
+		coreLogger = spdlog::stdout_color_mt("ENGINE");
 		coreLogger->set_level(spdlog::level::trace);
 
 		clientLogger = spdlog::stdout_color_mt("APP");

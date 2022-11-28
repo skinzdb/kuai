@@ -1,6 +1,6 @@
 #include "smpch.h"
 #include "ImGuiLayer.h"
-#include "Smongine/App.h"
+#include "Smongine/Core/App.h"
 
 #include "Smongine/Platform/OpenGL/ImGuiOpenGLRenderer.h"
 #include "backends/imgui_impl_glfw.h"

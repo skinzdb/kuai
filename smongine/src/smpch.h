@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <utility>
 #include <algorithm>
@@ -10,7 +11,7 @@
 #include <sstream>
 #include <vector>
 
-#include "Smongine/Log.h"
+#include "Smongine/Core/Log.h"
 
 #ifdef SM_PLATFORM_WINDOWS
 	#include <Windows.h>

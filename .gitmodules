@@ -4,3 +4,6 @@
 [submodule "Smongine/vendor/ImGui"]
 	path = Smongine/vendor/ImGui
 	url = https://github.com/TheCherno/imgui.git
+[submodule "Smongine/vendor/glm"]
+	path = Smongine/vendor/glm
+	url = https://github.com/g-truc/glm

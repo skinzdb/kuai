@@ -2,7 +2,7 @@
 
 #include "smpch.h"
 
-#include "Smongine/Core.h"
+#include "Smongine/Core/Core.h"
 
 namespace Smong {
 

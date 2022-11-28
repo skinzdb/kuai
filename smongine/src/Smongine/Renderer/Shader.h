@@ -2,6 +2,8 @@
 
 #include "smpch.h"
 
+#include "glm/mat4x4.hpp"
+
 namespace Smong {
 	class SMONGINE_API Shader
 	{
@@ -13,7 +15,11 @@ namespace Smong {
 
 		void SetUniform(std::string name, int val);
 		void SetUniform(std::string name, float val);
-
+		void SetUniform(std::string name, glm::vec2 val);
+		void SetUniform(std::string name, glm::vec3 val);
+		void SetUniform(std::string name, glm::vec4 val);
+		void SetUniform(std::string name, glm::mat4 val);
+		
 		void Bind();
 		void Unbind();
 	private:
