@@ -95,6 +95,9 @@
       <Filter>Smongine\Util</Filter>
     </ClInclude>
     <ClInclude Include="src\smpch.h" />
+    <ClInclude Include="src\Smongine\Renderer\Transformation.h" />
+    <ClInclude Include="src\Smongine\Renderer\Camera.h" />
+    <ClInclude Include="src\Smongine\Renderer\Object3D.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Smongine\Core\App.cpp">
@@ -138,6 +141,8 @@
     </ClCompile>
     <ClCompile Include="src\smpch.cpp" />
     <ClCompile Include="vendor\stb_image\stb_image.cpp" />
+    <ClCompile Include="src\Smongine\Renderer\Transformation.cpp" />
+    <ClCompile Include="src\Smongine\Renderer\Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Smongine\shader.frag" />

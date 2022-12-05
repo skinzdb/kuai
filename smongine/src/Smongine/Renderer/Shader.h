@@ -15,10 +15,10 @@ namespace Smong {
 
 		void SetUniform(std::string name, int val);
 		void SetUniform(std::string name, float val);
-		void SetUniform(std::string name, glm::vec2 val);
-		void SetUniform(std::string name, glm::vec3 val);
-		void SetUniform(std::string name, glm::vec4 val);
-		void SetUniform(std::string name, glm::mat4 val);
+		void SetUniform(std::string name, glm::vec2& val);
+		void SetUniform(std::string name, glm::vec3& val);
+		void SetUniform(std::string name, glm::vec4& val);
+		void SetUniform(std::string name, glm::mat4& val);
 		
 		void Bind();
 		void Unbind();
