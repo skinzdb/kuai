@@ -5,6 +5,8 @@
 #include "Shader.h"
 #include "Mesh.h"
 #include "Texture.h"
+#include "Camera.h"
+#include "Smongine/Core/App.h"
 
 #include <glad/glad.h>
 #include <stb_image.h>
@@ -43,6 +45,7 @@ namespace Smong {
     Mesh* mesh;
     Texture* texture;
     Shader* shader;
+    Camera* cam;
 
     void Renderer::Init()
     {
@@ -57,11 +60,25 @@ namespace Smong {
 
         shader = new Shader(vertShaderSrc.c_str(), fragShaderSrc.c_str());
 
-        texture = new Texture("C:/Users/David/Pictures/adam_4.png");
+        texture = new Texture("C:/Users/David/Pictures/cry.jpg");
 
         mesh = new Mesh(vertices, 12, texCoords, 8, indices, 6);
 
+        cam = new Camera(75.0f, 
+            App::Get().GetWindow().GetWidth(), 
+            App::Get().GetWindow().GetHeight(), 
+            0.1f, 
+            100.0f
+        );
+
+        shader->Bind();
+
         shader->CreateUniform("texSampler");
+        shader->SetUniform("texSampler", 0);
+
+        shader->CreateUniform("projectionMatrix");
+        shader->CreateUniform("viewMatrix");
+        shader->CreateUniform("modelMatrix");
     }
 
     void Renderer::Cleanup()
@@ -69,6 +86,7 @@ namespace Smong {
         delete texture;
         delete mesh;
         delete shader;
+        delete cam;
     }
 
     void Renderer::Render()
@@ -77,7 +95,10 @@ namespace Smong {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader->Bind();
-        shader->SetUniform("texSampler", 0);
+
+        shader->SetUniform("projectionMatrix", cam->GetProjectionMatrix());
+        shader->SetUniform("viewMatrix", cam->GetViewMatrix());
+        shader->SetUniform("modelMatrix", glm::identity<glm::mat4>());
 
         texture->Bind();
 

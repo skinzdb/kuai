@@ -7,7 +7,7 @@ namespace Smong {
 	Camera::Camera(float fov, float width, float height, float zNear, float zFar) :
 		fov(fov), width(width), height(height), zNear(zNear), zFar(zFar)
 	{
-		viewMatrix = glm::mat4();
+		viewMatrix = glm::mat4(1.0f);
 		UpdateViewMatrix();
 		projectionMatrix = glm::perspective(
 			glm::radians(fov), 
@@ -51,7 +51,7 @@ namespace Smong {
 	// View matrix: first translate by negated position, then rotate by negated rotation
 	void Camera::UpdateViewMatrix()
 	{
-		viewMatrix = glm::translate(viewMatrix, pos) * glm::toMat4(GetOrientation()); // Rotate first then translate, aka TR
+		viewMatrix = glm::translate(viewMatrix, pos) * glm::toMat4(GetOrientation()); // Rotate then translate, aka TR
 		viewMatrix = glm::inverse(viewMatrix); // Calculate inverse to get correct operation, aka (TR)^-1 = R^-1T^-1
 	}
 

@@ -14,7 +14,7 @@ namespace Smong {
 
 		inline virtual glm::vec3& GetRot() { return rot; }
 		inline virtual glm::quat& GetOrientation() { return glm::quat(rot); }
-		inline virtual void SetRot(float x, float y, float z) { rot = glm::vec3(x, y, z); }
+		inline virtual void SetRot(float x, float y, float z) { rot = glm::vec3(glm::radians(x), glm::radians(y), glm::radians(z)); }
 
 		inline virtual glm::vec3& GetScale() { return scale; }
 		inline virtual void SetScale(float x, float y, float z) { scale = glm::vec3(x, y, z); }
