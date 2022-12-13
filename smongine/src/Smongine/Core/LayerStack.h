@@ -1,7 +1,5 @@
 #pragma once
 
-#include <deque>
-
 #include "Smongine/Core/Core.h"
 #include "Layer.h"
 
@@ -17,13 +15,12 @@ namespace Smong {
 		void PopLayer(Layer* layer);
 		void PopOverlay(Layer* overlay);
 
-		std::deque<Layer*>::iterator begin() { return layers.begin(); }
-		std::deque<Layer*>::iterator end() { return layers.end(); }
-
+		std::vector<Layer*>::iterator begin() { return layers.begin(); }
+		std::vector<Layer*>::iterator end() { return layers.end(); }
 
 	private:
-		std::deque<Layer*> layers;
-		std::deque<Layer*>::iterator layerInsert;
+		std::vector<Layer*> layers;
+		std::vector<Layer*>::iterator layerInsert;
 	};
 }
 
