@@ -5,8 +5,9 @@
 #include "Shader.h"
 #include "Mesh.h"
 #include "Texture.h"
-#include "Camera.h"
+#include "Smongine/Components/Components.h"
 #include "Smongine/Core/App.h"
+#include "Smongine/Components/Scene.h"
 
 #include <glad/glad.h>
 #include <stb_image.h>
@@ -46,23 +47,26 @@ namespace Smong {
     Texture* texture;
     Shader* shader;
     Camera* cam;
+    Scene* scene;
 
     void Renderer::Init()
     {
-        //// Don't draw faces that are pointing away from the camera
-        //glEnable(GL_CULL_FACE);
-        //glCullFace(GL_BACK);
+        // Don't draw faces that are pointing away from the camera
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
 
         glEnable(GL_DEPTH_TEST);
 
         std::string vertShaderSrc = FileUtil::Load("C:/Users/David/source/repos/smongine/Smongine/src/Smongine/shader.vert");
         std::string fragShaderSrc = FileUtil::Load("C:/Users/David/source/repos/smongine/Smongine/src/Smongine/shader.frag");
 
+        scene = new Scene();
+
         shader = new Shader(vertShaderSrc.c_str(), fragShaderSrc.c_str());
 
         texture = new Texture("C:/Users/David/Pictures/cry.jpg");
 
-        mesh = new Mesh(vertices, 12, texCoords, 8, indices, 6);
+        //mesh = new Mesh(vertices, 12, texCoords, 8, indices, 6);
 
         cam = new Camera(75.0f, 
             App::Get().GetWindow().GetWidth(), 
@@ -87,6 +91,7 @@ namespace Smong {
         delete mesh;
         delete shader;
         delete cam;
+        delete scene;
     }
 
     void Renderer::Render()
@@ -96,13 +101,16 @@ namespace Smong {
 
         shader->Bind();
 
+        // cam->Translate(0, 0, 0.001f);
+
         shader->SetUniform("projectionMatrix", cam->GetProjectionMatrix());
         shader->SetUniform("viewMatrix", cam->GetViewMatrix());
-        shader->SetUniform("modelMatrix", glm::identity<glm::mat4>());
+        shader->SetUniform("modelMatrix", glm::mat4(1.0f));
 
+      
         texture->Bind();
 
-        mesh->Render();
+        //mesh->Render();
       
         shader->Unbind();
     }

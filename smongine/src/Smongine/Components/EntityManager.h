@@ -12,8 +12,6 @@ namespace Smong {
 	using EntityID = uint32_t;
 	using ComponentMask = std::bitset<MAX_COMPONENTS>;
 
-	const 
-
 	/**
 	* Manages creation and deletion of all entities (game objects)
 	* Entities are stored as a unique integer ID

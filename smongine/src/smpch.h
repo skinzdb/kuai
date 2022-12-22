@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <bitset>
 
 #include "Smongine/Core/Log.h"
 

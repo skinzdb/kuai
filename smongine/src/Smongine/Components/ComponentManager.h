@@ -25,7 +25,7 @@ namespace Smong {
 		template <typename ...Args>
 		void Insert(EntityID entity, Args&&... args)
 		{
-			assert(entityToIndex.find(entity) == entityToIndex.end(), "Added duplicate component to entity");
+			SM_CORE_ASSERT(entityToIndex.find(entity) == entityToIndex.end(), "Added duplicate component to entity");
 
 			entityToIndex[entity] = currentComponents;
 			indexToEntity[currentComponents] = entity;
@@ -35,7 +35,7 @@ namespace Smong {
 
 		void Remove(EntityID entity)
 		{
-			assert(entityToIndex.find(entity) != entityToIndex.end(), "Removing component that does not exist");
+			SM_CORE_ASSERT(entityToIndex.find(entity) != entityToIndex.end(), "Removing component that does not exist");
 
 			// Update mappings s.t. entity of last component in array points to removed index and vice-versa
 			size_t removeIndex = entityToIndex[entity];
@@ -83,9 +83,9 @@ namespace Smong {
 		template<typename T>
 		void RegisterComponent()
 		{
-			SM_CORE_ASSERT(componentTypes.find(typeName) == componentTypes.end(), "Registering a component type more than once")
-
 			const char* typeName = typeid(T).name();
+
+			SM_CORE_ASSERT(componentTypes.find(typeName) == componentTypes.end(), "Registering a component type more than once")
 
 			componentTypes.insert({ typeName, nextComponentType++ });	// Increment for next component
 			componentContainers.insert({ typeName, std::make_shared<ComponentContainer<T>>() });

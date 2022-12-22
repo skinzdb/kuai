@@ -3,7 +3,7 @@
 #include "smpch.h"
 
 #include "EntityComponentSystem.h"
-#include "Component.h"
+#include "Components.h"
 
 namespace Smong {
 	/**
@@ -17,9 +17,9 @@ namespace Smong {
 
 		Entity(EntityComponentSystem& ECS) : 
 			ECS(ECS),
-			id(ECS.CreateEntity())
+			id(ECS.CreateEntity()),
+			transform(AddComponent<Transform>()) // Every base object will have a transform component
 		{
-			AddComponent<Transform>();
 		}
 
 		template<class T, typename... Args>
@@ -34,13 +34,18 @@ namespace Smong {
 			return ECS.GetComponent<T>(id);
 		}
 
+		Transform& GetTransform()
+		{
+			return transform;
+		}
+
 		template<class T>
 		void RemoveComponent()
 		{
 			ECS.RemoveComponent(id);
 		}
 
-		EntityID GetID() const
+		EntityID GetId() const
 		{
 			return id;
 		}
@@ -53,5 +58,7 @@ namespace Smong {
 	private:
 		EntityID id;
 		EntityComponentSystem& ECS;
+
+		Transform& transform;
 	};
 }

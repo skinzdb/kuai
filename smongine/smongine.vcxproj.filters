@@ -95,9 +95,17 @@
       <Filter>Smongine\Util</Filter>
     </ClInclude>
     <ClInclude Include="src\smpch.h" />
-    <ClInclude Include="src\Smongine\Renderer\Transformation.h" />
-    <ClInclude Include="src\Smongine\Renderer\Camera.h" />
-    <ClInclude Include="src\Smongine\Renderer\Object3D.h" />
+    <ClInclude Include="src\Smongine\Components\GameObj.h" />
+    <ClInclude Include="src\Smongine\Core\Timer.h" />
+    <ClInclude Include="src\Smongine\Components\Components.h" />
+    <ClInclude Include="src\Smongine\Components\EntityManager.h" />
+    <ClInclude Include="src\Smongine\Components\ComponentManager.h" />
+    <ClInclude Include="src\Smongine\Components\System.h" />
+    <ClInclude Include="src\Smongine\Components\SystemManager.h" />
+    <ClInclude Include="src\Smongine\Core\MouseBtnCodes.h" />
+    <ClInclude Include="src\Smongine\Components\Entity.h" />
+    <ClInclude Include="src\Smongine\Components\EntityComponentSystem.h" />
+    <ClInclude Include="src\Smongine\Components\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Smongine\Core\App.cpp">
@@ -141,8 +149,7 @@
     </ClCompile>
     <ClCompile Include="src\smpch.cpp" />
     <ClCompile Include="vendor\stb_image\stb_image.cpp" />
-    <ClCompile Include="src\Smongine\Renderer\Transformation.cpp" />
-    <ClCompile Include="src\Smongine\Renderer\Camera.cpp" />
+    <ClCompile Include="src\Smongine\Components\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Smongine\shader.frag" />
