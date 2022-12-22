@@ -56,7 +56,7 @@ namespace Smong {
 		{
 			if (event.GetEventType() == T::GetStaticType()) // Check if passed event type matches event type of template argument
 			{ 
-				event.handled = func(*(T*)&event); // Call the function with that event as its argument
+				event.handled |= func(*(T*)&event); // Call the function with that event as its argument
 				return true; // Indicate the event has been handled
 			}
 			return false;
