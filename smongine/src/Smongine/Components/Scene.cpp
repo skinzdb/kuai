@@ -9,9 +9,6 @@ namespace Smong {
 
 		ECS->RegisterComponent<Transform>();
 		ECS->RegisterComponent<Camera>();
-
-		ECS->RegisterSystem<PhysicsSystem>();
-		ECS->RegisterSystem<CameraSystem>();
 	}
 
 	Scene::~Scene()
@@ -24,7 +21,7 @@ namespace Smong {
 
 	Entity* Scene::CreateEntity()
 	{
-		Entity* entity = new Entity(*ECS);
+		Entity* entity = new Entity(ECS);
 		entityMap.insert({ entity->GetId(), entity });
 		return entity;
 	}

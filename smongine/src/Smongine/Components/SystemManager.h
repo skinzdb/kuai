@@ -18,7 +18,7 @@ namespace Smong {
 		{
 			const char* typeName = typeid(T).name();
 
-			assert(systems.find(typeName) == systems.end(), "Registering a system more than once");
+			SM_CORE_ASSERT(systems.find(typeName) == systems.end(), "Registering a system more than once");
 			
 			auto system = std::make_shared<T>();
 			systems.insert({ typeName, system });
@@ -30,7 +30,7 @@ namespace Smong {
 		{
 			const char* typeName = typeid(T).name();
 
-			assert(systems.find(typeName) != systems.end(), "System not registered");
+			SM_CORE_ASSERT(systems.find(typeName) != systems.end(), "System not registered");
 
 			systemMasks.insert({ typeName, componentMask });
 		}

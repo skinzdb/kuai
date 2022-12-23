@@ -36,7 +36,7 @@ namespace Smong {
 
 			componentMasks[entity] = 0;
 
-			entityNo++;
+			return entityNo++;
 		}
 
 		void DestroyEntity(EntityID entity)

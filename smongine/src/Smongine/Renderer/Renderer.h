@@ -1,7 +1,7 @@
 #pragma once
 
 namespace Smong {
-	class SMONGINE_API Renderer
+	class Renderer
 	{
 	public:
 		static void Init();

@@ -24,7 +24,7 @@ namespace Smong {
 	};
 
 	// Interface for representing a desktop window
-	class SMONGINE_API Window
+	class Window
 	{
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;

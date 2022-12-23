@@ -3,7 +3,7 @@
 #include "Smongine/Core/Core.h"
 
 namespace Smong {
-	class SMONGINE_API Input
+	class Input
 	{
 	public:
 		inline static bool IsKeyPressed(int keycode);

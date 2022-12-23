@@ -4,7 +4,7 @@
 #include "Smongine/Events/Event.h"
 
 namespace Smong {
-	class SMONGINE_API Layer
+	class Layer
 	{
 	public:
 		Layer(const std::string& name = "Layer");

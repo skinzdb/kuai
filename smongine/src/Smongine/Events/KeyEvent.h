@@ -4,7 +4,7 @@
 
 namespace Smong {
 
-	class SMONGINE_API KeyEvent : public Event
+	class KeyEvent : public Event
 	{
 	public:
 		inline int GetKeyCode() const { return keycode; }
@@ -16,7 +16,7 @@ namespace Smong {
 		int keycode;
 	};
 
-	class SMONGINE_API KeyPressEvent : public KeyEvent
+	class KeyPressEvent : public KeyEvent
 	{
 	private:
 		int repeatCount;
@@ -35,7 +35,7 @@ namespace Smong {
 		EVENT_CLASS_TYPE(EventType::KeyPress)
 	};
 
-	class SMONGINE_API KeyReleaseEvent : public KeyEvent
+	class KeyReleaseEvent : public KeyEvent
 	{
 	public:
 		KeyReleaseEvent(int keycode) : KeyEvent(keycode) {}

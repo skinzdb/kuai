@@ -29,7 +29,7 @@ namespace Smong {
 
 			entityToIndex[entity] = currentComponents;
 			indexToEntity[currentComponents] = entity;
-			components.emplace_back(args);
+			components.emplace_back(args...);
 			currentComponents++;
 		}
 
@@ -106,7 +106,7 @@ namespace Smong {
 		template<typename T>
 		T& GetComponent(EntityID entity)
 		{
-			GetComponentContainer<T>()->Get(entity);
+			return GetComponentContainer<T>()->Get(entity);
 		}
 
 		template<typename T>
@@ -148,7 +148,7 @@ namespace Smong {
 		{
 			const char* typeName = typeid(T).name();
 
-			assert(componentTypes.find(typeName) != componentTypes.end(), "Component not registered");
+			SM_CORE_ASSERT(componentTypes.find(typeName) != componentTypes.end(), "Component not registered");
 
 			return std::static_pointer_cast<ComponentContainer<T>>(componentContainers[typeName]);
 		}

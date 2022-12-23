@@ -3,7 +3,7 @@
 #include "Event.h"
 
 namespace Smong {
-	class SMONGINE_API MouseMoveEvent : public Event
+	class MouseMoveEvent : public Event
 	{
 	public:
 		MouseMoveEvent(float x, float y) : xpos(x), ypos(y) {}
@@ -25,7 +25,7 @@ namespace Smong {
 		float xpos, ypos;
 	};
 
-	class SMONGINE_API MouseScrollEvent : public Event
+	class MouseScrollEvent : public Event
 	{
 	private:
 		float xoff, yoff;
@@ -47,7 +47,7 @@ namespace Smong {
 	};
 
 
-	class SMONGINE_API MouseBtnEvent : public Event
+	class MouseBtnEvent : public Event
 	{
 	public:
 		inline int GetButton() const { return button; }
@@ -60,7 +60,7 @@ namespace Smong {
 	};
 
 
-	class SMONGINE_API MouseBtnPressEvent : public MouseBtnEvent
+	class MouseBtnPressEvent : public MouseBtnEvent
 	{
 	public:
 		MouseBtnPressEvent(int button) : MouseBtnEvent(button) {}
@@ -75,7 +75,7 @@ namespace Smong {
 		EVENT_CLASS_TYPE(EventType::MouseBtnPress);
 	};
 
-	class SMONGINE_API MouseBtnReleaseEvent : public MouseBtnEvent
+	class MouseBtnReleaseEvent : public MouseBtnEvent
 	{
 	public:
 		MouseBtnReleaseEvent(int button) : MouseBtnEvent(button) {}

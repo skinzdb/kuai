@@ -9,7 +9,7 @@
 #include "Timer.h"
 
 namespace Smong {
-	class SMONGINE_API App {
+	class App {
 	public:
 		App();
 		virtual ~App();

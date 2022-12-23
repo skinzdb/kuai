@@ -45,7 +45,7 @@ namespace Smong {
 		
 	};*/
 
-	class SMONGINE_API Camera {
+	class Camera {
 	public:
 		enum class ProjectionType
 		{

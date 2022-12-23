@@ -1,158 +1,201 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Smongine">
-      <UniqueIdentifier>{A59A84E6-9167-DFF1-BA80-CD99A6AC1480}</UniqueIdentifier>
+    <Filter Include="src">
+      <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Smongine\Core">
-      <UniqueIdentifier>{1D2ED157-89EE-4C8E-5229-960BBEA8916A}</UniqueIdentifier>
+    <Filter Include="src\Smongine">
+      <UniqueIdentifier>{9C9DFE16-8800-8EBB-3186-C6711DC8593E}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Smongine\Events">
-      <UniqueIdentifier>{E93AF795-55C6-645A-5ED7-E74ECAE1C05A}</UniqueIdentifier>
+    <Filter Include="src\Smongine\Components">
+      <UniqueIdentifier>{3149FC6D-9D80-4405-A68A-A82812416BFE}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Smongine\ImGui">
-      <UniqueIdentifier>{8FB76152-7B85-5558-6419-C67E508631BD}</UniqueIdentifier>
+    <Filter Include="src\Smongine\Core">
+      <UniqueIdentifier>{74A306CF-E0B9-0465-2931-90869586D5EC}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Smongine\Platform">
-      <UniqueIdentifier>{99A0CF0C-05B7-CDA2-4E2E-59C4BA839E2A}</UniqueIdentifier>
+    <Filter Include="src\Smongine\Events">
+      <UniqueIdentifier>{00625FB0-6CC3-3CBE-F530-83706191737D}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Smongine\Platform\OpenGL">
-      <UniqueIdentifier>{AD83B0E8-99A8-FF68-C2F3-E4F8AE77FE86}</UniqueIdentifier>
+    <Filter Include="src\Smongine\ImGui">
+      <UniqueIdentifier>{C6D745B0-B2BB-0606-1B1C-0159071FF187}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Smongine\Platform\Windows">
-      <UniqueIdentifier>{D3D3DC56-3F96-10E1-8846-9F6DF447E9BE}</UniqueIdentifier>
+    <Filter Include="src\Smongine\Platform">
+      <UniqueIdentifier>{70E9DD61-DC55-995C-A549-31BA1175BBC4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Smongine\Renderer">
-      <UniqueIdentifier>{EBA7ACE7-57BE-AA7D-A035-369F0C8B7B05}</UniqueIdentifier>
+    <Filter Include="src\Smongine\Platform\OpenGL">
+      <UniqueIdentifier>{A4942731-904F-17DD-3907-902725A1616D}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Smongine\Util">
-      <UniqueIdentifier>{1221DB57-7EE1-568E-471C-A00BB39B9B6A}</UniqueIdentifier>
+    <Filter Include="src\Smongine\Platform\Windows">
+      <UniqueIdentifier>{AA0336AE-161C-1DD8-DFC8-AC714BA0B171}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Smongine\Renderer">
+      <UniqueIdentifier>{C2F0BA3C-2E5D-7637-F750-0E95637C989F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Smongine\Util">
+      <UniqueIdentifier>{699610CF-D5AC-0E65-1E24-9A868A79DFEC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor">
+      <UniqueIdentifier>{B3738122-9F15-ACF8-88D0-BF4C74113349}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\stb_image">
+      <UniqueIdentifier>{0DA0BA59-F998-D9AB-22CB-BE300E23B9B7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Smongine.h" />
+    <ClInclude Include="src\Smongine.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Components\ComponentManager.h">
+      <Filter>src\Smongine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Components\Components.h">
+      <Filter>src\Smongine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Components\Entity.h">
+      <Filter>src\Smongine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Components\EntityComponentSystem.h">
+      <Filter>src\Smongine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Components\EntityManager.h">
+      <Filter>src\Smongine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Components\GameObj.h">
+      <Filter>src\Smongine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Components\Scene.h">
+      <Filter>src\Smongine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Components\System.h">
+      <Filter>src\Smongine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Components\SystemManager.h">
+      <Filter>src\Smongine\Components</Filter>
+    </ClInclude>
     <ClInclude Include="src\Smongine\Core\App.h">
-      <Filter>Smongine\Core</Filter>
+      <Filter>src\Smongine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Core\Core.h">
-      <Filter>Smongine\Core</Filter>
+      <Filter>src\Smongine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Core\EntryPoint.h">
-      <Filter>Smongine\Core</Filter>
+      <Filter>src\Smongine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Core\Input.h">
-      <Filter>Smongine\Core</Filter>
+      <Filter>src\Smongine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Core\KeyCodes.h">
-      <Filter>Smongine\Core</Filter>
+      <Filter>src\Smongine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Core\Layer.h">
-      <Filter>Smongine\Core</Filter>
+      <Filter>src\Smongine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Core\LayerStack.h">
-      <Filter>Smongine\Core</Filter>
+      <Filter>src\Smongine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Core\Log.h">
-      <Filter>Smongine\Core</Filter>
+      <Filter>src\Smongine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Core\MouseBtnCodes.h">
+      <Filter>src\Smongine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Core\Timer.h">
+      <Filter>src\Smongine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Core\Window.h">
-      <Filter>Smongine\Core</Filter>
+      <Filter>src\Smongine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Events\AppEvent.h">
-      <Filter>Smongine\Events</Filter>
+      <Filter>src\Smongine\Events</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Events\Event.h">
-      <Filter>Smongine\Events</Filter>
+      <Filter>src\Smongine\Events</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Events\KeyEvent.h">
-      <Filter>Smongine\Events</Filter>
+      <Filter>src\Smongine\Events</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Events\MouseEvent.h">
-      <Filter>Smongine\Events</Filter>
+      <Filter>src\Smongine\Events</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\ImGui\ImGuiLayer.h">
-      <Filter>Smongine\ImGui</Filter>
+      <Filter>src\Smongine\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Platform\OpenGL\ImGuiOpenGLRenderer.h">
-      <Filter>Smongine\Platform\OpenGL</Filter>
+      <Filter>src\Smongine\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Platform\Windows\WinWindow.h">
-      <Filter>Smongine\Platform\Windows</Filter>
+      <Filter>src\Smongine\Platform\Windows</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Renderer\Mesh.h">
-      <Filter>Smongine\Renderer</Filter>
+      <Filter>src\Smongine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Renderer\Renderer.h">
-      <Filter>Smongine\Renderer</Filter>
+      <Filter>src\Smongine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Renderer\Shader.h">
-      <Filter>Smongine\Renderer</Filter>
+      <Filter>src\Smongine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Renderer\Texture.h">
-      <Filter>Smongine\Renderer</Filter>
+      <Filter>src\Smongine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Util\FileUtil.h">
-      <Filter>Smongine\Util</Filter>
+      <Filter>src\Smongine\Util</Filter>
     </ClInclude>
-    <ClInclude Include="src\smpch.h" />
-    <ClInclude Include="src\Smongine\Components\GameObj.h" />
-    <ClInclude Include="src\Smongine\Core\Timer.h" />
-    <ClInclude Include="src\Smongine\Components\Components.h" />
-    <ClInclude Include="src\Smongine\Components\EntityManager.h" />
-    <ClInclude Include="src\Smongine\Components\ComponentManager.h" />
-    <ClInclude Include="src\Smongine\Components\System.h" />
-    <ClInclude Include="src\Smongine\Components\SystemManager.h" />
-    <ClInclude Include="src\Smongine\Core\MouseBtnCodes.h" />
-    <ClInclude Include="src\Smongine\Components\Entity.h" />
-    <ClInclude Include="src\Smongine\Components\EntityComponentSystem.h" />
-    <ClInclude Include="src\Smongine\Components\Scene.h" />
+    <ClInclude Include="src\smpch.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\stb_image\stb_image.h">
+      <Filter>vendor\stb_image</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Smongine\Components\Scene.cpp">
+      <Filter>src\Smongine\Components</Filter>
+    </ClCompile>
     <ClCompile Include="src\Smongine\Core\App.cpp">
-      <Filter>Smongine\Core</Filter>
+      <Filter>src\Smongine\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Smongine\Core\Layer.cpp">
-      <Filter>Smongine\Core</Filter>
+      <Filter>src\Smongine\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Smongine\Core\LayerStack.cpp">
-      <Filter>Smongine\Core</Filter>
+      <Filter>src\Smongine\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Smongine\Core\Log.cpp">
-      <Filter>Smongine\Core</Filter>
+      <Filter>src\Smongine\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Smongine\ImGui\ImGuiLayer.cpp">
-      <Filter>Smongine\ImGui</Filter>
+      <Filter>src\Smongine\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\Smongine\Platform\OpenGL\ImGuiOpenGLRenderer.cpp">
-      <Filter>Smongine\Platform\OpenGL</Filter>
+      <Filter>src\Smongine\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Smongine\Platform\Windows\WinInput.cpp">
-      <Filter>Smongine\Platform\Windows</Filter>
+      <Filter>src\Smongine\Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\Smongine\Platform\Windows\WinWindow.cpp">
-      <Filter>Smongine\Platform\Windows</Filter>
+      <Filter>src\Smongine\Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\Smongine\Renderer\Mesh.cpp">
-      <Filter>Smongine\Renderer</Filter>
+      <Filter>src\Smongine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Smongine\Renderer\Renderer.cpp">
-      <Filter>Smongine\Renderer</Filter>
+      <Filter>src\Smongine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Smongine\Renderer\Shader.cpp">
-      <Filter>Smongine\Renderer</Filter>
+      <Filter>src\Smongine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Smongine\Renderer\Texture.cpp">
-      <Filter>Smongine\Renderer</Filter>
+      <Filter>src\Smongine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Smongine\Util\FileUtil.cpp">
-      <Filter>Smongine\Util</Filter>
+      <Filter>src\Smongine\Util</Filter>
     </ClCompile>
-    <ClCompile Include="src\smpch.cpp" />
-    <ClCompile Include="vendor\stb_image\stb_image.cpp" />
-    <ClCompile Include="src\Smongine\Components\Scene.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\Smongine\shader.frag" />
-    <None Include="src\Smongine\shader.vert" />
+    <ClCompile Include="src\smpch.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\stb_image\stb_image.cpp">
+      <Filter>vendor\stb_image</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

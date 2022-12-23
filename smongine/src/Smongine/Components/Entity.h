@@ -15,23 +15,24 @@ namespace Smong {
 		Entity() = default;
 		Entity(const Entity& other) = default;
 
-		Entity(EntityComponentSystem& ECS) : 
-			ECS(ECS),
-			id(ECS.CreateEntity()),
-			transform(AddComponent<Transform>()) // Every base object will have a transform component
+		Entity(std::shared_ptr<EntityComponentSystem> ECS)	
 		{
+			this->ECS = ECS;
+			id = ECS->CreateEntity();
+			transform = AddComponent<Transform>(); // Every base object will have a transform component
 		}
 
 		template<class T, typename... Args>
 		T& AddComponent(Args&&... args)
 		{
-			ECS.AddComponent(id, std::forward<Args>(args)...);
+			ECS->AddComponent<T>(id, std::forward<Args>(args)...);
+			return ECS->GetComponent<T>(id);
 		}
 
 		template<class T>
 		T& GetComponent()
 		{
-			return ECS.GetComponent<T>(id);
+			return ECS->GetComponent<T>(id);
 		}
 
 		Transform& GetTransform()
@@ -42,7 +43,7 @@ namespace Smong {
 		template<class T>
 		void RemoveComponent()
 		{
-			ECS.RemoveComponent(id);
+			ECS->RemoveComponent(id);
 		}
 
 		EntityID GetId() const
@@ -52,13 +53,13 @@ namespace Smong {
 
 		void Destroy()
 		{
-			ECS.DestroyEntity(id);
+			ECS->DestroyEntity(id);
 		}
 
 	private:
 		EntityID id;
-		EntityComponentSystem& ECS;
+		std::shared_ptr<EntityComponentSystem> ECS;
 
-		Transform& transform;
+		Transform transform;
 	};
 }

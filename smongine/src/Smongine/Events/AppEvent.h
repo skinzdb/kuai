@@ -3,7 +3,7 @@
 #include "Event.h"
 
 namespace Smong {
-	class SMONGINE_API WindowResizeEvent : public Event
+	class WindowResizeEvent : public Event
 	{
 	private:
 		int width, height;
@@ -24,7 +24,7 @@ namespace Smong {
 		EVENT_CLASS_TYPE(EventType::WindowResize)
 	};
 
-	class SMONGINE_API WindowCloseEvent : public Event
+	class WindowCloseEvent : public Event
 	{
 	public:
 		WindowCloseEvent() {}

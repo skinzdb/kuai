@@ -4,7 +4,7 @@
 #include "Layer.h"
 
 namespace Smong {
-	class SMONGINE_API LayerStack
+	class LayerStack
 	{
 	public:
 		LayerStack();

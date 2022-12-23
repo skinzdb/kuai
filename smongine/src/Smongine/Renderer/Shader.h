@@ -5,7 +5,7 @@
 #include "glm/mat4x4.hpp"
 
 namespace Smong {
-	class SMONGINE_API Shader
+	class Shader
 	{
 	public:
 		Shader(const char* vertSrc, const char* fragSrc);

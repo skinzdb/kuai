@@ -5,7 +5,7 @@
 
 namespace Smong {
 
-	class SMONGINE_API Scene
+	class Scene
 	{
 	public:
 		Scene();
@@ -16,7 +16,6 @@ namespace Smong {
 		void DestroyEntity(EntityID entity);
 
 		
-
 	private:
 		void Update(float dt);
 

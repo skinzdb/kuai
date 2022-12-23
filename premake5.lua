@@ -15,8 +15,10 @@ include "Smongine/vendor/ImGui"
 
 project "Smongine"
 	location "Smongine"
-	kind "SharedLib"
+	kind "StaticLib"
 	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -27,7 +29,10 @@ project "Smongine"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+
+		"%{prj.name}/vendor/stb_image/stb_image.h",
+		"%{prj.name}/vendor/stb_image/stb_image.cpp",
 	}
 
 	includedirs
@@ -55,39 +60,35 @@ project "Smongine"
 	}
 
 	filter "system:windows"
-		cppdialect "C++17"
-		staticruntime "Off"
 		systemversion "latest"
 
 		defines
 		{
 			"SM_PLATFORM_WINDOWS",
-			"SM_BUILD_DLL",
 			"GLFW_INCLUDE_NONE"
 		}
 
-		postbuildcommands
-		{
-			("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
-		}
-
-
 	filter "configurations:Debug"
 		defines "SM_DEBUG"
-		symbols "On"
+		runtime "Debug"
+		symbols "on"
 
 	filter "configurations:Release"
 		defines "SM_RELEASE"
-		optimize "On"	
+		runtime "Release"
+		optimize "on"	
 	
 	filter "configurations:Dist"
 		defines "SM_DIST"
-		optimize "On"
+		runtime "Release"
+		optimize "on"
 
 project "Sandbox" 
 	location "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -110,8 +111,6 @@ project "Sandbox"
 	}
 
 	filter "system:windows"
-		cppdialect "C++17"
-		staticruntime "Off"
 		systemversion "latest"
 
 		defines
@@ -121,12 +120,15 @@ project "Sandbox"
 
 	filter "configurations:Debug"
 		defines "SM_DEBUG"
-		symbols "On"
+		runtime "Debug"
+		symbols "on"
 
 	filter "configurations:Release"
 		defines "SM_RELEASE"
-		optimize "On"	
+		runtime "Release"
+		optimize "on"	
 	
 	filter "configurations:Dist"
 		defines "SM_DIST"
-		optimize "On"
+		runtime "Release"
+		optimize "on"

@@ -5,7 +5,7 @@
 #include "spdlog/fmt/ostr.h"
 
 namespace Smong {
-	class SMONGINE_API Log
+	class Log
 	{
 	public:
 		Log();
