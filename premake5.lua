@@ -12,6 +12,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 include "Smongine/vendor/Glad"
 include "Smongine/vendor/ImGui"
+include "Smongine/vendor/GLFW"
 
 project "Smongine"
 	location "Smongine"
@@ -21,7 +22,7 @@ project "Smongine"
 	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+	objdir ("obj/" .. outputdir .. "/%{prj.name}")
 
 	pchheader "smpch.h"
 	pchsource "Smongine/src/smpch.cpp"
@@ -46,14 +47,9 @@ project "Smongine"
 		"%{prj.name}/vendor/stb_image"
 	}
 
-	libdirs
-	{
-		"%{prj.name}/vendor/GLFW/lib-vc2019"
-	}
-
 	links
 	{
-		"glfw3.lib",
+		"GLFW",
 		"Glad",
 		"ImGui",
 		"opengl32.lib"
@@ -91,7 +87,7 @@ project "Sandbox"
 	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+	objdir ("obj/" .. outputdir .. "/%{prj.name}")
 
 	files
 	{
@@ -102,12 +98,15 @@ project "Sandbox"
 	includedirs
 	{
 		"Smongine/vendor/spdlog/include",
-		"Smongine/src"
+		"Smongine/src",
+		"Smongine/vendor",
+		"Smongine/vendor/glm"
 	}
 
 	links
 	{
-		"Smongine"
+		"Smongine",
+		"dwmapi.lib"
 	}
 
 	filter "system:windows"

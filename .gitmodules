@@ -7,3 +7,6 @@
 [submodule "Smongine/vendor/glm"]
 	path = Smongine/vendor/glm
 	url = https://github.com/g-truc/glm
+[submodule "smongine/vendor/GLFW"]
+	path = smongine/vendor/GLFW
+	url = https://github.com/TheCherno/glfw/
