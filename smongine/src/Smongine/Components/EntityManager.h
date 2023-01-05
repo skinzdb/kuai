@@ -61,7 +61,7 @@ namespace Smong {
 		// List of unused entity IDs
 		std::vector<EntityID> availableEntities;
 		// Number of entities currently in use
-		size_t entityNo;
+		uint32_t entityNo;
 
 		// Components associated with each entity
 		std::array<ComponentMask, MAX_ENTITIES> componentMasks;

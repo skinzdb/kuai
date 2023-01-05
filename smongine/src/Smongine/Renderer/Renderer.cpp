@@ -69,8 +69,8 @@ namespace Smong {
         //mesh = new Mesh(vertices, 12, texCoords, 8, indices, 6);
 
         cam = new Camera(75.0f, 
-            App::Get().GetWindow().GetWidth(), 
-            App::Get().GetWindow().GetHeight(), 
+            (float)App::Get().GetWindow().GetWidth(), 
+            (float)App::Get().GetWindow().GetHeight(), 
             0.1f, 
             100.0f
         );

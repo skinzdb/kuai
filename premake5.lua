@@ -11,7 +11,7 @@ workspace "Smongine"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 include "Smongine/vendor/Glad"
-include "Smongine/vendor/ImGui"
+-- include "Smongine/vendor/ImGui"
 include "Smongine/vendor/GLFW"
 
 project "Smongine"
@@ -42,7 +42,7 @@ project "Smongine"
 		"%{prj.name}/vendor/spdlog/include",
 		"%{prj.name}/vendor/GLFW/include",
 		"%{prj.name}/vendor/Glad/include",
-		"%{prj.name}/vendor/ImGui",
+		-- "%{prj.name}/vendor/ImGui",
 		"%{prj.name}/vendor/glm",
 		"%{prj.name}/vendor/stb_image"
 	}
@@ -51,7 +51,7 @@ project "Smongine"
 	{
 		"GLFW",
 		"Glad",
-		"ImGui",
+		-- "ImGui",
 		"opengl32.lib"
 	}
 
@@ -60,22 +60,23 @@ project "Smongine"
 
 		defines
 		{
+			"_CRT_SECURE_NO_WARNINGS",
 			"SM_PLATFORM_WINDOWS",
 			"GLFW_INCLUDE_NONE"
 		}
 
 	filter "configurations:Debug"
-		defines "SM_DEBUG"
+		defines "SMONG_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "SM_RELEASE"
+		defines "SMONG_RELEASE"
 		runtime "Release"
 		optimize "on"	
 	
 	filter "configurations:Dist"
-		defines "SM_DIST"
+		defines "SMONG_DIST"
 		runtime "Release"
 		optimize "on"
 
@@ -118,16 +119,16 @@ project "Sandbox"
 		}
 
 	filter "configurations:Debug"
-		defines "SM_DEBUG"
+		defines "SMONG_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "SM_RELEASE"
+		defines "SMONG_RELEASE"
 		runtime "Release"
 		optimize "on"	
 	
 	filter "configurations:Dist"
-		defines "SM_DIST"
+		defines "SMONG_DIST"
 		runtime "Release"
 		optimize "on"

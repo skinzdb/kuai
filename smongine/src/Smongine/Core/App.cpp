@@ -31,7 +31,7 @@ namespace Smong {
 	void App::Run() {
 		uint64_t elapsedTime;
 		uint64_t accumulator = 0;
-		double interval = 1000.0f / 60.0f;
+		uint64_t interval = 1000 / 60;
 
 		while (running) 
 		{
