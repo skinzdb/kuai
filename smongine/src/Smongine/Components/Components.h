@@ -4,6 +4,8 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "Smongine/Core/Core.h"
+#include "Smongine/Renderer/Mesh.h"
+#include "Smongine/Renderer/Material.h"
 
 namespace Smong {
 
@@ -19,6 +21,8 @@ namespace Smong {
 		glm::vec3 GetUp() { return glm::rotate(glm::quat(rot), glm::vec3(0.0f, 1.0f, 0.0f)); }
 		glm::vec3 GetRight() { return glm::rotate(glm::quat(rot), glm::vec3(1.0f, 0.0f, 0.0f)); }
 		glm::vec3 GetForward() { return glm::rotate(glm::quat(rot), glm::vec3(0.0f, 0.0f, -1.0f)); }
+
+		bool hasChanged = true;
 
 		glm::mat4 GetTransform()
 		{
@@ -40,10 +44,28 @@ namespace Smong {
 		bool useGravity = false;
 	};
 
-	/*struct Mesh
+	struct MeshMaterial
 	{
-		
-	};*/
+		MeshMaterial() = default;
+
+		Mesh* mesh;
+		Material* material;
+	};
+
+	enum LightType
+	{
+		Directional,
+		Point
+	};
+
+	struct Light 
+	{
+		LightType type = Point;
+
+		glm::vec3 col = { 1.0f, 1.0f, 1.0f };
+		float intensity = 1;
+		float range = 10; // Only used for point light
+	};
 
 	class Camera {
 	public:
@@ -112,5 +134,7 @@ namespace Smong {
 		// Ortho params
 		float orthoSize = 10.0f;
 		float orthoNear = -1.0f, orthoFar = 1.0f;
+
+		friend class CameraSystem;
 	};
 }
