@@ -1,7 +1,6 @@
 #pragma once
 
 #include "smpch.h"
-
 #include "glm/mat4x4.hpp"
 
 namespace Smong {
@@ -22,6 +21,7 @@ namespace Smong {
 		
 		void Bind();
 		void Unbind();
+
 	private:
 		int CreateShader(const char* src, int type);
 		void Link();

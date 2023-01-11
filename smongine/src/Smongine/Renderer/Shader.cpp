@@ -1,10 +1,11 @@
 #include "smpch.h"
 #include "Shader.h"
 
+#include "Smongine/Util/FileUtil.h" // REMOVE after creating shaders properly
+
 #include <glad/glad.h>
 
 namespace Smong {
-
 	Shader::Shader(const char* vertSrc, const char* fragSrc)
 	{
 		programId = glCreateProgram();
@@ -118,6 +119,5 @@ namespace Smong {
 			SM_CORE_ERROR("Error validating shader code: {0}", errStr);
 		}
 	}
-
 }
 
