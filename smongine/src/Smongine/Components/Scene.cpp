@@ -9,6 +9,8 @@ namespace Smong {
 
 		ECS->RegisterComponent<Transform>();
 		ECS->RegisterComponent<Camera>();
+
+		mainCam = Camera();
 	}
 
 	Scene::~Scene()
@@ -38,6 +40,21 @@ namespace Smong {
 	void Scene::DestroyEntity(EntityID entity)
 	{
 		ECS->DestroyEntity(entity);
+	}
+
+	Camera Scene::GetMainCam()
+	{
+		return mainCam;
+	}
+
+	void Scene::SetMainCam(Camera cam)
+	{
+		this->mainCam = cam;
+	}
+
+	void Scene::GetLights()
+	{
+	
 	}
 
 	void Scene::Update(float dt)

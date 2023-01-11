@@ -1,7 +1,5 @@
 #pragma once
 
-#include "smpch.h"
-
 namespace Smong {
 
 	const uint32_t MAX_ENTITIES = 4096;	// Includes reserved null entity

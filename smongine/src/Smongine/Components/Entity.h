@@ -1,11 +1,10 @@
 #pragma once
 
-#include "smpch.h"
-
 #include "EntityComponentSystem.h"
 #include "Components.h"
 
 namespace Smong {
+	class EntityComponentSystem;
 	/**
 	* A wrapper for EntityID so one can do entity.AddComponent<T>() instead of ECS.AddComponent(entity, T)
 	*/
@@ -15,46 +14,24 @@ namespace Smong {
 		Entity() = default;
 		Entity(const Entity& other) = default;
 
-		Entity(std::shared_ptr<EntityComponentSystem> ECS)	
-		{
-			this->ECS = ECS;
-			id = ECS->CreateEntity();
-			transform = AddComponent<Transform>(); // Every base object will have a transform component
-		}
+		Entity(std::shared_ptr<EntityComponentSystem> ECS);
+
+		Entity(std::shared_ptr<EntityComponentSystem> ECS, EntityID id); // Wrap existing ID into entity object
 
 		template<class T, typename... Args>
-		T& AddComponent(Args&&... args)
-		{
-			ECS->AddComponent<T>(id, std::forward<Args>(args)...);
-			return ECS->GetComponent<T>(id);
-		}
+		T& AddComponent(Args&&... args);
 
 		template<class T>
-		T& GetComponent()
-		{
-			return ECS->GetComponent<T>(id);
-		}
+		T& GetComponent();
 
-		Transform& GetTransform()
-		{
-			return transform;
-		}
+		Transform& GetTransform();
 
 		template<class T>
-		void RemoveComponent()
-		{
-			ECS->RemoveComponent(id);
-		}
+		void RemoveComponent();
 
-		EntityID GetId() const
-		{
-			return id;
-		}
+		EntityID GetId() const;
 
-		void Destroy()
-		{
-			ECS->DestroyEntity(id);
-		}
+		void Destroy();
 
 	private:
 		EntityID id;
@@ -62,4 +39,23 @@ namespace Smong {
 
 		Transform transform;
 	};
+
+	template<class T, typename ...Args>
+	inline T& Entity::AddComponent(Args && ...args)
+	{
+		ECS->AddComponent<T>(id, std::forward<Args>(args)...);
+		return ECS->GetComponent<T>(id);
+	}
+
+	template<class T>
+	inline T& Entity::GetComponent()
+	{
+		return ECS->GetComponent<T>(id);
+	}
+
+	template<class T>
+	inline void Entity::RemoveComponent()
+	{
+		ECS->RemoveComponent(id);
+	}
 }
