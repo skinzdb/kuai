@@ -54,6 +54,11 @@ namespace Smong {
 		glUniform4f(uniforms[name], val.x, val.y, val.z, val.w);
 	}
 
+	void Shader::SetUniform(std::string name, glm::mat3& val)
+	{
+		glUniformMatrix3fv(uniforms[name], 1, GL_FALSE, &val[0][0]);
+	}
+
 	void Shader::SetUniform(std::string name, glm::mat4& val)
 	{
 		glUniformMatrix4fv(uniforms[name], 1, GL_FALSE, &val[0][0]);
