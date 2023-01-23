@@ -8,13 +8,18 @@ namespace Smong {
 		Timer() { Reset(); }
 
 		/**
-		* Returns elapsed time since last call in milliseconds
+		* Returns elapsed time since last call in seconds
 		*/
-		uint64_t GetElapsed()
+		float GetElapsed()
 		{
 			auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin);
 			Reset();
-			return time.count();
+			return time.count() * 0.001f;
+		}
+
+		float GetElaspedMillis()
+		{
+			return GetElapsed() * 1000.0f;
 		}
 
 		void Reset()
