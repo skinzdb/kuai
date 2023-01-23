@@ -9,3 +9,5 @@
 	#define SM_ASSERT(x, ...) 
 	#define SM_CORE_ASSERT(x, ...)
 #endif
+
+#define BIT(x) (1 << x)
