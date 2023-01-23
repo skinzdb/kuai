@@ -8,9 +8,9 @@
 #include "Smongine/Events/KeyEvent.h"
 #include "Components.h"
 
-namespace Smong {
-	class SystemManager;
+#include <bitset>
 
+namespace Smong {
 	class EventBus
 	{
 	public:
@@ -38,56 +38,6 @@ namespace Smong {
 		std::unordered_map<const char*, std::vector<EventCallbackFn>> subscribers;
 	};
 
-	class EntityComponentSystem
-	{
-	public:
-		void Init();
-
-		// *** Entity Management *********************************
-
-		EntityID CreateEntity();
-		void DestroyEntity(EntityID entity);
-
-		// *** Component Management ******************************
-
-		template<typename T>
-		void RegisterComponent();
-
-		template<typename T, typename... Args>
-		void AddComponent(EntityID entity, Args&&... args);
-
-		template<typename T>
-		void RemoveComponent(EntityID entity);
-
-		template<typename T>
-		T& GetComponent(EntityID entity);
-
-		template<typename T>
-		ComponentType GetComponentType();
-
-		template<typename T>
-		void ApplyToComponents(std::function<void(T component)> fn);
-
-		// *** System Management ******************************
-
-		template<typename T>
-		std::shared_ptr<T> RegisterSystem();
-
-		template<typename T>
-		void SetSystemMask(ComponentMask mask);
-
-		template<typename T, typename... Args>
-		void SetSystemMask(ComponentMask mask, Args&&... args);
-
-	private:
-		std::unique_ptr<EntityManager> entityManager;
-		std::unique_ptr<ComponentManager> componentManager;
-		std::unique_ptr<SystemManager> systemManager;
-	public:
-		// *** Event bus - for communication between systems ***
-		std::unique_ptr<EventBus> eventBus;
-	};
-
 	//class IFnHandler
 	//{
 	//public:
@@ -105,77 +55,118 @@ namespace Smong {
 
 	//};
 
-	template<typename T>
-	inline void EntityComponentSystem::RegisterComponent()
+	class EntityComponentSystem
 	{
-		componentManager->RegisterComponent<T>();
-		SM_CORE_INFO("Registered new component: {0}", typeid(T).name());
-	}
+	public:
+		EntityComponentSystem()
+		{
+			entityManager = std::make_unique<EntityManager>();
+			componentManager = std::make_unique<ComponentManager>();
+			systemManager = std::make_unique<SystemManager>();
+			eventBus = std::make_unique<EventBus>();
+		}
 
-	template<typename T, typename ...Args>
-	inline void EntityComponentSystem::AddComponent(EntityID entity, Args && ...args)
-	{
-		componentManager->AddComponent<T>(entity, std::forward<Args>(args)...);
+		// *** Entity Management **********************************************
 
-		auto componentMask = entityManager->GetComponentMask(entity);
-		componentMask.set(componentManager->GetComponentType<T>(), true);
-		entityManager->SetComponentMask(entity, componentMask);
+		EntityID CreateEntity()
+		{
+			return entityManager->CreateEntity();
+		}
 
-		systemManager->OnEntityComponentMaskChanged(entity, componentMask);
-	}
+		void DestroyEntity(EntityID entity)
+		{
+			entityManager->DestroyEntity(entity);
+			componentManager->OnEntityDestroyed(entity);
+			systemManager->OnEntityDestroyed(entity);
+		}
 
-	template<typename T>
-	inline void EntityComponentSystem::RemoveComponent(EntityID entity)
-	{
-		componentManager->RemoveComponent(entity);
+		// *** Component Management *******************************************
 
-		auto componentMask = entityManager->GetComponentMask(entity);
-		componentMask.set(componentManager->GetComponentType<T>(), false);
-		entityManager->SetComponentMask(entity, componentMask);
+		template<typename T>
+		void RegisterComponent()
+		{
+			componentManager->RegisterComponent<T>();
+			SM_CORE_INFO("Registered new component: {0}", typeid(T).name());
+		}
 
-		systemManager->OnEntityComponentMaskChanged(entity, componentMask);
-	}
+		template<typename T, typename ...Args>
+		void AddComponent(EntityID entity, Args && ...args)
+		{
+			componentManager->AddComponent<T>(entity, std::forward<Args>(args)...);
+			
+			auto componentMask = entityManager->GetComponentMask(entity);
+			componentMask |= BIT(componentManager->GetComponentType<T>());
 
-	template<typename T>
-	inline T& EntityComponentSystem::GetComponent(EntityID entity)
-	{
-		return componentManager->GetComponent<T>(entity);
-	}
+			entityManager->SetComponentMask(entity, componentMask);
+			systemManager->OnEntityComponentMaskChanged(entity, componentMask);
+		}
 
-	template<typename T>
-	inline ComponentType EntityComponentSystem::GetComponentType()
-	{
-		return componentManager->GetComponentType<T>();
-	}
+		template<typename T>
+		void RemoveComponent(EntityID entity)
+		{
+			componentManager->RemoveComponent(entity);
 
-	template<typename T>
-	inline void EntityComponentSystem::ApplyToComponents(std::function<void(T component)> fn)
-	{
-		componentManager->ApplyToComponents(fn);
-	}
+			auto componentMask = entityManager->GetComponentMask(entity);
+			componentMask &= BIT(componentManager->GetComponentType<T>()) ^ std::numeric_limits<ComponentMask>::max();
+	
+			entityManager->SetComponentMask(entity, componentMask);
+			systemManager->OnEntityComponentMaskChanged(entity, componentMask);
+		}
 
-	template<typename T>
-	inline std::shared_ptr<T> EntityComponentSystem::RegisterSystem()
-	{
+		template<typename T>
+		T& GetComponent(EntityID entity)
+		{
+			return componentManager->GetComponent<T>(entity);
+		}
+
+		template<typename T>
+		bool HasComponent(EntityID entity)
+		{
+			return componentManager->HasComponent<T>(entity);
+		}
+
+		template<typename T>
+		ComponentType GetComponentType()
+		{
+			return componentManager->GetComponentType<T>();
+		}
+
+		template<typename T>
+		void ApplyToComponents(std::function<void(T component)> fn)
+		{
+			componentManager->ApplyToComponents(fn);
+		}
+
+		// *** System Management **********************************************
+
+		template<typename T>
+		std::shared_ptr<T> RegisterSystem()
 		{
 			SM_CORE_INFO("Registered new system: {0}", typeid(T).name());
 
 			return systemManager->RegisterSystem<T>();
 		}
 
-	}
+		template<typename T>
+		void SetSystemMask(ComponentMask mask)
+		{
+			systemManager->SetComponentMask<T>(mask);
+		}
 
-	template<typename T>
-	inline void EntityComponentSystem::SetSystemMask(ComponentMask mask)
-	{
-		systemManager->SetComponentMask<T>(mask);
-	}
+		// *** Event Management (of systems) **********************************
 
-	template<typename T, typename ...Args>
-	inline void EntityComponentSystem::SetSystemMask(ComponentMask mask, Args && ...args)
-	{
-		systemManager->SetComponentMask<T>(mask);
+		template<typename EventType>
+		void NotifySystems(EventType& event);
 
-		SetSystemMask<T>(args ...);
-	}
+		template<typename T, typename EventType>
+		void SubscribeSystem(EventType& event);
+
+	private:
+		std::unique_ptr<EntityManager> entityManager;
+		std::unique_ptr<ComponentManager> componentManager;
+		std::unique_ptr<SystemManager> systemManager;
+
+		// *** Event bus - for communication between systems ***
+		std::unique_ptr<EventBus> eventBus;
+	};
 }

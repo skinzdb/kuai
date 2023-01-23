@@ -14,22 +14,36 @@ namespace Smong {
 		Transform() = default;
 		Transform(glm::vec3& pos) : pos(pos) {}
 
-		glm::vec3 pos = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 rot = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 scale = { 1.0f, 1.0f, 1.0f };
+		glm::vec3 GetPos() { return pos; }
+		void SetPos(glm::vec3& pos) { this->pos = pos; /* TODO: Update camera view matrix */ }
+		void SetPos(float x, float y, float z) { SetPos(glm::vec3(x, y, z)); }
+		void Translate(glm::vec3& amount) { this->pos += amount; /* TODO: Update camera view matrix */ }
+		void Translate(float x, float y, float z) { Translate(glm::vec3(x, y, z)); }
+
+		glm::vec3 GetRot() { return rot; }
+		void SetRot(glm::vec3& rot) { this->rot = glm::radians(rot); /* TODO: Update camera view matrix */ }
+		void SetRot(float x, float y, float z) { Rotate(glm::vec3(x, y, z)); }
+		void Rotate(glm::vec3& amount) { this->rot += glm::radians(amount); /* TODO: Update camera view matrix */ }
+		void Rotate(float x, float y, float z) { Rotate(glm::vec3(x, y, z)); }
+
+		glm::vec3 GetScale() { return scale; }
+		void SetScale(glm::vec3& scale) { this->scale = scale; }
+		void Scale(float factor) { this->scale *= factor; }
 
 		glm::vec3 GetUp() { return glm::rotate(glm::quat(rot), glm::vec3(0.0f, 1.0f, 0.0f)); }
 		glm::vec3 GetRight() { return glm::rotate(glm::quat(rot), glm::vec3(1.0f, 0.0f, 0.0f)); }
 		glm::vec3 GetForward() { return glm::rotate(glm::quat(rot), glm::vec3(0.0f, 0.0f, -1.0f)); }
 
-		bool hasChanged = true;
-
-		glm::mat4 GetTransform()
+		glm::mat4 GetModelMatrix()
 		{
 			return glm::translate(glm::mat4(1.0f), pos) *
 				glm::toMat4(glm::quat(rot)) *
 				glm::scale(glm::mat4(1.0f), scale);
 		}
+	private:
+		glm::vec3 pos = { 0.0f, 0.0f, 0.0f };
+		glm::vec3 rot = { 0.0f, 0.0f, 0.0f };
+		glm::vec3 scale = { 1.0f, 1.0f, 1.0f };	
 	};
 
 	struct Rigidbody
@@ -48,35 +62,56 @@ namespace Smong {
 	{
 		MeshMaterial() = default;
 
+		MeshMaterial(Mesh* mesh, Material* material)
+		{
+			this->mesh = mesh;
+			this->material = material;
+		}
+
+		void Render()
+		{
+			material->Render(); // Render first to bind textures
+			mesh->Render();
+		}
+
 		Mesh* mesh;
 		Material* material;
 	};
 
-	enum LightType
-	{
-		Directional,
-		Point
-	};
-
 	struct Light 
 	{
-		LightType type = Point;
+		enum class LightType
+		{
+			Directional,
+			Point
+		};
+
+		Light() = default;
+		Light(float intensity) : intensity(intensity), type(LightType::Directional) {}
+		Light(float intensity, float range) : intensity(intensity), range(range), type(LightType::Point) {}
+
+		LightType type = LightType::Point;
 
 		glm::vec3 col = { 1.0f, 1.0f, 1.0f };
 		float intensity = 1;
 		float range = 10; // Only used for point light
 	};
 
-	class Camera {
-	public:
+	struct Camera
+	{
 		enum class ProjectionType
 		{
 			Perspective,
 			Ortho
 		};
-	public:
-		Camera() { UpdateProjectionMatrix(); }
-		Camera(float fov, float width, float height, float zNear, float zFar) : aspect(width / height) { SetPerspective(fov, zNear, zFar); }
+
+		Camera() = default;
+
+		Camera(float fov, float width, float height, float zNear, float zFar) : aspect(width / height) 
+		{ 
+			SetPerspective(fov, zNear, zFar); 
+			UpdateViewMatrix(glm::vec3(0.0f), glm::vec3(0.0f));
+		}
 
 		void SetPerspective(float fov, float zNear, float zFar)
 		{
@@ -122,10 +157,10 @@ namespace Smong {
 
 		ProjectionType projectionType = ProjectionType::Perspective;
 
-		glm::mat4 viewMatrix;
-		glm::mat4 projectionMatrix;
+		glm::mat4 viewMatrix = glm::mat4(1.0f);
+		glm::mat4 projectionMatrix = glm::mat4(1.0f);
 
-		float aspect = 0.0f;
+		float aspect = 1.0f;
 
 		// Perspective params
 		float fov = glm::radians(60.0f);
@@ -135,6 +170,6 @@ namespace Smong {
 		float orthoSize = 10.0f;
 		float orthoNear = -1.0f, orthoFar = 1.0f;
 
-		friend class CameraSystem;
+		friend class CameraTransformSystem;
 	};
 }

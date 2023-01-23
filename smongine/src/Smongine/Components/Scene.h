@@ -5,11 +5,16 @@
 #include "Components.h"
 
 namespace Smong {
-	class EntityComponentSystem;
-	class Entity;
+	class LightSystem : public System
+	{
+	public:
+		LightSystem() { acceptsSubset = true; };
+		virtual void Update(float dt) {};
+	};
 
 	class Scene
 	{
+		using EntityMap = std::unordered_map<EntityID, Entity*>;
 	public:
 		Scene();
 		~Scene();
@@ -21,15 +26,19 @@ namespace Smong {
 		Camera GetMainCam();
 		void SetMainCam(Camera cam);
 
-		void GetLights();
+		std::vector<EntityID> GetLights();
 
-	private:
+		EntityMap::iterator begin() { return entityMap.begin(); }
+		EntityMap::iterator end() { return entityMap.end(); }
+
 		void Update(float dt);
-
+	private:
 		Camera mainCam;
 
-		std::shared_ptr<EntityComponentSystem> ECS;
-		std::unordered_map<EntityID, Entity*> entityMap;
+		EntityComponentSystem* ECS;
+		EntityMap entityMap;
+
+		std::shared_ptr<LightSystem> lightSystem;
 	};
 
 	//scene.addSystem<mask>(
@@ -51,6 +60,15 @@ namespace Smong {
 	//		}
 	//	}
 	//};
+
+	class MeshMaterialSystem : public System
+	{
+	public:
+		virtual void Update(float dt) {};
+
+	private:
+
+	};
 }
 
 

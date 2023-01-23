@@ -57,6 +57,11 @@ namespace Smong {
 			return components[entityToIndex[entity]]; // Return reference to entity's component
 		}
 
+		bool Has(EntityID entity)
+		{
+			return entityToIndex.find(entity) != entityToIndex.end();
+		}
+
 		virtual void OnEntityDestroyed(EntityID entity) override
 		{
 			// If entity owns this component type
@@ -107,6 +112,12 @@ namespace Smong {
 		T& GetComponent(EntityID entity)
 		{
 			return GetComponentContainer<T>()->Get(entity);
+		}
+
+		template<typename T>
+		bool HasComponent(EntityID entity)
+		{
+			return GetComponentContainer<T>()->Has(entity);
 		}
 
 		template<typename T>

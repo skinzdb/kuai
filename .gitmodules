@@ -10,3 +10,7 @@
 [submodule "smongine/vendor/GLFW"]
 	path = smongine/vendor/GLFW
 	url = https://github.com/TheCherno/glfw/
+[submodule "Smongine/vendor/pybind11"]
+	path = Smongine/vendor/pybind11
+	url = git@github.com:pybind/pybind11.git
+	branch = stable

@@ -1,16 +1,32 @@
 #include "smpch.h"
 #include "Scene.h"
 
+#include "Smongine/Renderer/Renderer.h"
+#include "Smongine/Core/App.h"
+
 namespace Smong {
 	Scene::Scene()
 	{
-		ECS = std::make_shared<EntityComponentSystem>();
-		ECS->Init();
+		ECS = new EntityComponentSystem();
 
 		ECS->RegisterComponent<Transform>();
 		ECS->RegisterComponent<Camera>();
+		ECS->RegisterComponent<Light>();
+		ECS->RegisterComponent<MeshMaterial>();
 
-		mainCam = Camera();
+		this->lightSystem = ECS->RegisterSystem<LightSystem>();
+		ECS->SetSystemMask<LightSystem>(BIT(ECS->GetComponentType<Light>()));
+
+		/*ECS->RegisterSystem<CameraTransformSystem>();
+		ECS->SetSystemMask<CameraTransformSystem>(BIT(ECS->GetComponentType<Camera>()) | BIT(ECS->GetComponentType<Transform>()));*/
+
+		mainCam = Camera(
+			70.0f, 
+			(float)App::Get().GetWindow().GetWidth(),
+			(float)App::Get().GetWindow().GetHeight(),
+			0.1f,
+			100.0f
+		);
 	}
 
 	Scene::~Scene()
@@ -19,6 +35,7 @@ namespace Smong {
 		{
 			delete pair.second;
 		}
+		delete ECS;
 	}
 
 	Entity* Scene::CreateEntity()
@@ -52,13 +69,14 @@ namespace Smong {
 		this->mainCam = cam;
 	}
 
-	void Scene::GetLights()
+	std::vector<EntityID> Scene::GetLights()
 	{
-	
+		return lightSystem->GetEntities();
 	}
 
 	void Scene::Update(float dt)
 	{
+		Renderer::Render(*this);
 	}
 
 

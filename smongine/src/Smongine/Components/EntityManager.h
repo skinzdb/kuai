@@ -8,7 +8,7 @@ namespace Smong {
 	const uint32_t NULL_ENTITY = 0;
 
 	using EntityID = uint32_t;
-	using ComponentMask = std::bitset<MAX_COMPONENTS>;
+	using ComponentMask = uint32_t;
 
 	/**
 	* Manages creation and deletion of all entities (game objects)
@@ -20,7 +20,7 @@ namespace Smong {
 	public:
 		EntityManager()
 		{
-			entityNo = 1;
+			entityNo = 0;
 			for (EntityID entity = 1; entity < MAX_ENTITIES; entity++)
 				availableEntities.push_back(entity);
 		}
@@ -31,15 +31,15 @@ namespace Smong {
 
 			EntityID entity = availableEntities.back();
 			availableEntities.pop_back();
-
 			componentMasks[entity] = 0;
+			entityNo++;
 
-			return entityNo++;
+			return entity;
 		}
 
 		void DestroyEntity(EntityID entity)
 		{
-			componentMasks[entity].reset();
+			componentMasks[entity] = 0;
 
 			availableEntities.push_back(entity);
 			entityNo--;
@@ -62,6 +62,6 @@ namespace Smong {
 		uint32_t entityNo;
 
 		// Components associated with each entity
-		std::array<ComponentMask, MAX_ENTITIES> componentMasks;
+		ComponentMask componentMasks[MAX_ENTITIES];
 	};
 }
