@@ -15,7 +15,6 @@ namespace Smong {
 		virtual ~App();
 
 		void Run();
-		void Update();
 
 		void OnEvent(Event& e);
 

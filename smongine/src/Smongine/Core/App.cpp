@@ -3,7 +3,6 @@
 #include "Log.h"
 
 #include "Smongine/Renderer/Renderer.h"
-#include "Smongine/Components/EntityComponentSystem.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -29,9 +28,9 @@ namespace Smong {
 	}
 
 	void App::Run() {
-		uint64_t elapsedTime;
-		uint64_t accumulator = 0;
-		uint64_t interval = 1000 / 60;
+		float elapsedTime; // Time since last frame
+		float accumulator = 0;
+		float interval = 1.0f / 60.0f;
 
 		while (running) 
 		{
@@ -40,21 +39,15 @@ namespace Smong {
 
 			while (accumulator >= interval)
 			{
-				Update();
+				for (Layer* layer : layerStack)
+					layer->Update(elapsedTime);
+
 				accumulator -= interval;
 			}
 
 			window->Update();
 		}
 		Renderer::Cleanup();
-	}
-
-	void App::Update()
-	{
-		for (Layer* layer : layerStack)
-			layer->Update();
-
-		Renderer::Render();
 	}
 
 	void App::OnEvent(Event& e)
