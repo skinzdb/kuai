@@ -53,7 +53,7 @@ namespace Smong {
 		float mass = 1.0f;
 		float drag = 0.0f;
 
-		glm::vec3 velocity = glm::vec3(0.0f);
+		glm::vec3 velocity = { 0.0f, 0.0f, 0.0f };
 
 		bool useGravity = false;
 	};
@@ -62,39 +62,44 @@ namespace Smong {
 	{
 		MeshMaterial() = default;
 
-		MeshMaterial(Mesh* mesh, Material* material)
+		MeshMaterial(Mesh& mesh, Material& material) : mesh(mesh), material(material)
 		{
-			this->mesh = mesh;
-			this->material = material;
 		}
 
 		void Render()
 		{
-			material->Render(); // Render first to bind textures
-			mesh->Render();
+			material.Render(); // Render first to bind textures
+			mesh.Render();
 		}
 
-		Mesh* mesh;
-		Material* material;
+		Mesh& mesh;
+		Material& material;
 	};
 
 	struct Light 
 	{
-		enum class LightType
+		enum LightType
 		{
-			Directional,
-			Point
+			Directional = 0,
+			Point = 1,
+			Spot = 2
 		};
 
 		Light() = default;
 		Light(float intensity) : intensity(intensity), type(LightType::Directional) {}
-		Light(float intensity, float range) : intensity(intensity), range(range), type(LightType::Point) {}
+		Light(float intensity, float linear, float quadratic) : intensity(intensity), linear(linear), quadratic(quadratic), type(LightType::Point) {}
 
 		LightType type = LightType::Point;
 
 		glm::vec3 col = { 1.0f, 1.0f, 1.0f };
 		float intensity = 1;
-		float range = 10; // Only used for point light
+
+		// Only used for point light and spot light (attenuation values)
+		float linear = 1;	
+		float quadratic = 1;
+
+		// Only used for spot light
+		float angle = 30;
 	};
 
 	struct Camera
