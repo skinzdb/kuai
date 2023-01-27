@@ -10,19 +10,13 @@ namespace Smong {
 	class Entity
 	{
 	public:
-		Entity(const Entity& other) = default;
-
-		Entity(EntityComponentSystem* ECS)
+		Entity(EntityComponentSystem* ECS) : ECS(ECS)
 		{
-			this->ECS = ECS;
 			id = ECS->CreateEntity();
-			transform = AddComponent<Transform>(); // Every base object will have a transform component
+			AddComponent<Transform>(); // Every entity has a transform
 		}
-		Entity(EntityComponentSystem* ECS, EntityID id) // Wrap existing ID into entity object
+		Entity(EntityComponentSystem* ECS, EntityID id) : ECS(ECS), id(id) // Wrap entity object over existing ID
 		{
-			this->ECS = ECS;
-			this->id = id;
-			transform = GetComponent<Transform>();
 		}
 
 		template<class T, typename ...Args>
@@ -34,7 +28,7 @@ namespace Smong {
 
 		template<class T>
 		T& GetComponent()
-		{
+		{	
 			return ECS->GetComponent<T>(id);
 		}
 
@@ -52,7 +46,7 @@ namespace Smong {
 
 		Transform& GetTransform()
 		{
-			return transform;
+			return ECS->GetComponent<Transform>(id);
 		}
 
 		EntityID GetId() const
@@ -68,8 +62,6 @@ namespace Smong {
 	private:
 		EntityID id;
 		EntityComponentSystem* ECS;
-
-		Transform transform;
 	};
 
 }
