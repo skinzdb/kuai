@@ -6,57 +6,50 @@
 #include "glm/glm.hpp"
 
 namespace Smong {
-	class Material
+	struct Material
 	{
-	protected:
 		virtual void Render() = 0;
+		Shader* shader = nullptr;
 	};
 
-	class PhongMaterial : public Material
+	struct PhongMaterial : Material
 	{
-	public:
-		PhongMaterial(float shininess, float reflectivity, Texture* diffuse, Texture* normal, Texture* specular, glm::vec3& col) :
-			shininess(shininess), reflectivity(reflectivity), diffuse(diffuse), normal(normal), specular(specular), col(col)
+		PhongMaterial(Texture& diffuse, Texture& specular, float shininess) :
+			shininess(shininess), diffuse(diffuse), specular(specular)
 		{
+			shader = StaticShader::Phong;
 		}
 
-		Texture* GetDiffuse() { return diffuse; }
-		void SetDiffuse(Texture* diffuse) { this->diffuse = diffuse; }
+		Texture& diffuse;
+		Texture& specular;
 
-		Texture* GetNormal() { return normal; }
-		void SetNormal(Texture* normal) { this->normal = normal; }
-
-		Texture* GetSpecular() { return specular; }
-		void SetSpecular(Texture* specular) { this->specular = specular; }
-
-		glm::vec3 GetCol() { return col; }
-		void SetCol(glm::vec3 col) { this->col = col; }
-
-		float GetShininess() { return shininess; }
-		void SetShininess(float shininess) { this->shininess = shininess; }
-
-		float GetReflectivity() { return reflectivity; }
-		void SetReflectivity(float reflectivity) { this->reflectivity = reflectivity; }
+		float shininess = 1.0f;
 
 		virtual void Render()
 		{
-			StaticShader::Phong->SetUniforms(col, shininess, reflectivity);
+			StaticShader::Phong->SetUniforms(shininess);
 
-			if (diffuse)
-				diffuse->Bind();
-			if (normal)
-				normal->Bind();
-			if (specular)
-				specular->Bind();
+			diffuse.Bind(0);
+			specular.Bind(1);
+		}
+	};
+
+	struct SimpleMaterial : Material {
+		SimpleMaterial()
+		{
+			shader = StaticShader::Simple;
 		}
 
-	private:
-		Texture* diffuse;
-		Texture* normal;
-		Texture* specular;
+		SimpleMaterial(glm::vec3& col) : col(col)
+		{
+			SimpleMaterial();
+		}
 
-		glm::vec3 col;
-		float shininess;
-		float reflectivity;
+		glm::vec3 col = { 1.0f, 1.0f, 1.0f };
+
+		virtual void Render() 
+		{
+			StaticShader::Simple->SetUniforms(col);
+		}
 	};
 }

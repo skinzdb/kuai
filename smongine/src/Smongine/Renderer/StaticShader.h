@@ -2,8 +2,11 @@
 
 #include "Shader.h"
 
+#define NUM_LIGHTS 10
+
 namespace Smong {
 	class PhongShader;
+	class SimpleShader;
 
 	class StaticShader
 	{
@@ -12,6 +15,7 @@ namespace Smong {
 		static void Cleanup();
 
 		static PhongShader* Phong;
+		static SimpleShader* Simple;
 	};
 
 	class PhongShader : public Shader
@@ -19,6 +23,14 @@ namespace Smong {
 	public:
 		PhongShader();
 
-		void SetUniforms(glm::vec3& col, float shininess, float reflectivity);
+		void SetUniforms(float shininess);
+	};
+
+	class SimpleShader : public Shader
+	{
+	public:
+		SimpleShader();
+
+		void SetUniforms(glm::vec3& col);
 	};
 }
