@@ -5,10 +5,13 @@
 namespace Smong {
 	class Texture {
 	public:
+		Texture();
 		Texture(const char* filename);
 		~Texture();
 
-		void Bind();
+		uint32_t GetId();
+
+		void Bind(uint32_t activeTex);
 	private:
 		uint32_t textureId;
 	};
