@@ -24,8 +24,8 @@ namespace Smong {
 	void Shader::CreateUniform(std::string name)
 	{
 		int uniformLoc = glGetUniformLocation(programId, name.c_str());
-		if (uniformLoc < -1)
-			SM_CORE_ERROR("Could not find the uniform {0}", name);
+		if (uniformLoc == -1)
+			SM_CORE_ERROR("[Shader {0}] Could not find the uniform {1}", programId, name);
 		uniforms[name] = uniformLoc;
 	}
 
@@ -78,7 +78,7 @@ namespace Smong {
 	{
 		int shaderId = glCreateShader(type);
 		if (!shaderId)
-			SM_CORE_ERROR("Failed to create shader ({0})", type);
+			SM_CORE_ERROR("[Shader {0}] Failed to create shader ({1})", programId, type);
 
 		glShaderSource(shaderId, 1, &src, nullptr);
 		glCompileShader(shaderId);
@@ -89,7 +89,7 @@ namespace Smong {
 		{
 			char errStr[1024];
 			glGetShaderInfoLog(shaderId, 1024, nullptr, errStr); // Set max length of character buffer to 1024
-			SM_CORE_ERROR("Error compiling shader code: {0}", errStr);
+			SM_CORE_ERROR("[Shader {0}] Error compiling shader code: {1}", programId, errStr);
 		}
 
 		glAttachShader(programId, shaderId);
@@ -106,7 +106,7 @@ namespace Smong {
 		{
 			char errStr[1024];
 			glGetProgramInfoLog(programId, 1024, nullptr, errStr);
-			SM_CORE_ERROR("Error linking shader code: {0}", errStr);
+			SM_CORE_ERROR("[Shader {0}] Error linking shader code: {1}", programId, errStr);
 		}
 
 		if (vertShaderId)
@@ -121,7 +121,7 @@ namespace Smong {
 		{
 			char errStr[1024];
 			glGetProgramInfoLog(programId, 1024, nullptr, errStr);
-			SM_CORE_ERROR("Error validating shader code: {0}", errStr);
+			SM_CORE_ERROR("[Shader {0}] Error validating shader code: {1}", programId, errStr);
 		}
 	}
 }
