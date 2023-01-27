@@ -8,13 +8,19 @@ namespace Smong {
 	class LightSystem : public System
 	{
 	public:
-		LightSystem() { acceptsSubset = true; };
-		virtual void Update(float dt) {};
+		LightSystem() { acceptsSubset = true; }
+		virtual void Update(float dt) {}
+	};
+
+	class RenderSystem : public System
+	{
+	public:
+		RenderSystem() { acceptsSubset = true; }
+		virtual void Update(float dt) {}
 	};
 
 	class Scene
 	{
-		using EntityMap = std::unordered_map<EntityID, Entity*>;
 	public:
 		Scene();
 		~Scene();
@@ -27,18 +33,20 @@ namespace Smong {
 		void SetMainCam(Camera cam);
 
 		std::vector<EntityID> GetLights();
+		std::vector<EntityID> GetRenderItems();
 
-		EntityMap::iterator begin() { return entityMap.begin(); }
-		EntityMap::iterator end() { return entityMap.end(); }
+		std::vector<Entity*>::iterator begin() { return entities.begin(); }
+		std::vector<Entity*>::iterator end() { return entities.end(); }
 
 		void Update(float dt);
 	private:
 		Camera mainCam;
 
 		EntityComponentSystem* ECS;
-		EntityMap entityMap;
+		std::vector<Entity*> entities;
 
-		std::shared_ptr<LightSystem> lightSystem;
+		std::shared_ptr<LightSystem> lightSystem;	// Keeps track of all Light components
+		std::shared_ptr<RenderSystem> renderSystem; // Keeps track of all MeshMaterial components
 	};
 
 	//scene.addSystem<mask>(
@@ -61,14 +69,5 @@ namespace Smong {
 	//	}
 	//};
 
-	class MeshMaterialSystem : public System
-	{
-	public:
-		virtual void Update(float dt) {};
 
-	private:
-
-	};
 }
-
-

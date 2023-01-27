@@ -17,6 +17,9 @@ namespace Smong {
 		this->lightSystem = ECS->RegisterSystem<LightSystem>();
 		ECS->SetSystemMask<LightSystem>(BIT(ECS->GetComponentType<Light>()));
 
+		this->renderSystem = ECS->RegisterSystem<RenderSystem>();
+		ECS->SetSystemMask<RenderSystem>(BIT(ECS->GetComponentType<MeshMaterial>()));
+		
 		/*ECS->RegisterSystem<CameraTransformSystem>();
 		ECS->SetSystemMask<CameraTransformSystem>(BIT(ECS->GetComponentType<Camera>()) | BIT(ECS->GetComponentType<Transform>()));*/
 
@@ -31,9 +34,9 @@ namespace Smong {
 
 	Scene::~Scene()
 	{
-		for (auto& pair : entityMap)
+		for (auto& entity : entities)
 		{
-			delete pair.second;
+			delete entity;
 		}
 		delete ECS;
 	}
@@ -41,17 +44,19 @@ namespace Smong {
 	Entity* Scene::CreateEntity()
 	{
 		Entity* entity = new Entity(ECS);
-		entityMap.insert({ entity->GetId(), entity });
+		entities.push_back(entity);
 		return entity;
 	}
 
 	Entity* Scene::GetEntityById(EntityID entity)
 	{
-		auto pos = entityMap.find(entity);
+		return new Entity(ECS, entity); // TODO: CHANGE THIS, RAW POINTERS !!!!!!!!!!!!!
+
+		/*auto pos = entityMap.find(entity);
 
 		SM_CORE_ASSERT(pos != entityMap.end(), "Entity with ID={0} does not exist", entity);
 
-		return pos->second;
+		return pos->second;*/
 	}
 
 	void Scene::DestroyEntity(EntityID entity)
@@ -74,8 +79,14 @@ namespace Smong {
 		return lightSystem->GetEntities();
 	}
 
+	std::vector<EntityID> Scene::GetRenderItems()
+	{
+		return renderSystem->GetEntities();
+	}
+
 	void Scene::Update(float dt)
 	{
+		Renderer::Clear();
 		Renderer::Render(*this);
 	}
 
