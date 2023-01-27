@@ -28,19 +28,21 @@ namespace Smong {
 	}
 
 	void App::Run() {
-		float elapsedTime; // Time since last frame
 		float accumulator = 0;
 		float interval = 1.0f / 60.0f;
 
 		while (running) 
 		{
-			elapsedTime = timer.GetElapsed();
+			float elapsedTime = timer.GetElapsed(); // Time since last frame
 			accumulator += elapsedTime;
 
 			while (accumulator >= interval)
 			{
-				for (Layer* layer : layerStack)
-					layer->Update(elapsedTime);
+				if (!minimised)
+				{
+					for (Layer* layer : layerStack)
+						layer->Update(elapsedTime);
+				}
 
 				accumulator -= interval;
 			}
@@ -54,6 +56,7 @@ namespace Smong {
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(std::bind(&App::OnWindowClose, this, std::placeholders::_1));
+		dispatcher.Dispatch<WindowResizeEvent>(std::bind(&App::OnWindowResize, this, std::placeholders::_1));
 
 		for (auto it = layerStack.end(); it != layerStack.begin(); ) // Start from end and go backwards through stack
 		{
@@ -77,6 +80,20 @@ namespace Smong {
 	{
 		running = false;
 		return true;
+	}
+
+	bool App::OnWindowResize(WindowResizeEvent& e)
+	{
+		if (e.GetWidth() == 0 || e.GetHeight() == 0)
+		{
+			minimised = true;
+			return false;
+		}
+
+		minimised = false;
+		Renderer::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
+
+		return false;
 	}
 
 }

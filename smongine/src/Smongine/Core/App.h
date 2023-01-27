@@ -25,10 +25,12 @@ namespace Smong {
 		inline Window& GetWindow() { return *window; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
-		 
+		bool OnWindowResize(WindowResizeEvent& e);
+	private:
 		std::unique_ptr<Window> window;
 		Timer timer;
-		bool running;
+		bool running = true;
+		bool minimised = false;
 		LayerStack layerStack;
 
 		static App* instance;
