@@ -14,16 +14,17 @@ namespace Smong {
 		ECS->RegisterComponent<Light>();
 		ECS->RegisterComponent<MeshMaterial>();
 
-		this->lightSystem = ECS->RegisterSystem<LightSystem>();
+		this->lightSys = ECS->RegisterSystem<LightSystem>(this);
 		ECS->SetSystemMask<LightSystem>(BIT(ECS->GetComponentType<Light>()));
 
-		this->renderSystem = ECS->RegisterSystem<RenderSystem>();
+		this->renderSys = ECS->RegisterSystem<RenderSystem>(this);
 		ECS->SetSystemMask<RenderSystem>(BIT(ECS->GetComponentType<MeshMaterial>()));
 		
-		/*ECS->RegisterSystem<CameraTransformSystem>();
-		ECS->SetSystemMask<CameraTransformSystem>(BIT(ECS->GetComponentType<Camera>()) | BIT(ECS->GetComponentType<Transform>()));*/
+		this->cameraSys = ECS->RegisterSystem<CameraSystem>(this);
+		ECS->SetSystemMask<CameraSystem>(BIT(ECS->GetComponentType<Camera>()));
 
-		mainCam = Camera(
+		mainCam = CreateEntity();
+		mainCam->AddComponent<Camera>(
 			70.0f, 
 			(float)App::Get().GetWindow().GetWidth(),
 			(float)App::Get().GetWindow().GetHeight(),
@@ -34,29 +35,19 @@ namespace Smong {
 
 	Scene::~Scene()
 	{
-		for (auto& entity : entities)
-		{
-			delete entity;
-		}
 		delete ECS;
 	}
 
-	Entity* Scene::CreateEntity()
+	std::shared_ptr<Entity> Scene::CreateEntity()
 	{
-		Entity* entity = new Entity(ECS);
+		std::shared_ptr<Entity> entity = std::make_shared<Entity>(ECS);
 		entities.push_back(entity);
 		return entity;
 	}
 
-	Entity* Scene::GetEntityById(EntityID entity)
+	std::shared_ptr<Entity> Scene::GetEntityById(EntityID entity)
 	{
-		return new Entity(ECS, entity); // TODO: CHANGE THIS, RAW POINTERS !!!!!!!!!!!!!
-
-		/*auto pos = entityMap.find(entity);
-
-		SM_CORE_ASSERT(pos != entityMap.end(), "Entity with ID={0} does not exist", entity);
-
-		return pos->second;*/
+		return std::make_shared<Entity>(ECS, entity);
 	}
 
 	void Scene::DestroyEntity(EntityID entity)
@@ -64,32 +55,49 @@ namespace Smong {
 		ECS->DestroyEntity(entity);
 	}
 
-	Camera Scene::GetMainCam()
+	Camera& Scene::GetMainCam()
 	{
-		return mainCam;
+		return mainCam->GetComponent<Camera>();
 	}
 
-	void Scene::SetMainCam(Camera cam)
+	Transform& Scene::GetMainCamTransform()
 	{
-		this->mainCam = cam;
+		return mainCam->GetTransform();
 	}
 
-	std::vector<EntityID> Scene::GetLights()
+	void Scene::SetMainCam(Camera& cam)
 	{
-		return lightSystem->GetEntities();
-	}
-
-	std::vector<EntityID> Scene::GetRenderItems()
-	{
-		return renderSystem->GetEntities();
+		this->mainCam->GetComponent<Camera>() = cam;
 	}
 
 	void Scene::Update(float dt)
 	{
-		Renderer::Clear();
-		Renderer::Render(*this);
+		cameraSys->Update(dt);
+		lightSys->Update(dt);
+		renderSys->Update(dt);
 	}
 
+	void RenderSystem::Update(float dt)
+	{
+		Renderer::Clear();
+		for (auto& entity : entities)
+		{
+			Renderer::Render(entity->GetComponent<MeshMaterial>(), entity->GetTransform().GetModelMatrix());
+		}
+	}
 
+	void LightSystem::Update(float dt)
+	{
+		Renderer::SetLights(entities);
+	}
+
+	void CameraSystem::Update(float dt)
+	{
+		for (auto& entity : entities)
+		{
+			entity->GetComponent<Camera>().UpdateViewMatrix(entity->GetTransform().pos, entity->GetTransform().rot);
+			Renderer::SetCamera(entity->GetComponent<Camera>(), entity->GetTransform().pos);
+		}
+	}
 
 }

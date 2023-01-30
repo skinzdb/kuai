@@ -3,9 +3,8 @@
 #include "EntityManager.h"
 #include "System.h"
 
-#include <bitset>
-
 namespace Smong {
+	class Scene; // Forward declaration
 	/**
 	* Manages creation and deletion of all systems
 	* Updates each system when an entity's component mask changes
@@ -14,13 +13,13 @@ namespace Smong {
 	{
 	public:
 		template<typename T>
-		std::shared_ptr<T> RegisterSystem()
+		std::shared_ptr<T> RegisterSystem(Scene* scene)
 		{
 			const char* typeName = typeid(T).name();
 
 			SM_CORE_ASSERT(systems.find(typeName) == systems.end(), "Registering a system more than once");
 
-			auto system = std::make_shared<T>();
+			auto system = std::make_shared<T>(scene);
 			systems.insert({ typeName, system });
 			return system;
 		}

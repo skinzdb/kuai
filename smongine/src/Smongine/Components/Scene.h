@@ -5,19 +5,9 @@
 #include "Components.h"
 
 namespace Smong {
-	class LightSystem : public System
-	{
-	public:
-		LightSystem() { acceptsSubset = true; }
-		virtual void Update(float dt) {}
-	};
-
-	class RenderSystem : public System
-	{
-	public:
-		RenderSystem() { acceptsSubset = true; }
-		virtual void Update(float dt) {}
-	};
+	class LightSystem;
+	class RenderSystem;
+	class CameraSystem;
 
 	class Scene
 	{
@@ -25,28 +15,51 @@ namespace Smong {
 		Scene();
 		~Scene();
 
-		Entity* CreateEntity();
-		Entity* GetEntityById(EntityID entity);
+		std::shared_ptr<Entity> CreateEntity();
+		std::shared_ptr<Entity> GetEntityById(EntityID entity);
 		void DestroyEntity(EntityID entity);
 
-		Camera GetMainCam();
-		void SetMainCam(Camera cam);
+		Camera& GetMainCam();
+		Transform& GetMainCamTransform();
+		void SetMainCam(Camera& cam);
 
-		std::vector<EntityID> GetLights();
-		std::vector<EntityID> GetRenderItems();
-
-		std::vector<Entity*>::iterator begin() { return entities.begin(); }
-		std::vector<Entity*>::iterator end() { return entities.end(); }
+		std::vector<std::shared_ptr<Entity>>::iterator begin() { return entities.begin(); }
+		std::vector<std::shared_ptr<Entity>>::iterator end() { return entities.end(); }
 
 		void Update(float dt);
 	private:
-		Camera mainCam;
+		std::shared_ptr<Entity> mainCam;
 
 		EntityComponentSystem* ECS;
-		std::vector<Entity*> entities;
+		std::vector<std::shared_ptr<Entity>> entities;
 
-		std::shared_ptr<LightSystem> lightSystem;	// Keeps track of all Light components
-		std::shared_ptr<RenderSystem> renderSystem; // Keeps track of all MeshMaterial components
+		std::shared_ptr<LightSystem> lightSys;
+		std::shared_ptr<RenderSystem> renderSys;
+		std::shared_ptr<CameraSystem> cameraSys;
+	};
+
+	class LightSystem : public System
+	{
+	public:
+		LightSystem(Scene* scene) : System(scene) { acceptsSubset = true; }
+
+		virtual void Update(float dt);
+	};
+
+	class RenderSystem : public System
+	{
+	public:
+		RenderSystem(Scene* scene) : System(scene) { acceptsSubset = true; }
+
+		virtual void Update(float dt);
+	};
+
+	class CameraSystem : public System
+	{
+	public:
+		CameraSystem(Scene* scene) : System(scene) { acceptsSubset = true; }
+
+		virtual void Update(float dt);
 	};
 
 	//scene.addSystem<mask>(

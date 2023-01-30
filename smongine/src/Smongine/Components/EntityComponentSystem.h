@@ -8,9 +8,8 @@
 #include "Smongine/Events/KeyEvent.h"
 #include "Components.h"
 
-#include <bitset>
-
 namespace Smong {
+
 	class EventBus
 	{
 	public:
@@ -93,7 +92,7 @@ namespace Smong {
 		void AddComponent(EntityID entity, Args && ...args)
 		{
 			componentManager->AddComponent<T>(entity, std::forward<Args>(args)...);
-			
+
 			auto componentMask = entityManager->GetComponentMask(entity);
 			componentMask |= BIT(componentManager->GetComponentType<T>());
 
@@ -108,7 +107,7 @@ namespace Smong {
 
 			auto componentMask = entityManager->GetComponentMask(entity);
 			componentMask &= BIT(componentManager->GetComponentType<T>()) ^ std::numeric_limits<ComponentMask>::max();
-	
+
 			entityManager->SetComponentMask(entity, componentMask);
 			systemManager->OnEntityComponentMaskChanged(entity, componentMask);
 		}
@@ -140,11 +139,11 @@ namespace Smong {
 		// *** System Management **********************************************
 
 		template<typename T>
-		std::shared_ptr<T> RegisterSystem()
+		std::shared_ptr<T> RegisterSystem(Scene* scene)
 		{
 			SM_CORE_INFO("Registered new system: {0}", typeid(T).name());
 
-			return systemManager->RegisterSystem<T>();
+			return systemManager->RegisterSystem<T>(scene);
 		}
 
 		template<typename T>

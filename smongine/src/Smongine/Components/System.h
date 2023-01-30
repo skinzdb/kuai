@@ -3,37 +3,32 @@
 #include "Smongine/Events/Event.h"
 
 namespace Smong {
+	class Scene; // Forward declarations
+	class Entity;
+
+	using EntityID = uint32_t;
 	/**
 	* Defines the game logic for a set of entities
 	*/
 	class System
 	{
 	public:
+		System(Scene* scene) { this->scene = scene; }
+
 		virtual void Update(float dt) = 0;
 
-		void InsertEntity(EntityID entity)
-		{
-			entities.push_back(entity);
-			//entities.push_back(scene->GetEntityById(entity));
-		}
+		virtual void InsertEntity(EntityID entity);
 
-		void RemoveEntity(EntityID entity)
-		{
-			entities.erase(std::remove(entities.begin(), entities.end(), entity), entities.end());
-			//entities.erase(std::remove(entities.begin(), entities.end(), scene->GetEntityById(entity)), entities.end());
-		}
+		virtual void RemoveEntity(EntityID entity);
 
-		std::vector<EntityID>& GetEntities()
-		{
-			return entities;
-		}
+		std::vector<std::shared_ptr<Entity>>& GetEntities();
 
 	protected:
-		std::vector<EntityID> entities;
+		std::vector<std::shared_ptr<Entity>> entities;
+
+		Scene* scene;
 
 		bool acceptsSubset = false;	// Add entities that have components which are a subset of the system's component mask
-
-		//std::shared_ptr<Scene> scene;
 
 		friend class SystemManager;
 	};
