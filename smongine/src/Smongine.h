@@ -6,6 +6,7 @@
 #include "Smongine/Core/Layer.h"
 #include "Smongine/Core/Log.h"
 
+#include "Smongine/Core/Input.h"
 #include "Smongine/Core/KeyCodes.h"
 #include "Smongine/Core/MouseBtnCodes.h"
 

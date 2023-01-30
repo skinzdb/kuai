@@ -1,16 +1,17 @@
 #pragma once
 
-#include "Smongine/Core/Core.h"
+#include "KeyCodes.h"
+#include "MouseBtnCodes.h"
 
 namespace Smong {
 	class Input
 	{
 	public:
-		inline static bool IsKeyPressed(int keycode);
+		static bool IsKeyPressed(KeyCode keycode);
 
-		inline static bool IsMouseBtnPressed(int button);
-		inline static std::pair<float, float> GetMousePos();
-		inline static float GetMouseX();
-		inline static float GetMouseY();
+		static bool IsMouseBtnPressed(MouseBtnCode button);
+		static std::pair<float, float> GetMousePos();
+		static float GetMouseX();
+		static float GetMouseY();
 	};
 }

@@ -6,7 +6,7 @@
 
 namespace Smong {
 
-	bool Input::IsKeyPressed(int keycode)
+	bool Input::IsKeyPressed(KeyCode keycode)
 	{
 		auto window = static_cast<GLFWwindow*>(App::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetKey(window, keycode);
@@ -14,7 +14,7 @@ namespace Smong {
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool Input::IsMouseBtnPressed(int keycode)
+	bool Input::IsMouseBtnPressed(MouseBtnCode keycode)
 	{
 		auto window = static_cast<GLFWwindow*>(App::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetMouseButton(window, keycode);
