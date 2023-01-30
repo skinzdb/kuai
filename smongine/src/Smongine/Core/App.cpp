@@ -23,32 +23,26 @@ namespace Smong {
 		Renderer::Init();
 	}
 
-	App::~App() {
+	App::~App() 
+	{
 
 	}
 
-	void App::Run() {
-		float accumulator = 0;
-		float interval = 1.0f / 60.0f;
-
+	void App::Run() 
+	{
 		while (running) 
 		{
 			float elapsedTime = timer.GetElapsed(); // Time since last frame
-			accumulator += elapsedTime;
-
-			while (accumulator >= interval)
+						
+			if (!minimised)
 			{
-				if (!minimised)
-				{
-					for (Layer* layer : layerStack)
-						layer->Update(elapsedTime);
-				}
-
-				accumulator -= interval;
+				for (Layer* layer : layerStack)
+					layer->Update(elapsedTime);
 			}
 
 			window->Update();
 		}
+
 		Renderer::Cleanup();
 	}
 
