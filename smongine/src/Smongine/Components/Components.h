@@ -139,7 +139,7 @@ namespace Smong {
 			aspect = width / height;
 		}
 
-		inline glm::mat4& GetViewMatrix() { return viewMatrix; }
+		inline glm::mat4& GetViewMatrix()  { return viewMatrix; }
 		inline glm::mat4& GetProjectionMatrix() { return projectionMatrix; }
 
 		void UpdateViewMatrix(glm::vec3 pos, glm::vec3 rot)

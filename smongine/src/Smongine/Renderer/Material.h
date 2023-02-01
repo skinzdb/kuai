@@ -12,18 +12,14 @@ namespace Smong {
 		Shader* shader = nullptr;
 	};
 
-	struct PhongMaterial : Material
+	class PhongMaterial : public Material
 	{
+	public:
 		PhongMaterial(Texture& diffuse, Texture& specular, float shininess) :
 			shininess(shininess), diffuse(diffuse), specular(specular)
 		{
 			shader = StaticShader::Phong;
 		}
-
-		Texture& diffuse;
-		Texture& specular;
-
-		float shininess = 1.0f;
 
 		virtual void Render()
 		{
@@ -32,9 +28,16 @@ namespace Smong {
 			diffuse.Bind(0);
 			specular.Bind(1);
 		}
+
+	private:
+		Texture& diffuse;
+		Texture& specular;
+
+		float shininess = 1.0f;
 	};
 
-	struct SimpleMaterial : Material {
+	class SimpleMaterial : Material {
+	public:
 		SimpleMaterial()
 		{
 			shader = StaticShader::Simple;
@@ -45,11 +48,12 @@ namespace Smong {
 			SimpleMaterial();
 		}
 
-		glm::vec3 col = { 1.0f, 1.0f, 1.0f };
-
 		virtual void Render() 
 		{
 			StaticShader::Simple->SetUniforms(col);
 		}
+
+	private:
+		glm::vec3 col = { 1.0f, 1.0f, 1.0f };
 	};
 }

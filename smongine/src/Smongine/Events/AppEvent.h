@@ -31,9 +31,7 @@ namespace Smong {
 
 		std::string ToString() const override
 		{
-			std::stringstream ss;
-			ss << "WindowCloseEvent";
-			return ss.str();
+			return "WindowCloseEvent";
 		}
 
 		EVENT_CLASS_CATEGORY(AppEventCategory)

@@ -13,7 +13,7 @@ namespace Smong {
 	class System
 	{
 	public:
-		System(Scene* scene) { this->scene = scene; }
+		System(Scene* scene) : scene(scene) {}
 
 		virtual void Update(float dt) = 0;
 

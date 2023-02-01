@@ -10,16 +10,19 @@ namespace Smong {
 		Shader(const char* vertSrc, const char* fragSrc);
 		~Shader();
 
-		void CreateUniform(std::string name);
+		void CreateUniform(const std::string& name);
+		void CreateUniformBlock(const std::string& name, const std::vector<const char*>& memberNames, uint32_t size);
 
-		void SetUniform(std::string name, int val);
-		void SetUniform(std::string name, float val);
-		void SetUniform(std::string name, glm::vec2& val);
-		void SetUniform(std::string name, glm::vec3& val);
-		void SetUniform(std::string name, glm::vec4& val);
-		void SetUniform(std::string name, glm::mat3& val);
-		void SetUniform(std::string name, glm::mat4& val);
+		void SetUniform(const std::string& name, int val) const;
+		void SetUniform(const std::string& name, float val) const;
+		void SetUniform(const std::string& name, const glm::vec2& val) const;
+		void SetUniform(const std::string& name, const glm::vec3& val) const;
+		void SetUniform(const std::string& name, const glm::vec4& val) const;
+		void SetUniform(const std::string& name, const glm::mat3& val) const;
+		void SetUniform(const std::string& name, const glm::mat4& val) const;
 		
+		void SetUniform(const std::string& blockName, const std::string& name, const glm::mat4& val) const;
+
 		void Bind();
 		void Unbind();
 
@@ -30,7 +33,9 @@ namespace Smong {
 		int programId;
 		int vertShaderId;
 		int fragShaderId;
+
 		std::unordered_map<std::string, int> uniforms;
+		std::unordered_map<std::string, int> uniformOffsets;
 	};
 }
 

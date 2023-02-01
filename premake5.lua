@@ -11,7 +11,6 @@ workspace "Smongine"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 include "Smongine/vendor/Glad"
--- include "Smongine/vendor/ImGui"
 include "Smongine/vendor/GLFW"
 
 project "Smongine"
@@ -34,6 +33,9 @@ project "Smongine"
 
 		"%{prj.name}/vendor/stb_image/stb_image.h",
 		"%{prj.name}/vendor/stb_image/stb_image.cpp",
+
+		"%{prj.name}/vendor/tinyobjloader/tiny_obj_loader.h",
+		"%{prj.name}/vendor/tinyobjloader/tiny_obj_loader.cpp"
 	}
 
 	includedirs
@@ -42,16 +44,15 @@ project "Smongine"
 		"%{prj.name}/vendor/spdlog/include",
 		"%{prj.name}/vendor/GLFW/include",
 		"%{prj.name}/vendor/Glad/include",
-		-- "%{prj.name}/vendor/ImGui",
 		"%{prj.name}/vendor/glm",
-		"%{prj.name}/vendor/stb_image"
+		"%{prj.name}/vendor/stb_image",
+		"%{prj.name}/vendor/tinyobjloader"
 	}
 
 	links
 	{
 		"GLFW",
 		"Glad",
-		-- "ImGui",
 		"opengl32.lib"
 	}
 

@@ -5,11 +5,10 @@
 
 #include <glad/glad.h>
 #include <glm/gtc/matrix_inverse.hpp>
-#include <glm/gtx/string_cast.hpp>
 
 namespace Smong {
-    std::shared_ptr<Mesh> mesh;
-    Texture* texture;
+    std::unique_ptr<Renderer::CameraData> Renderer::camData = std::make_unique<Renderer::CameraData>();
+    std::vector<std::shared_ptr<Entity>> Renderer::lights = std::vector<std::shared_ptr<Entity>>();
 
     void Renderer::Init()
     {
@@ -24,6 +23,8 @@ namespace Smong {
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glEnable(GL_FRAMEBUFFER_SRGB); // TODO: IMPLEMENT THIS MANUALLY IN SHADER AND TEXTURES 
     }
 
     void Renderer::Cleanup()
@@ -36,7 +37,7 @@ namespace Smong {
         glViewport(x, y, width, height);
     }
 
-    void Renderer::SetClearCol(glm::vec4& col)
+    void Renderer::SetClearCol(const glm::vec4& col)
     {
         glClearColor(col.r, col.g, col.b, col.a);
     }
@@ -46,46 +47,50 @@ namespace Smong {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    void Renderer::Render(Scene& scene)
+    void Renderer::SetCamera(Camera& cam, glm::vec3& viewPos)
     {
-        for (auto& entityId : scene.GetRenderItems())
+        camData->projectionMatrix = cam.GetProjectionMatrix();
+        camData->viewMatrix = cam.GetViewMatrix();
+        camData->viewPos = viewPos;
+    }
+
+    void Renderer::SetLights(std::vector<std::shared_ptr<Entity>>& lights)
+    {
+        Renderer::lights = lights;
+    }
+
+    void Renderer::Render(MeshMaterial& meshMat, glm::mat4& transform)
+    {
+        Shader* shader = meshMat.material.shader;
+
+        shader->Bind();
+
+        for (int i = 0; i < lights.size(); i++)
         {
-            Entity* renderEntity = scene.GetEntityById(entityId);
+            Light light = lights[i]->GetComponent<Light>();
 
-            MeshMaterial meshMat = renderEntity->GetComponent<MeshMaterial>();
-            Shader* shader = meshMat.material.shader;
+            shader->SetUniform("lights[" + std::to_string(i) + "].type", (int)light.type);
 
-            shader->Bind();
+            shader->SetUniform("lights[" + std::to_string(i) + "].pos", lights[i]->GetTransform().pos);
+            shader->SetUniform("lights[" + std::to_string(i) + "].dir", lights[i]->GetTransform().rot);
+            shader->SetUniform("lights[" + std::to_string(i) + "].col", light.col);
 
-            shader->SetUniform("projectionMatrix", scene.GetMainCam().GetProjectionMatrix());
-            shader->SetUniform("viewMatrix", scene.GetMainCam().GetViewMatrix());
-            shader->SetUniform("modelMatrix", renderEntity->GetTransform().GetModelMatrix());
+            shader->SetUniform("lights[" + std::to_string(i) + "].intensity", light.intensity);
 
-            shader->SetUniform("model3x3InvTransp", glm::inverseTranspose(glm::mat3(renderEntity->GetTransform().GetModelMatrix())));
+            shader->SetUniform("lights[" + std::to_string(i) + "].linear", light.linear);
+            shader->SetUniform("lights[" + std::to_string(i) + "].quadratic", light.quadratic);
 
-            shader->SetUniform("viewPos", glm::vec3(0, 0, 0));
-
-            for (int i = 0; i < scene.GetLights().size(); i++)
-            {
-                Entity* lightEntity = scene.GetEntityById(scene.GetLights()[i]);
-                Light light = lightEntity->GetComponent<Light>();
-
-                shader->SetUniform("lights[" + std::to_string(i) + "].type", light.type);
-            
-                shader->SetUniform("lights[" + std::to_string(i) + "].pos", lightEntity->GetTransform().GetPos());
-                shader->SetUniform("lights[" + std::to_string(i) + "].dir", lightEntity->GetTransform().GetForward());
-                shader->SetUniform("lights[" + std::to_string(i) + "].col", light.col);
-
-                shader->SetUniform("lights[" + std::to_string(i) + "].intensity", light.intensity);
-
-                shader->SetUniform("lights[" + std::to_string(i) + "].linear", light.linear);
-                shader->SetUniform("lights[" + std::to_string(i) + "].quadratic", light.quadratic);
-
-                //shader->SetUniform("lights[" + std::to_string(i) + "].cutoff", light.angle);
-            }
-
-            meshMat.Render();
+            shader->SetUniform("lights[" + std::to_string(i) + "].cutoff", glm::cos(glm::radians(light.angle)));
         }
+
+        shader->SetUniform("projectionMatrix", camData->projectionMatrix);
+        shader->SetUniform("viewMatrix", camData->viewMatrix);
+        shader->SetUniform("viewPos", camData->viewPos);
+              
+        shader->SetUniform("modelMatrix", transform);
+        shader->SetUniform("model3x3InvTransp", glm::inverseTranspose(glm::mat3(transform)));
+           
+        meshMat.Render();
     }
 }
 

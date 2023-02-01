@@ -4,7 +4,7 @@
 #include <tiny_obj_loader.h>
 
 namespace Smong {
-    std::shared_ptr<Mesh> ModelLoader::LoadObj(std::string filename)
+    Mesh* ModelLoader::LoadObj(std::string filename)
     {
         tinyobj::ObjReaderConfig reader_config;
         reader_config.mtl_search_path = "./"; // Path to material files
@@ -28,7 +28,7 @@ namespace Smong {
 
         std::vector<uint32_t> indices;
 
-        for (size_t s = 0; s < shapes.size(); s++) 
+        for (size_t s = 0; s < shapes.size(); s++) // Build indices vector
         {
             for (size_t i = 0; i < shapes[s].mesh.indices.size(); i++)
             {
@@ -36,6 +36,14 @@ namespace Smong {
             }
         }
 
-        return std::make_shared<Mesh>(attrib.vertices, attrib.normals, attrib.texcoords, indices);
+        SM_CORE_INFO("Loaded OBJ file: {0}", filename);
+
+        // REMOVE (one day) ---------------------
+        std::vector texCoords = attrib.normals;
+        if (texCoords.empty())
+            texCoords = { 0, 0 };
+        // --------------------------------------
+
+        return new Mesh(attrib.vertices, attrib.normals, texCoords, indices);
     }
 }

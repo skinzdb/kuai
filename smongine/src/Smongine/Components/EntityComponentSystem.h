@@ -30,7 +30,7 @@ namespace Smong {
 		template<typename T, typename EventType>
 		void subscribe(T& instance, EventCallbackFn fn)
 		{
-			auto callbacks = subscribers[typeid(EventType).name()]; // Get callbacks or insert and initialise new list if entry does not exist
+			auto callbacks = subscribers.at(typeid(EventType).name()); // Get callbacks or insert and initialise new list if entry does not exist
 			callbacks->push_back(fn);
 		}
 	private:
@@ -158,7 +158,10 @@ namespace Smong {
 		void NotifySystems(EventType& event);
 
 		template<typename T, typename EventType>
-		void SubscribeSystem(EventType& event);
+		void SubscribeSystem(T& instance, EventType& event)
+		{
+			eventBus->subscribe(T, event);
+		}
 
 	private:
 		std::unique_ptr<EntityManager> entityManager;

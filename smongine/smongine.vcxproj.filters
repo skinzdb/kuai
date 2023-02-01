@@ -34,6 +34,9 @@
     <Filter Include="vendor\stb_image">
       <UniqueIdentifier>{0DA0BA59-F998-D9AB-22CB-BE300E23B9B7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vendor\tinyobjloader">
+      <UniqueIdentifier>{386CC32A-24FB-4CF4-CD19-61EFB9875D9A}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Smongine.h">
@@ -52,9 +55,6 @@
       <Filter>src\Smongine\Components</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Components\EntityManager.h">
-      <Filter>src\Smongine\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Smongine\Components\GameObj.h">
       <Filter>src\Smongine\Components</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Components\Scene.h">
@@ -114,6 +114,9 @@
     <ClInclude Include="src\Smongine\Platform\Windows\WinWindow.h">
       <Filter>src\Smongine\Platform\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="src\Smongine\Renderer\Material.h">
+      <Filter>src\Smongine\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Smongine\Renderer\Mesh.h">
       <Filter>src\Smongine\Renderer</Filter>
     </ClInclude>
@@ -123,10 +126,16 @@
     <ClInclude Include="src\Smongine\Renderer\Shader.h">
       <Filter>src\Smongine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Smongine\Renderer\StaticShader.h">
+      <Filter>src\Smongine\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Smongine\Renderer\Texture.h">
       <Filter>src\Smongine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Smongine\Util\FileUtil.h">
+      <Filter>src\Smongine\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Smongine\Util\ModelLoader.h">
       <Filter>src\Smongine\Util</Filter>
     </ClInclude>
     <ClInclude Include="src\smpch.h">
@@ -134,6 +143,9 @@
     </ClInclude>
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\tinyobjloader\tiny_obj_loader.h">
+      <Filter>vendor\tinyobjloader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -167,10 +179,16 @@
     <ClCompile Include="src\Smongine\Renderer\Shader.cpp">
       <Filter>src\Smongine\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Smongine\Renderer\StaticShader.cpp">
+      <Filter>src\Smongine\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Smongine\Renderer\Texture.cpp">
       <Filter>src\Smongine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Smongine\Util\FileUtil.cpp">
+      <Filter>src\Smongine\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Smongine\Util\ModelLoader.cpp">
       <Filter>src\Smongine\Util</Filter>
     </ClCompile>
     <ClCompile Include="src\smpch.cpp">
@@ -179,5 +197,9 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="vendor\tinyobjloader\tiny_obj_loader.cpp">
+      <Filter>vendor\tinyobjloader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Smongine\Components\System.cpp" />
   </ItemGroup>
 </Project>

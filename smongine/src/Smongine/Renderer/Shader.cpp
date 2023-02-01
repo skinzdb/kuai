@@ -21,7 +21,7 @@ namespace Smong {
 			glDeleteProgram(programId);
 	}
 
-	void Shader::CreateUniform(std::string name)
+	void Shader::CreateUniform(const std::string& name)
 	{
 		int uniformLoc = glGetUniformLocation(programId, name.c_str());
 		if (uniformLoc == -1)
@@ -29,39 +29,77 @@ namespace Smong {
 		uniforms[name] = uniformLoc;
 	}
 
-	void Shader::SetUniform(std::string name, int val)
+	void Shader::CreateUniformBlock(const std::string& name, const std::vector<const char*>& memberNames, uint32_t size)
 	{
-		glUniform1i(uniforms[name], val);
+		SM_CORE_ASSERT(memberNames.size(), "No member names entered for uniform block.");
+
+		// Create uniform buffer object
+		unsigned int ubo;
+		glGenBuffers(1, &ubo);
+		glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+		glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+		glBindBufferRange(GL_UNIFORM_BUFFER, 0, ubo, 0, size);
+
+		// Define the range of the buffer that links to a uniform binding point
+
+		uniforms[name] = ubo;
+
+		// Get indices of uniforms within block
+		unsigned int* indices = new unsigned int[memberNames.size()];
+		glGetUniformIndices(programId, memberNames.size(), memberNames.data(), indices);
+		// Get offsets for uniforms in bytes
+		int* offsets = new int[std::max(1, (int)memberNames.size())];
+		glGetActiveUniformsiv(programId, memberNames.size(), indices, GL_UNIFORM_OFFSET, offsets);
+
+		for (int i = 0; i < memberNames.size(); i++)
+		{
+			uniformOffsets[memberNames[i]] = offsets[i];
+		}
+
+		delete[] indices;
+		delete[] offsets;
 	}
 
-	void Shader::SetUniform(std::string name, float val)
+	void Shader::SetUniform(const std::string& name, int val) const
 	{
-		glUniform1f(uniforms[name], val);
+		glUniform1i(uniforms.at(name), val);
 	}
 
-	void Shader::SetUniform(std::string name, glm::vec2& val)
+	void Shader::SetUniform(const std::string& name, float val) const
 	{
-		glUniform2f(uniforms[name], val.x, val.y);
+		glUniform1f(uniforms.at(name), val);
 	}
 
-	void Shader::SetUniform(std::string name, glm::vec3& val)
+	void Shader::SetUniform(const std::string& name, const glm::vec2& val) const
 	{
-		glUniform3f(uniforms[name], val.x, val.y, val.z);
+		glUniform2f(uniforms.at(name), val.x, val.y);
 	}
 
-	void Shader::SetUniform(std::string name, glm::vec4& val)
+	void Shader::SetUniform(const std::string& name, const glm::vec3& val) const
 	{
-		glUniform4f(uniforms[name], val.x, val.y, val.z, val.w);
+		glUniform3f(uniforms.at(name), val.x, val.y, val.z);
 	}
 
-	void Shader::SetUniform(std::string name, glm::mat3& val)
+	void Shader::SetUniform(const std::string& name, const glm::vec4& val) const
 	{
-		glUniformMatrix3fv(uniforms[name], 1, GL_FALSE, &val[0][0]);
+		glUniform4f(uniforms.at(name), val.x, val.y, val.z, val.w);
 	}
 
-	void Shader::SetUniform(std::string name, glm::mat4& val)
+	void Shader::SetUniform(const std::string& name, const glm::mat3& val) const
 	{
-		glUniformMatrix4fv(uniforms[name], 1, GL_FALSE, &val[0][0]);
+		glUniformMatrix3fv(uniforms.at(name), 1, GL_FALSE, &val[0][0]);
+	}
+
+	void Shader::SetUniform(const std::string& name, const glm::mat4& val) const
+	{
+		glUniformMatrix4fv(uniforms.at(name), 1, GL_FALSE, &val[0][0]);
+	}
+
+	void Shader::SetUniform(const std::string& blockName, const std::string& memberName, const glm::mat4& val) const
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, uniforms.at(blockName));
+		glBufferSubData(GL_UNIFORM_BUFFER, uniformOffsets.at(memberName), sizeof(glm::mat4), &val[0][0]);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
 	void Shader::Bind()

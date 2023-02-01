@@ -20,7 +20,7 @@ namespace Smong {
 	// *** PHONG ******************************************************************
 
 	const char* PHONG_VERT_SRC = R"(
-		#version 330 core
+		#version 460
 		layout (location = 0) in vec3 aPos;
 		layout (location = 1) in vec3 aNormals;
 		layout (location = 2) in vec2 aTexCoords;
@@ -31,8 +31,14 @@ namespace Smong {
 
 		uniform mat4 projectionMatrix;
 		uniform mat4 viewMatrix;
-		uniform mat4 modelMatrix;
 
+		//layout (std140, binding = 0) uniform Matrices
+		//{
+		//	uniform mat4 projectionMatrix;
+		//	uniform mat4 viewMatrix;
+		//};
+
+		uniform mat4 modelMatrix;
 		uniform mat3 model3x3InvTransp; // Used to calculate proper world position of normals
 
 		void main()
@@ -45,7 +51,7 @@ namespace Smong {
 	)";
 
 	const char* PHONG_FRAG_SRC = R"(
-		#version 330 core
+		#version 460
 		out vec4 fragCol;
 
 		in vec4 worldPos;
@@ -55,7 +61,7 @@ namespace Smong {
 		uniform vec3 viewPos;
 
 		#define NUM_LIGHTS 10
-		
+
 		struct Light
 		{
 			int type;
@@ -63,10 +69,9 @@ namespace Smong {
 			vec3 pos;
 			vec3 dir;
 			vec3 col;
-
+			
 			float intensity;
 
-			float range;
 			float linear;
 			float quadratic;
 
@@ -91,7 +96,7 @@ namespace Smong {
 
 			vec3 finalCol = vec3(0.0, 0.0, 0.0);
 
-			for (int i = 0; i < 2; i++)
+			for (int i = 0; i < NUM_LIGHTS; i++)
 			{
 				if (lights[i].type == 0) // Directional Light
 				{
@@ -109,8 +114,8 @@ namespace Smong {
 					if (lights[i].type == 2) // Spotlight
 					{
 						float theta = dot(lightDir, normalize(-lights[i].dir)); 
-						float epsilon = lights[i].cutoff - (lights[i].cutoff + 5);
-						float intensity = clamp((theta - (lights[i].cutoff + 5)) / epsilon, 0.0, 1.0);
+						float epsilon = 0.1;
+						float intensity = clamp((theta - lights[i].cutoff) / epsilon, 0.0, 1.0);
 
 						factor *= intensity;
 					}
@@ -119,7 +124,7 @@ namespace Smong {
 				vec3 lighting = lights[i].intensity * lights[i].col;
 
 				// Ambient
-				vec3 ambient = 0.15 * lighting * vec3(texture(material.diffuse, texCoords));
+				vec3 ambient = 0.1 * lighting * vec3(texture(material.diffuse, texCoords));
 
 				// Diffuse
 				float diff = max(dot(norm, lightDir), 0.0);
@@ -127,7 +132,8 @@ namespace Smong {
 
 				// Specular
 				vec3 reflectDir = reflect(-lightDir, norm);
-				float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+				vec3 halfwayDir = normalize(lightDir + viewDir);
+				float spec = pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
 				vec3 specular = lighting * spec * vec3(texture(material.specular, texCoords));
 
 				finalCol += (ambient + diffuse + specular) * factor;
@@ -143,8 +149,12 @@ namespace Smong {
 	
 		CreateUniform("projectionMatrix");
 		CreateUniform("viewMatrix");
-		CreateUniform("modelMatrix");
 
+		//std::vector<const char*> matrixMemberNames = { "projectionMatrix", "viewMatrix" };
+
+		//CreateUniformBlock("Matrices", matrixMemberNames, sizeof(glm::mat4) * 2);
+
+		CreateUniform("modelMatrix");
 		CreateUniform("model3x3InvTransp");
 
 		CreateUniform("material.diffuse");
@@ -258,7 +268,7 @@ namespace Smong {
 		CreateUniform("light.intensity");
 	}
 
-	void SimpleShader::SetUniforms(glm::vec3& col)
+	void SimpleShader::SetUniforms(const glm::vec3& col) const
 	{
 		SetUniform("material.col", col);
 	}

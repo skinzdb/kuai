@@ -1,16 +1,10 @@
 [submodule "smongine/vendor/spdlog"]
 	path = smongine/vendor/spdlog
 	url = https://github.com/gabime/spdlog
-[submodule "Smongine/vendor/ImGui"]
-	path = Smongine/vendor/ImGui
-	url = https://github.com/TheCherno/imgui.git
 [submodule "Smongine/vendor/glm"]
 	path = Smongine/vendor/glm
 	url = https://github.com/g-truc/glm
 [submodule "smongine/vendor/GLFW"]
 	path = smongine/vendor/GLFW
 	url = https://github.com/TheCherno/glfw/
-[submodule "Smongine/vendor/pybind11"]
-	path = Smongine/vendor/pybind11
-	url = git@github.com:pybind/pybind11.git
-	branch = stable
+	

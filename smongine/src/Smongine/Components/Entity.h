@@ -59,6 +59,12 @@ namespace Smong {
 			ECS->DestroyEntity(id);
 		}
 
+		template<class T>
+		void SetOnCollision(std::function<bool(T&)> fn) 
+		{
+			ECS->SubscribeSystem(fn, )
+		}
+
 	private:
 		EntityID id;
 		EntityComponentSystem* ECS;

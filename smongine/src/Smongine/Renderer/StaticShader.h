@@ -31,6 +31,6 @@ namespace Smong {
 	public:
 		SimpleShader();
 
-		void SetUniforms(glm::vec3& col);
+		void SetUniforms(const glm::vec3& col) const;
 	};
 }
