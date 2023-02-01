@@ -6,5 +6,4 @@
 	url = https://github.com/g-truc/glm
 [submodule "Smongine/vendor/GLFW"]
 	path = Smongine/vendor/GLFW
-	url = https://github.com/TheCherno/glfw/
-	
+	url = git@github.com:skinzdb/glfw.git
