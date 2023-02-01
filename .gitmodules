@@ -1,10 +1,10 @@
-[submodule "smongine/vendor/spdlog"]
-	path = smongine/vendor/spdlog
+[submodule "Smongine/vendor/spdlog"]
+	path = Smongine/vendor/spdlog
 	url = https://github.com/gabime/spdlog
 [submodule "Smongine/vendor/glm"]
 	path = Smongine/vendor/glm
 	url = https://github.com/g-truc/glm
-[submodule "smongine/vendor/GLFW"]
-	path = smongine/vendor/GLFW
+[submodule "Smongine/vendor/GLFW"]
+	path = Smongine/vendor/GLFW
 	url = https://github.com/TheCherno/glfw/
 	
