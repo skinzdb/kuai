@@ -13,7 +13,7 @@ namespace Smong {
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
 		virtual void Update(float dt) {}
-		virtual void OnEvent(Event& event) {}
+		virtual void OnEvent(Event* event) {}
 
 		inline const std::string& GetName() const { return name;  }
 	protected:

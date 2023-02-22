@@ -152,6 +152,9 @@
     <ClCompile Include="src\Smongine\Components\Scene.cpp">
       <Filter>src\Smongine\Components</Filter>
     </ClCompile>
+    <ClCompile Include="src\Smongine\Components\System.cpp">
+      <Filter>src\Smongine\Components</Filter>
+    </ClCompile>
     <ClCompile Include="src\Smongine\Core\App.cpp">
       <Filter>src\Smongine\Core</Filter>
     </ClCompile>
@@ -200,6 +203,5 @@
     <ClCompile Include="vendor\tinyobjloader\tiny_obj_loader.cpp">
       <Filter>vendor\tinyobjloader</Filter>
     </ClCompile>
-    <ClCompile Include="src\Smongine\Components\System.cpp" />
   </ItemGroup>
 </Project>

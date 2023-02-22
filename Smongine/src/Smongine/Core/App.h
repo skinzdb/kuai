@@ -16,7 +16,7 @@ namespace Smong {
 
 		void Run();
 
-		void OnEvent(Event& e);
+		void OnEvent(Event* e);
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
@@ -35,7 +35,5 @@ namespace Smong {
 
 		static App* instance;
 	};
-
-	App* CreateApp();
 }
 

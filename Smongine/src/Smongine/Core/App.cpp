@@ -46,7 +46,7 @@ namespace Smong {
 		Renderer::Cleanup();
 	}
 
-	void App::OnEvent(Event& e)
+	void App::OnEvent(Event* e)
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(std::bind(&App::OnWindowClose, this, std::placeholders::_1));
@@ -55,7 +55,7 @@ namespace Smong {
 		for (auto it = layerStack.end(); it != layerStack.begin(); ) // Start from end and go backwards through stack
 		{
 			(*--it)->OnEvent(e);
-			if (e.handled) // As soon as event handled, break
+			if (e->handled) // As soon as event handled, break
 				break;
 		}
 	}

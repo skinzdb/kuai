@@ -49,21 +49,21 @@ namespace Smong {
 		template<typename T>
 		using EventFn = std::function<bool(T&)>;
 	public:
-		EventDispatcher(Event& event) : event(event) {}
+		EventDispatcher(Event* event) : event(event) {}
 
 		template<typename T>
 		bool Dispatch(EventFn<T> func)
 		{
-			if (event.GetEventType() == T::GetStaticType()) // Check if passed event type matches event type of template argument
+			if (event->GetEventType() == T::GetStaticType()) // Check if passed event type matches event type of template argument
 			{ 
-				event.handled |= func(*(T*)&event); // Call the function with that event as its argument
+				event->handled |= func(*(T*)event); // Call the function with that event as its argument
 				return true; // Indicate the event has been handled
 			}
 			return false;
 		}
 
 	private:
-		Event& event;
+		Event* event;
 	};
 
 	inline std::ostream& operator<<(std::ostream& os, const Event& e)
