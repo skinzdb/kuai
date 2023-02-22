@@ -6,8 +6,9 @@
 #include "glm/glm.hpp"
 
 namespace Smong {
-	struct Material
+	class Material
 	{
+	public:
 		virtual void Render() = 0;
 		Shader* shader = nullptr;
 	};

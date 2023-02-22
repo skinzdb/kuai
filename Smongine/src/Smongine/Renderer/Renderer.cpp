@@ -61,7 +61,7 @@ namespace Smong {
 
     void Renderer::Render(MeshMaterial& meshMat, glm::mat4& transform)
     {
-        Shader* shader = meshMat.material.shader;
+        Shader* shader = meshMat.material->shader;
 
         shader->Bind();
 

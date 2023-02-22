@@ -60,17 +60,17 @@ namespace Smong {
 	struct MeshMaterial
 	{
 		MeshMaterial() = default;
-
-		MeshMaterial(Mesh& mesh, Material& material) : mesh(mesh), material(material) {}
+	
+		MeshMaterial(Mesh* mesh, Material* material) : mesh(mesh), material(material) {}
 
 		void Render()
 		{
-			material.Render(); // Render first to bind textures
-			mesh.Render();
+			material->Render(); // Render first to bind textures
+			mesh->Render();
 		}
 
-		Mesh& mesh;
-		Material& material;
+		Mesh* mesh = nullptr;
+		Material* material = nullptr;
 	};
 
 	struct Light 
