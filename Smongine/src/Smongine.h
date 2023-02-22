@@ -18,7 +18,3 @@
 #include "Smongine/Renderer/Texture.h"
 #include "Smongine/Renderer/Material.h"
 #include "Smongine/Util/ModelLoader.h"
-
-// *** Entry Point **************
-#include "Smongine/Core/EntryPoint.h"
-// ******************************
