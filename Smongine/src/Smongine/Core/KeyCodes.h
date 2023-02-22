@@ -8,7 +8,7 @@ namespace Smong
 
 	namespace Key
 	{
-		enum : KeyCode
+		enum Key : KeyCode // Enum needs name for Python bindings
 		{
 			// From glfw3.h
 			Space = 32,
