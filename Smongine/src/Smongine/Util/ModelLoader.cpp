@@ -4,7 +4,7 @@
 #include <tiny_obj_loader.h>
 
 namespace Smong {
-    Mesh* ModelLoader::LoadObj(std::string filename)
+    std::shared_ptr<Mesh> ModelLoader::LoadObj(std::string filename)
     {
         tinyobj::ObjReaderConfig reader_config;
         reader_config.mtl_search_path = "./"; // Path to material files
@@ -44,6 +44,6 @@ namespace Smong {
             texCoords = { 0, 0 };
         // --------------------------------------
 
-        return new Mesh(attrib.vertices, attrib.normals, texCoords, indices);
+        return std::make_shared<Mesh>(attrib.vertices, attrib.normals, texCoords, indices);
     }
 }

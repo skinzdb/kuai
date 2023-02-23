@@ -61,7 +61,7 @@ namespace Smong {
 	{
 		MeshMaterial() = default;
 	
-		MeshMaterial(Mesh* mesh, Material* material) : mesh(mesh), material(material) {}
+		MeshMaterial(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) : mesh(mesh), material(material) {}
 
 		void Render()
 		{
@@ -69,8 +69,8 @@ namespace Smong {
 			mesh->Render();
 		}
 
-		Mesh* mesh = nullptr;
-		Material* material = nullptr;
+		std::shared_ptr<Mesh> mesh = nullptr;
+		std::shared_ptr<Material> material = nullptr;
 	};
 
 	struct Light 

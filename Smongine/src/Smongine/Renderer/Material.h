@@ -16,7 +16,7 @@ namespace Smong {
 	class PhongMaterial : public Material
 	{
 	public:
-		PhongMaterial(Texture& diffuse, Texture& specular, float shininess) :
+		PhongMaterial(std::shared_ptr<Texture> diffuse, std::shared_ptr<Texture> specular, float shininess) :
 			shininess(shininess), diffuse(diffuse), specular(specular)
 		{
 			shader = StaticShader::Phong;
@@ -26,13 +26,13 @@ namespace Smong {
 		{
 			StaticShader::Phong->SetUniforms(shininess);
 
-			diffuse.Bind(0);
-			specular.Bind(1);
+			diffuse->Bind(0);
+			specular->Bind(1);
 		}
 
 	private:
-		Texture& diffuse;
-		Texture& specular;
+		std::shared_ptr<Texture> diffuse;
+		std::shared_ptr<Texture> specular;
 
 		float shininess = 1.0f;
 	};

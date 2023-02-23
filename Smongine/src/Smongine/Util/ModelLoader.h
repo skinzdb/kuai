@@ -7,7 +7,7 @@ namespace Smong {
 	class ModelLoader
 	{
 	public:
-		static Mesh* LoadObj(std::string filename);
+		static std::shared_ptr<Mesh> LoadObj(std::string filename);
 	};
 }
 
