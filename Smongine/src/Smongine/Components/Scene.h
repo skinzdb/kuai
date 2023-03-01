@@ -20,7 +20,6 @@ namespace Smong {
 		void DestroyEntity(EntityID entity);
 
 		Camera& GetMainCam();
-		Transform& GetMainCamTransform();
 		void SetMainCam(Camera& cam);
 
 		std::vector<std::shared_ptr<Entity>>::iterator begin() { return entities.begin(); }
@@ -35,7 +34,6 @@ namespace Smong {
 
 		std::shared_ptr<LightSystem> lightSys;
 		std::shared_ptr<RenderSystem> renderSys;
-		std::shared_ptr<CameraSystem> cameraSys;
 	};
 
 	class LightSystem : public System

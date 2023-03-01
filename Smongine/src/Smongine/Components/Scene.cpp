@@ -20,8 +20,8 @@ namespace Smong {
 		this->renderSys = ECS->RegisterSystem<RenderSystem>(this);
 		ECS->SetSystemMask<RenderSystem>(BIT(ECS->GetComponentType<MeshMaterial>()));
 		
-		this->cameraSys = ECS->RegisterSystem<CameraSystem>(this);
-		ECS->SetSystemMask<CameraSystem>(BIT(ECS->GetComponentType<Camera>()));
+		//this->cameraSys = ECS->RegisterSystem<CameraSystem>(this);
+		//ECS->SetSystemMask<CameraSystem>(BIT(ECS->GetComponentType<Camera>()));
 
 		mainCam = CreateEntity();
 		mainCam->AddComponent<Camera>(
@@ -60,11 +60,6 @@ namespace Smong {
 		return mainCam->GetComponent<Camera>();
 	}
 
-	Transform& Scene::GetMainCamTransform()
-	{
-		return mainCam->GetTransform();
-	}
-
 	void Scene::SetMainCam(Camera& cam)
 	{
 		this->mainCam->GetComponent<Camera>() = cam;
@@ -72,7 +67,6 @@ namespace Smong {
 
 	void Scene::Update(float dt)
 	{
-		cameraSys->Update(dt);
 		lightSys->Update(dt);
 		renderSys->Update(dt);
 	}
@@ -91,13 +85,12 @@ namespace Smong {
 		Renderer::SetLights(entities);
 	}
 
-	void CameraSystem::Update(float dt)
-	{
-		for (auto& entity : entities)
-		{
-			entity->GetComponent<Camera>().UpdateViewMatrix(entity->GetTransform().pos, entity->GetTransform().rot);
-			Renderer::SetCamera(entity->GetComponent<Camera>(), entity->GetTransform().pos);
-		}
-	}
+	//void CameraSystem::Update(float dt)
+	//{
+	//	for (auto& entity : entities)
+	//	{
+	//		Renderer::SetCamera(entity->GetComponent<Camera>(), entity->GetTransform().GetPos());
+	//	}
+	//}
 
 }

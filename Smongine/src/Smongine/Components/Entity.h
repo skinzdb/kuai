@@ -22,7 +22,8 @@ namespace Smong {
 		template<class T, typename ...Args>
 		T& AddComponent(Args&& ...args)
 		{
-			ECS->AddComponent<T>(id, std::forward<Args>(args)...);
+			// Send a reference of this entity to the component
+			ECS->AddComponent<T>(id, this, std::forward<Args>(args)...);
 			return ECS->GetComponent<T>(id);
 		}
 
@@ -57,12 +58,6 @@ namespace Smong {
 		void Destroy()
 		{
 			ECS->DestroyEntity(id);
-		}
-
-		template<class T>
-		void SetOnCollision(std::function<bool(T&)> fn) 
-		{
-			ECS->SubscribeSystem(fn, )
 		}
 
 	private:

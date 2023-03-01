@@ -89,7 +89,7 @@ namespace Smong {
 		}
 
 		template<typename T, typename ...Args>
-		void AddComponent(EntityID entity, Args && ...args)
+		void AddComponent(EntityID entity, Args&& ...args)
 		{
 			componentManager->AddComponent<T>(entity, std::forward<Args>(args)...);
 
@@ -158,10 +158,7 @@ namespace Smong {
 		void NotifySystems(EventType& event);
 
 		template<typename T, typename EventType>
-		void SubscribeSystem(T& instance, EventType& event)
-		{
-			eventBus->subscribe(T, event);
-		}
+		void SubscribeSystem(T& instance, EventType& event);
 
 	private:
 		std::unique_ptr<EntityManager> entityManager;
