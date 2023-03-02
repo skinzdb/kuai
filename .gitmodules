@@ -22,3 +22,6 @@
 [submodule "kuai/vendor/GLFW"]
 	path = kuai/vendor/GLFW
 	url = git@github.com:skinzdb/glfw.git
+[submodule "kuai/vendor/openal-soft"]
+	path = kuai/vendor/openal-soft
+	url = git@github.com:kcat/openal-soft.git
