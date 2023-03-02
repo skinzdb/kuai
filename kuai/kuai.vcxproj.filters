@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\kuai">
+      <UniqueIdentifier>{26DA32CF-12A7-8DDA-3BC0-7B8227ECC268}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\kuai\Components">
+      <UniqueIdentifier>{7B5BC38A-E7BC-A098-702A-E74ADC8AD757}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\kuai\Core">
+      <UniqueIdentifier>{3E4628FF-AA06-A435-7341-EDB2DFC0E811}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\kuai\Events">
+      <UniqueIdentifier>{4ADF746F-B66A-E233-BF7B-65282B863E34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\kuai\Platform">
+      <UniqueIdentifier>{3AE1473C-A6F7-45D2-EF6E-D1F35BC4165A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\kuai\Platform\Windows">
+      <UniqueIdentifier>{7425D8DC-E0E7-0B67-2998-9AF39599E444}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\kuai\Renderer">
+      <UniqueIdentifier>{8CE82417-F8FE-22AD-4176-AECEADCBF334}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\kuai\Scripting">
+      <UniqueIdentifier>{A8B615D8-949A-D62D-FDFA-D080E9FDC0AF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\kuai\Sound">
+      <UniqueIdentifier>{5EA452E5-4A72-46EB-3306-B7111F732250}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\kuai\Util">
+      <UniqueIdentifier>{333932FF-9FF9-AD35-6834-F7B2D4B3F211}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor">
+      <UniqueIdentifier>{B3738122-9F15-ACF8-88D0-BF4C74113349}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\stb_image">
+      <UniqueIdentifier>{0DA0BA59-F998-D9AB-22CB-BE300E23B9B7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\tinyobjloader">
+      <UniqueIdentifier>{386CC32A-24FB-4CF4-CD19-61EFB9875D9A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\kpch.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Components\ComponentManager.h">
+      <Filter>src\kuai\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Components\Components.h">
+      <Filter>src\kuai\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Components\Entity.h">
+      <Filter>src\kuai\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Components\EntityComponentSystem.h">
+      <Filter>src\kuai\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Components\EntityManager.h">
+      <Filter>src\kuai\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Components\Scene.h">
+      <Filter>src\kuai\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Components\System.h">
+      <Filter>src\kuai\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Components\SystemManager.h">
+      <Filter>src\kuai\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Core\App.h">
+      <Filter>src\kuai\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Core\Core.h">
+      <Filter>src\kuai\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Core\Input.h">
+      <Filter>src\kuai\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Core\KeyCodes.h">
+      <Filter>src\kuai\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Core\Layer.h">
+      <Filter>src\kuai\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Core\LayerStack.h">
+      <Filter>src\kuai\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Core\Log.h">
+      <Filter>src\kuai\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Core\MouseBtnCodes.h">
+      <Filter>src\kuai\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Core\Timer.h">
+      <Filter>src\kuai\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Core\Window.h">
+      <Filter>src\kuai\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Events\AppEvent.h">
+      <Filter>src\kuai\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Events\Event.h">
+      <Filter>src\kuai\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Events\KeyEvent.h">
+      <Filter>src\kuai\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Events\MouseEvent.h">
+      <Filter>src\kuai\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Platform\Windows\WinWindow.h">
+      <Filter>src\kuai\Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Renderer\Geometry.h">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Renderer\Material.h">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Renderer\Mesh.h">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Renderer\Renderer.h">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Renderer\Shader.h">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Renderer\StaticShader.h">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Renderer\Texture.h">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Scripting\ScriptEngine.h">
+      <Filter>src\kuai\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Sound\AudioClip.h">
+      <Filter>src\kuai\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Sound\AudioManager.h">
+      <Filter>src\kuai\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Util\FileUtil.h">
+      <Filter>src\kuai\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Util\ModelLoader.h">
+      <Filter>src\kuai\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\stb_image\stb_image.h">
+      <Filter>vendor\stb_image</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\tinyobjloader\tiny_obj_loader.h">
+      <Filter>vendor\tinyobjloader</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\kpch.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Components\Components.cpp">
+      <Filter>src\kuai\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Components\Scene.cpp">
+      <Filter>src\kuai\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Components\System.cpp">
+      <Filter>src\kuai\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Core\App.cpp">
+      <Filter>src\kuai\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Core\Layer.cpp">
+      <Filter>src\kuai\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Core\LayerStack.cpp">
+      <Filter>src\kuai\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Core\Log.cpp">
+      <Filter>src\kuai\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Platform\Windows\WinInput.cpp">
+      <Filter>src\kuai\Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Platform\Windows\WinWindow.cpp">
+      <Filter>src\kuai\Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Renderer\Mesh.cpp">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Renderer\Renderer.cpp">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Renderer\Shader.cpp">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Renderer\StaticShader.cpp">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Renderer\Texture.cpp">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Scripting\ScriptEngine.cpp">
+      <Filter>src\kuai\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Sound\AudioClip.cpp">
+      <Filter>src\kuai\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Sound\AudioManager.cpp">
+      <Filter>src\kuai\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Util\FileUtil.cpp">
+      <Filter>src\kuai\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Util\ModelLoader.cpp">
+      <Filter>src\kuai\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\stb_image\stb_image.cpp">
+      <Filter>vendor\stb_image</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\tinyobjloader\tiny_obj_loader.cpp">
+      <Filter>vendor\tinyobjloader</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
