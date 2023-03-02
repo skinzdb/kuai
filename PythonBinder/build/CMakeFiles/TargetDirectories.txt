@@ -1,0 +1,4 @@
+C:/Users/David/source/repos/smongine/PythonBinder/build/CMakeFiles/pysmong.dir
+C:/Users/David/source/repos/smongine/PythonBinder/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/David/source/repos/smongine/PythonBinder/build/CMakeFiles/ZERO_CHECK.dir
+C:/Users/David/source/repos/smongine/PythonBinder/build/vendor/pybind11/CMakeFiles/ALL_BUILD.dir

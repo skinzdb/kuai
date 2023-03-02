@@ -7,3 +7,9 @@
 [submodule "Smongine/vendor/GLFW"]
 	path = Smongine/vendor/GLFW
 	url = git@github.com:skinzdb/glfw.git
+[submodule "Smongine/vendor/openal"]
+	path = Smongine/vendor/openal
+	url = git@github.com:kcat/openal-soft.git
+[submodule "Smongine/vendor/libsndfile"]
+	path = Smongine/vendor/libsndfile
+	url = git@github.com:libsndfile/libsndfile.git

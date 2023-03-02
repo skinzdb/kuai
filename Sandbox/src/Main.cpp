@@ -1,8 +1,8 @@
-#include <Smongine.h>
+#include <kuai.h>
 
 #include <glm/gtx/string_cast.hpp>
 
-class BaseLayer : public Smong::Layer
+class BaseLayer : public kuai::Layer
 {
 public:
 
@@ -26,83 +26,82 @@ public:
 
 	std::vector<uint32_t> quadIndices = { 0, 1, 2, 2, 3, 0 };
 
-	std::shared_ptr<Smong::Entity> cube;
-	std::shared_ptr<Smong::Entity> light;
+	std::shared_ptr<kuai::Entity> cube;
+	std::shared_ptr<kuai::Entity> light;
 
-	BaseLayer() : Layer("Base"), scene(std::make_unique<Smong::Scene>())
+	BaseLayer() : Layer("Base"), scene(std::make_unique<kuai::Scene>())
 	{
-		Smong::Mesh* mesh = Smong::ModelLoader::LoadObj("C:/Users/David/source/repos/smongine/bunny.obj");
-		//Smong::Mesh* mesh = Smong::ModelLoader::LoadObj("C:/Users/David/Documents/FinalBaseMesh.obj");
+		//auto mesh = kuai::ModelLoader::LoadObj("C:/Users/David/source/repos/smongine/sphere.obj");
+		auto mesh = kuai::ModelLoader::LoadObj("C:/Users/David/Documents/FinalBaseMesh.obj");
 
-		//Smong::Mesh* mesh = new Smong::Mesh(quadPositions, quadNormals, quadTexCoords, quadIndices);
-		//Smong::Texture* texture = new Smong::Texture("C:/Users/David/Pictures/billy.png");
-		Smong::Texture* texture = new Smong::Texture();
+		//kuai::Mesh* mesh = new kuai::Mesh(quadPositions, quadNormals, quadTexCoords, quadIndices);
+		//kuai::Texture* texture = new kuai::Texture("C:/Users/David/Pictures/billy.png");
+		auto texture = std::make_shared<kuai::Texture>();
 	
-		Smong::PhongMaterial* material = new Smong::PhongMaterial(*texture, *texture, 32);
-		//Smong::SimpleMaterial* material = new Smong::SimpleMaterial();
+		auto material = std::make_shared<kuai::PhongMaterial>(texture, texture, 32);
+		//auto material = std::make_shared<kuai::SimpleMaterial>();
 
-		light = scene->CreateEntity();
-		light->AddComponent<Smong::Light>(1.0f, 0.5f, 0.05f);
-		light->GetTransform().pos = glm::vec3(0, 1, -1);
-		light->GetTransform().rot = glm::vec3(0, 0, 0);
+		light = scene->createEntity();
+		light->addComponent<kuai::Light>();
+		light->getTransform().setPos(0, 1, -1);
+		light->getTransform().setRot(0, 0, 0);
 
-		cube = scene->CreateEntity();
-		cube->AddComponent<Smong::MeshMaterial>(*mesh, *material);
-		cube->GetTransform().pos += glm::vec3(0, -0.6f, -3);
+		cube = scene->createEntity();
+		cube->addComponent<kuai::MeshMaterial>(mesh, material);
+		cube->getTransform().translate(0, -0.6f, -5);
 	}
 
-	void Update(float dt) override
+	void update(float dt) override
 	{
-		scene->Update(dt);
+		scene->update(dt);
 
-		if (Smong::Input::IsKeyPressed(Smong::Key::A))
+		if (kuai::Input::isKeyPressed(kuai::Key::A))
 		{
-			scene->GetMainCamTransform().pos += glm::vec3(-0.1f, 0, 0);
+			scene->getMainCam().getTransform().translate(-0.1f, 0, 0);
 		}
-		if (Smong::Input::IsKeyPressed(Smong::Key::D))
+		if (kuai::Input::isKeyPressed(kuai::Key::D))
 		{
-			scene->GetMainCamTransform().pos += glm::vec3(0.1f, 0, 0);
+			scene->getMainCam().getTransform().translate(0.1f, 0, 0);
 		}
-		if (Smong::Input::IsKeyPressed(Smong::Key::W))
+		if (kuai::Input::isKeyPressed(kuai::Key::W))
 		{
-			scene->GetMainCamTransform().pos += glm::vec3(0, 0, -0.1f);
+			scene->getMainCam().getTransform().translate(0, 0, -0.1f);
 		}
-		if (Smong::Input::IsKeyPressed(Smong::Key::S))
+		if (kuai::Input::isKeyPressed(kuai::Key::S))
 		{
-			scene->GetMainCamTransform().pos += glm::vec3(0, 0, 0.1f);
+			scene->getMainCam().getTransform().translate(0, 0, 0.1f);
 		}
-		if (Smong::Input::IsKeyPressed(Smong::Key::Space))
+		if (kuai::Input::isKeyPressed(kuai::Key::Space))
 		{
-			scene->GetMainCamTransform().pos += glm::vec3(0, 0.1f, 0);
+			scene->getMainCam().getTransform().translate(0, 0.1f, 0);
 		}
-		if (Smong::Input::IsKeyPressed(Smong::Key::LeftShift))
+		if (kuai::Input::isKeyPressed(kuai::Key::LeftShift))
 		{
-			scene->GetMainCamTransform().pos += glm::vec3(0, -0.1f, 0);
+			scene->getMainCam().getTransform().translate(0, -0.1f, 0);
 		}
+
+		cube->getTransform().rotate(0, 0.01f, 0);
 	}
 
-	void OnEvent(Smong::Event& event) override
+	void onEvent(kuai::Event* event) override
 	{
 
 	}
 
 private:
-	std::unique_ptr<Smong::Scene> scene;
+	std::unique_ptr<kuai::Scene> scene;
 };
 
-class Sandbox : public Smong::App {
-public:
-	Sandbox() {
-		PushLayer(new BaseLayer());
-	}
-
-	~Sandbox() {
-
-	}
-};
-
-Smong::App* Smong::CreateApp()
+int main()
 {
-	return new Sandbox();
-}
+	kuai::Log::Init();
+	KU_CORE_WARN("Initialised Core Log");
+	KU_CORE_INFO("Initialised Client Log");
 
+	kuai::App* app = new kuai::App();
+	app->pushLayer(new BaseLayer());
+	app->run();
+	delete app;
+
+	return 0;
+}

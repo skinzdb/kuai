@@ -1,4 +1,4 @@
-workspace "Smongine"
+workspace "kuai"
 	architecture "x64"
 
 	configurations
@@ -10,11 +10,11 @@ workspace "Smongine"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-include "Smongine/vendor/Glad"
-include "Smongine/vendor/GLFW"
+include "kuai/vendor/Glad"
+include "kuai/vendor/GLFW"
 
-project "Smongine"
-	location "Smongine"
+project "kuai"
+	location "kuai"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
@@ -23,8 +23,8 @@ project "Smongine"
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("obj/" .. outputdir .. "/%{prj.name}")
 
-	pchheader "smpch.h"
-	pchsource "Smongine/src/smpch.cpp"
+	pchheader "kpch.h"
+	pchsource "kuai/src/kpch.cpp"
 
 	files
 	{
@@ -46,14 +46,24 @@ project "Smongine"
 		"%{prj.name}/vendor/Glad/include",
 		"%{prj.name}/vendor/glm",
 		"%{prj.name}/vendor/stb_image",
-		"%{prj.name}/vendor/tinyobjloader"
+		"%{prj.name}/vendor/tinyobjloader",
+		"%{prj.name}/vendor/mono/include",
+		"%{prj.name}/vendor/openal/include",
+		"%{prj.name}/vendor/libsndfile/include"
+	}
+
+	libdirs
+	{
+		"%{prj.name}/vendor/mono/lib",
+		"%{prj.name}/vendor/openal/build/Debug/"
 	}
 
 	links
 	{
 		"GLFW",
 		"Glad",
-		"opengl32.lib"
+		"opengl32.lib",
+		"libmono-static-sgen.lib"
 	}
 
 	filter "system:windows"
@@ -62,22 +72,22 @@ project "Smongine"
 		defines
 		{
 			"_CRT_SECURE_NO_WARNINGS",
-			"SM_PLATFORM_WINDOWS",
+			"KU_PLATFORM_WINDOWS",
 			"GLFW_INCLUDE_NONE"
 		}
 
 	filter "configurations:Debug"
-		defines "SMONG_DEBUG"
+		defines "KU_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "SMONG_RELEASE"
+		defines "KU_RELEASE"
 		runtime "Release"
 		optimize "on"	
 	
 	filter "configurations:Dist"
-		defines "SMONG_DIST"
+		defines "KU_DIST"
 		runtime "Release"
 		optimize "on"
 
@@ -99,15 +109,70 @@ project "Sandbox"
 
 	includedirs
 	{
-		"Smongine/vendor/spdlog/include",
-		"Smongine/src",
-		"Smongine/vendor",
-		"Smongine/vendor/glm"
+		"${prj.name}/vendor/pybind11/include",
+		
+		"kuai/vendor/spdlog/include",
+		"kuai/src",
+		"kuai/vendor",
+		"kuai/vendor/glm"
 	}
 
 	links
 	{
-		"Smongine",
+		"kuai",
+		"dwmapi.lib"
+	}
+
+	filter "system:windows"
+		systemversion "latest"
+
+		defines
+		{
+			"KU_PLATFORM_WINDOWS"
+		}
+
+	filter "configurations:Debug"
+		defines "KU_DEBUG"
+		runtime "Debug"
+		symbols "on"
+
+	filter "configurations:Release"
+		defines "KU_RELEASE"
+		runtime "Release"
+		optimize "on"	
+	
+	filter "configurations:Dist"
+		defines "KU_DIST"
+		runtime "Release"
+		optimize "on"
+
+project "PythonBinder"
+	location "PythonBinder"
+	kind "SharedLib"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
+
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("obj/" .. outputdir .. "/%{prj.name}")
+
+	files
+	{
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp"
+	}
+
+	includedirs
+	{
+		"kuai/vendor/spdlog/include",
+		"kuai/src",
+		"kuai/vendor",
+		"kuai/vendor/glm"
+	}
+
+	links
+	{
+		"kuai",
 		"dwmapi.lib"
 	}
 
@@ -120,16 +185,16 @@ project "Sandbox"
 		}
 
 	filter "configurations:Debug"
-		defines "SMONG_DEBUG"
+		defines "KU_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "SMONG_RELEASE"
+		defines "KU_RELEASE"
 		runtime "Release"
 		optimize "on"	
-	
+
 	filter "configurations:Dist"
-		defines "SMONG_DIST"
+		defines "KU_DIST"
 		runtime "Release"
 		optimize "on"
