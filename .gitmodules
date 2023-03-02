@@ -13,3 +13,12 @@
 [submodule "Smongine/vendor/libsndfile"]
 	path = Smongine/vendor/libsndfile
 	url = git@github.com:libsndfile/libsndfile.git
+[submodule "kuai/vendor/spdlog"]
+	path = kuai/vendor/spdlog
+	url = git@github.com:gabime/spdlog.git
+[submodule "kuai/vendor/glm"]
+	path = kuai/vendor/glm
+	url = git@github.com:g-truc/glm.git
+[submodule "kuai/vendor/GLFW"]
+	path = kuai/vendor/GLFW
+	url = git@github.com:skinzdb/glfw.git
