@@ -3,7 +3,7 @@
 #include "Log.h"
 
 #include "kuai/Renderer/Renderer.h"
-//#include "kuai/Sound/AudioManager.h"
+#include "kuai/Sound/AudioManager.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -22,7 +22,7 @@ namespace kuai {
 		running = true;
 
 		Renderer::init();
-		//AudioManager::init();
+		AudioManager::init();
 	}
 
 	App::~App() 
@@ -45,7 +45,7 @@ namespace kuai {
 			window->update();
 		}
 
-		//AudioManager::cleanup();
+		AudioManager::cleanup();
 		Renderer::cleanup();
 	}
 

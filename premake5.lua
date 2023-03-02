@@ -50,14 +50,14 @@ project "kuai"
 		"%{prj.name}/vendor/stb_image",
 		"%{prj.name}/vendor/tinyobjloader",
 		--"%{prj.name}/vendor/mono/include",
-		"%{prj.name}/vendor/openal/include",
+		"%{prj.name}/vendor/openal-soft/include",
 		"%{prj.name}/vendor/libsndfile/include"
 	}
 
 	libdirs
 	{
-		"%{prj.name}/vendor/mono/lib",
-		"%{prj.name}/vendor/openal/build/Debug/"
+		--"%{prj.name}/vendor/mono/lib",
+		"%{prj.name}/vendor/openal-soft/build/Debug/"
 	}
 
 	links
@@ -65,6 +65,7 @@ project "kuai"
 		"GLFW",
 		"Glad",
 		"opengl32.lib",
+		"OpenAL32.lib"
 		--"libmono-static-sgen.lib"
 	}
 
@@ -122,7 +123,6 @@ project "Sandbox"
 	links
 	{
 		"kuai",
-		"dwmapi.lib"
 	}
 
 	filter "system:windows"
@@ -131,6 +131,12 @@ project "Sandbox"
 		defines
 		{
 			"KU_PLATFORM_WINDOWS"
+		}
+
+		links
+		{
+			"dwmapi.lib",
+			"winmm.lib"	-- For audio
 		}
 
 	filter "configurations:Debug"
