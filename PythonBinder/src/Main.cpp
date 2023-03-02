@@ -2,9 +2,9 @@
 #include <pybind11/operators.h>
 #include <pybind11/stl.h>
 
-#include <Smongine.h>
+#include <kuai.h>
 
-using namespace Smong;
+using namespace kuai;
 namespace py = pybind11;
 
 class PyLayer : public Layer
@@ -12,40 +12,40 @@ class PyLayer : public Layer
 public:
     using Layer::Layer;
 
-    //virtual void OnAttach() override
+    //virtual void onAttach() override
     //{
     //    PYBIND11_OVERRIDE_PURE(
     //        void,
     //        Layer,
-    //        OnAttach
+    //        onAttach
     //    );
     //}
 
-    //virtual void OnDetach() override
+    //virtual void onDetach() override
     //{
     //    PYBIND11_OVERRIDE_PURE(
     //        void,
     //        Layer,
-    //        OnDetach
+    //        onDetach
     //    );
     //}
 
-    virtual void Update(float dt) override
+    virtual void update(float dt) override
     {
         PYBIND11_OVERRIDE_PURE(
             void,
             Layer,
-            Update,
+            update,
             dt
         );
     }
 
-    virtual void OnEvent(Event* event) override
+    virtual void onEvent(Event* event) override
     {
         PYBIND11_OVERRIDE_PURE(
             void,
             Layer,
-            OnEvent,
+            onEvent,
             event
         );
     }
@@ -69,35 +69,35 @@ public:
 //    }
 //};
 
-PYBIND11_MODULE(pysmong, m)
+PYBIND11_MODULE(pykuai, m)
 {
     Log::Init();
-    SM_CORE_WARN("Initialised Core Log");
-    SM_INFO("Initialised Client Log");
+    KU_CORE_WARN("Initialised Core Log");
+    KU_INFO("Initialised Client Log");
 
     m.doc() = "Game Engine";
 
     py::class_<App>(m, "App")
         .def(py::init<>())
-        .def("PushLayer", &App::PushLayer)
-        .def("Run", &App::Run);
+        .def("pushLayer", &App::pushLayer)
+        .def("run", &App::run);
 
     py::class_<Layer, PyLayer>(m, "Layer")
         .def(py::init<>())
-        .def("OnAttach", &Layer::OnAttach)
-        .def("OnDetach", &Layer::OnDetach)
-        .def("Update", &Layer::Update)
-        .def("OnEvent", &Layer::OnEvent, py::return_value_policy::reference);
+        .def("onAttach", &Layer::onAttach)
+        .def("onDetach", &Layer::onDetach)
+        .def("update", &Layer::update)
+        .def("onEvent", &Layer::onEvent, py::return_value_policy::reference);
 
     py::class_<Event>(m, "Event")
-        .def("ToString", &Event::ToString);
+        .def("ToString", &Event::toString);
 
     py::class_<Input>(m, "Input")
-        .def_static("IsKeyPressed", &Input::IsKeyPressed)
-        .def_static("IsMouseBtnPressed", &Input::IsMouseBtnPressed)
-        .def_static("GetMousePos", &Input::GetMousePos)
-        .def_static("GetMouseX", &Input::GetMouseX)
-        .def_static("GetMouseY", &Input::GetMouseY);
+        .def_static("isKeyPressed", &Input::isKeyPressed)
+        .def_static("isMouseBtnPressed", &Input::isMouseBtnPressed)
+        .def_static("getMousePos", &Input::getMousePos)
+        .def_static("getMouseX", &Input::getMouseX)
+        .def_static("getMouseY", &Input::getMouseY);
 
     py::enum_<Mouse::Mouse>(m, "Mouse")
         .value("Button0", Mouse::Button0)
@@ -117,10 +117,9 @@ PYBIND11_MODULE(pysmong, m)
 
     py::class_<Scene>(m, "Scene")
         .def(py::init<>())
-        .def("Update", &Scene::Update)
-        .def("CreateEntity", &Scene::CreateEntity, py::return_value_policy::reference)
-        .def("GetMainCam", &Scene::GetMainCam, py::return_value_policy::reference)
-        .def("GetMainCamTransform", &Scene::GetMainCamTransform, py::return_value_policy::reference);
+        .def("update", &Scene::update)
+        .def("createEntity", &Scene::createEntity, py::return_value_policy::reference)
+        .def("getMainCam", &Scene::getMainCam, py::return_value_policy::reference);
 
     py::class_<glm::vec3>(m, "Vec3")
         .def(py::init<float, float, float>())
@@ -139,12 +138,9 @@ PYBIND11_MODULE(pysmong, m)
 
     py::class_<Transform>(m, "Transform")
         .def(py::init<>())
-        .def_readwrite("pos", &Transform::pos)
-        .def_readwrite("rot", &Transform::rot)
-        .def_readwrite("scale", &Transform::scale)
-        .def("GetForward", &Transform::GetForward, py::return_value_policy::copy)
-        .def("GetRight", &Transform::GetRight, py::return_value_policy::copy)
-        .def("GetUp", &Transform::GetUp, py::return_value_policy::copy);
+        .def("getForward", &Transform::getForward, py::return_value_policy::copy)
+        .def("getRight", &Transform::getRight, py::return_value_policy::copy)
+        .def("getUp", &Transform::getUp, py::return_value_policy::copy);
 
     py::enum_<Light::LightType>(m, "LightType")
         .value("Directional", Light::LightType::Directional)
@@ -152,20 +148,20 @@ PYBIND11_MODULE(pysmong, m)
         .value("Spot", Light::LightType::Spot)
         .export_values();
 
-    py::class_<Light>(m, "Light")
-        .def(py::init<float>())
-        .def(py::init<float, float, float>())
-        .def_readwrite("type", &Light::type)
-        .def_readwrite("col", &Light::col)
-        .def_readwrite("intensity", &Light::intensity)
-        .def_readwrite("linear", &Light::linear)
-        .def_readwrite("quadratic", &Light::quadratic);
+    //py::class_<Light>(m, "Light")
+    //    .def(py::init<float>())
+    //    .def(py::init<float, float, float>())
+    //    .def_readwrite("type", &Light::type)
+    //    .def_readwrite("col", &Light::col)
+    //    .def_readwrite("intensity", &Light::intensity)
+    //    .def_readwrite("linear", &Light::linear)
+    //    .def_readwrite("quadratic", &Light::quadratic);
 
-    py::class_<Camera>(m, "Camera")
-        .def(py::init<float, float, float, float, float>())
-        .def("SetPerspective", &Camera::SetPerspective)
-        .def("SetOrtho", &Camera::SetOrtho)
-        .def("SetAspect", &Camera::SetAspect);
+    //py::class_<Camera>(m, "Camera")
+    //    .def(py::init<float, float, float, float, float>())
+    //    .def("SetPerspective", &Camera::SetPerspective)
+    //    .def("SetOrtho", &Camera::SetOrtho)
+    //    .def("SetAspect", &Camera::SetAspect);
 
     py::class_<Texture, std::shared_ptr<Texture>>(m, "Texture")
         .def(py::init<>())
@@ -185,14 +181,14 @@ PYBIND11_MODULE(pysmong, m)
         .def_readwrite("material", &MeshMaterial::material);
 
     py::class_<Entity, std::shared_ptr<Entity>>(m, "Entity")
-        .def("GetTransform", &Entity::GetTransform, py::return_value_policy::reference)
-        .def("GetCam", &Entity::GetComponent<Camera>, py::return_value_policy::reference)
-        .def("GetMeshMaterial", &Entity::GetComponent<MeshMaterial>, py::return_value_policy::reference)
-        .def("GetLight", &Entity::GetComponent<Light>, py::return_value_policy::reference)
-        .def("AddCam", &Entity::AddComponent<Camera>)
-        .def("AddMeshMaterial", &Entity::AddComponent<MeshMaterial>)
-        .def("AddLight", &Entity::AddComponent<Light>);
+        .def("getTransform", &Entity::getTransform, py::return_value_policy::reference)
+        .def("getCam", &Entity::getComponent<Camera>, py::return_value_policy::reference)
+        .def("getMeshMaterial", &Entity::getComponent<MeshMaterial>, py::return_value_policy::reference)
+        .def("getLight", &Entity::getComponent<Light>, py::return_value_policy::reference)
+        .def("addCam", &Entity::addComponent<Camera>)
+        .def("addMeshMaterial", &Entity::addComponent<MeshMaterial>)
+        .def("addLight", &Entity::addComponent<Light>);
 
     py::class_<ModelLoader>(m, "ModelLoader")
-        .def_static("LoadObj", &ModelLoader::LoadObj, py::return_value_policy::reference);
+        .def_static("loadObj", &ModelLoader::LoadObj, py::return_value_policy::reference);
 }

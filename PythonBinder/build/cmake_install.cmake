@@ -1,8 +1,8 @@
-# Install script for directory: C:/Users/David/source/repos/smongine/PythonBinder
+# Install script for directory: C:/Users/David/source/repos/kuai/PythonBinder
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/smongine")
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/pykuai")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -34,7 +34,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/David/source/repos/smongine/PythonBinder/build/vendor/pybind11/cmake_install.cmake")
+  include("C:/Users/David/source/repos/kuai/PythonBinder/build/vendor/pybind11/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/David/source/repos/smongine/PythonBinder/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/David/source/repos/kuai/PythonBinder/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

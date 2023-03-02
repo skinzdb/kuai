@@ -8,6 +8,8 @@ workspace "kuai"
 		"Dist"
 	}
 
+	startproject "Sandbox"
+
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 include "kuai/vendor/Glad"
@@ -47,7 +49,7 @@ project "kuai"
 		"%{prj.name}/vendor/glm",
 		"%{prj.name}/vendor/stb_image",
 		"%{prj.name}/vendor/tinyobjloader",
-		"%{prj.name}/vendor/mono/include",
+		--"%{prj.name}/vendor/mono/include",
 		"%{prj.name}/vendor/openal/include",
 		"%{prj.name}/vendor/libsndfile/include"
 	}
@@ -63,7 +65,7 @@ project "kuai"
 		"GLFW",
 		"Glad",
 		"opengl32.lib",
-		"libmono-static-sgen.lib"
+		--"libmono-static-sgen.lib"
 	}
 
 	filter "system:windows"
@@ -109,7 +111,7 @@ project "Sandbox"
 
 	includedirs
 	{
-		"${prj.name}/vendor/pybind11/include",
+		--"kuai/vendor/pybind11/include",
 		
 		"kuai/vendor/spdlog/include",
 		"kuai/src",

@@ -1,8 +1,8 @@
-# Install script for directory: C:/Users/David/source/repos/smongine/PythonBinder/vendor/pybind11
+# Install script for directory: C:/Users/David/source/repos/kuai/PythonBinder/vendor/pybind11
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/smongine")
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/pykuai")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
