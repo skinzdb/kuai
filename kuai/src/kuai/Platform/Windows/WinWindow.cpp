@@ -31,6 +31,8 @@ namespace kuai {
 
 	void WinWindow::init(const WindowProps& props)
 	{
+		KU_PROFILE_FUNCTION();
+
 		data.title = props.title;
 		data.width = props.width;
 		data.height = props.height;
@@ -146,6 +148,7 @@ namespace kuai {
 
 	void WinWindow::update()
 	{
+		KU_PROFILE_FUNCTION();
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}

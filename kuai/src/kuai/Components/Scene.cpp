@@ -44,6 +44,7 @@ namespace kuai {
 
 	std::shared_ptr<Entity> Scene::createEntity()
 	{
+		KU_PROFILE_FUNCTION();
 		std::shared_ptr<Entity> entity = std::make_shared<Entity>(ECS);
 		entities.push_back(entity);
 		return entity;
@@ -78,6 +79,7 @@ namespace kuai {
 
 	void RenderSystem::update(float dt)
 	{
+		KU_PROFILE_FUNCTION();
 		Renderer::clear();
 		for (auto& entity : entities)
 		{
@@ -87,11 +89,13 @@ namespace kuai {
 
 	void LightSystem::update(float dt)
 	{
+		KU_PROFILE_FUNCTION();
 		Renderer::setLights(entities);
 	}
 
 	void AudioSystem::update(float dt)
 	{
+		KU_PROFILE_FUNCTION();
 		for (auto& entity : entities)
 		{
 			AudioManager::updateStream(entity->getComponent<AudioSource>().getId());

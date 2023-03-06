@@ -50,40 +50,44 @@ namespace kuai {
 		Transform(Entity* entity, glm::vec3& pos) : Component(entity), pos(pos) {}
 
 		glm::vec3 getPos() { return pos; }
-		void setPos(glm::vec3& pos) { this->pos = pos; updateComponents(); }
+		void setPos(glm::vec3& pos) { this->pos = pos; updateComponents(); calcModelMatrix(); }
 		void setPos(float x, float y, float z) { setPos(glm::vec3(x, y, z)); }
 
-		void translate(glm::vec3& amount) { this->pos += amount; updateComponents(); }
+		void translate(glm::vec3& amount) { this->pos += amount; updateComponents(); calcModelMatrix(); }
 		void translate(float x, float y, float z) { translate(glm::vec3(x, y, z)); }
 
 		glm::vec3 getRot() { return rot; }
-		void setRot(glm::vec3& rot) { this->rot = glm::radians(rot); updateComponents(); }
+		void setRot(glm::vec3& rot) { this->rot = glm::radians(rot); updateComponents(); calcModelMatrix(); }
 		void setRot(float x, float y, float z) { rotate(glm::vec3(x, y, z)); }
 
-		void rotate(glm::vec3& amount) { this->rot += glm::radians(amount); updateComponents(); }
+		void rotate(glm::vec3& amount) { this->rot += glm::radians(amount); updateComponents(); calcModelMatrix(); }
 		void rotate(float x, float y, float z) { rotate(glm::vec3(x, y, z)); }
 
 		glm::vec3 getScale() { return scale; }
-		void setScale(glm::vec3& scale) { this->scale = scale; }
-		void Scale(float factor) { this->scale *= factor; }
+		void setScale(glm::vec3& scale) { this->scale = scale; calcModelMatrix(); }
+		void Scale(float factor) { this->scale *= factor; calcModelMatrix(); }
 
 		glm::vec3 getUp() { return glm::rotate(glm::quat(rot), glm::vec3(0.0f, 1.0f, 0.0f)); }
 		glm::vec3 getRight() { return glm::rotate(glm::quat(rot), glm::vec3(1.0f, 0.0f, 0.0f)); }
 		glm::vec3 getForward() { return glm::rotate(glm::quat(rot), glm::vec3(0.0f, 0.0f, -1.0f)); }
 
-		glm::mat4 getModelMatrix()
-		{
-			return glm::translate(glm::mat4(1.0f), pos) *
-				glm::toMat4(glm::quat(rot)) *
-				glm::scale(glm::mat4(1.0f), scale);
-		}
+		glm::mat4 getModelMatrix() { return modelMatrix; }
 
 	private:
 		void updateComponents();
 
+		void calcModelMatrix()
+		{
+			modelMatrix = glm::translate(glm::mat4(1.0f), pos) *
+				glm::toMat4(glm::quat(rot)) *
+				glm::scale(glm::mat4(1.0f), scale);
+		}
+
 		glm::vec3 pos = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 rot = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 scale = { 1.0f, 1.0f, 1.0f };	
+		glm::vec3 scale = { 1.0f, 1.0f, 1.0f };
+
+		glm::mat4 modelMatrix = glm::mat4(1.0f);
 	};
 
 	struct Rigidbody : Component

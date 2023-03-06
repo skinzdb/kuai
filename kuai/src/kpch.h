@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "kuai/Core/Log.h"
+#include "kuai/Util/Instrumentor.h"
 
 #ifdef SM_PLATFORM_WINDOWS
 	#include <Windows.h>

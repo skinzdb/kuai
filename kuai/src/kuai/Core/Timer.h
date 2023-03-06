@@ -12,14 +12,19 @@ namespace kuai {
 		*/
 		float getElapsed()
 		{
-			auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin);
+			auto time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin);
 			reset();
-			return time.count() * 0.001f;
+			return time.count() * 0.000001f;
 		}
 
 		float getElaspedMillis()
 		{
 			return getElapsed() * 1000.0f;
+		}
+		
+		float getElapsedMicros()
+		{
+			return getElapsed() * 1000000.0f;
 		}
 
 		void reset()

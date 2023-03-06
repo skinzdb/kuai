@@ -2,7 +2,7 @@
 
 namespace kuai {
 
-	const uint32_t MAX_ENTITIES = 4096;	// Includes reserved null entity
+	const uint32_t MAX_ENTITIES = 65536;
 	const uint32_t MAX_COMPONENTS = 32;
 
 	const uint32_t NULL_ENTITY = 0;
@@ -21,7 +21,7 @@ namespace kuai {
 		EntityManager()
 		{
 			entityNo = 0;
-			for (EntityID entity = 1; entity < MAX_ENTITIES; entity++)
+			for (EntityID entity = 0; entity < MAX_ENTITIES; entity++)
 				availableEntities.push_back(entity);
 		}
 
