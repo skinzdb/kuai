@@ -6,6 +6,7 @@
 #include "kuai/Core/Core.h"
 #include "kuai/Renderer/Mesh.h"
 #include "kuai/Renderer/Material.h"
+#include "kuai/Sound/AudioClip.h"
 
 namespace kuai {
 	// Forward Declarations
@@ -85,9 +86,9 @@ namespace kuai {
 		glm::vec3 scale = { 1.0f, 1.0f, 1.0f };	
 	};
 
-	struct Rigidbody
+	struct Rigidbody : Component
 	{
-		Rigidbody() = default;
+		Rigidbody(Entity* entity) : Component(entity) {};
 
 		float mass = 1.0f;
 		float drag = 0.0f;
@@ -231,6 +232,25 @@ namespace kuai {
 		float orthoNear = -1.0f, orthoFar = 1.0f;
 	};
 
+	class AudioListener : public Component
+	{
+	public:
+		AudioListener(Entity* entity);
+
+		float getGain() { return gain; }
+		void setGain(float gain);
+
+	private:
+		void setPos(glm::vec3& pos);
+		void setOrientation(glm::vec3& at, glm::vec3& up);
+		void setVel(glm::vec3& vel);
+
+	private:
+		float gain = 1.0f;
+
+		friend class Transform;
+	};
+
 	class AudioSource : public Component
 	{
 	public:
@@ -239,21 +259,42 @@ namespace kuai {
 		void play();
 		void stop();
 
-		float getGain() { return gain; }
-		void setGain(float gain) { this->gain = gain; }
+		void setAudioClip(std::shared_ptr<AudioClip> audioClip);
 
 		float getPitch() { return pitch; }
-		void setPitch(float pitch) { this->pitch = pitch; }
+		void setPitch(float pitch);
 
-		void setLoop(bool loop) { this->loop = loop; }
+		float getGain() { return gain; }
+		void setGain(float gain);
+
+		float getRolloff() { return rolloff; }
+		void setRolloff(float rolloff);
+
+		float getRefDist() { return refDist; }
+		void setRefDist(float refDist);
+
+		void setLoop(bool loop);
 		bool isLoop() { return loop; }
 
+		uint32_t getId() { return sourceId; }
+
 	private:
+		void setPos(glm::vec3& pos);
+		void setDir(glm::vec3& dir);
+		void setVel(glm::vec3& vel);
+
+	private:
+		std::shared_ptr<AudioClip> audioClip = nullptr;
+
 		float gain = 1.0f;
 		float pitch = 1.0f;
+		float rolloff = 1.0f;
+		float refDist = 1.0f;
 
 		bool loop = false;
 
 		uint32_t sourceId = 0;
+
+		friend class Transform;
 	};
 }

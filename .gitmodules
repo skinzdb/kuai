@@ -25,3 +25,6 @@
 [submodule "kuai/vendor/openal-soft"]
 	path = kuai/vendor/openal-soft
 	url = git@github.com:kcat/openal-soft.git
+[submodule "kuai/vendor/libsndfile"]
+	path = kuai/vendor/libsndfile
+	url = git@github.com:libsndfile/libsndfile.git

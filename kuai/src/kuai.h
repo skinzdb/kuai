@@ -18,3 +18,5 @@
 #include "kuai/Renderer/Texture.h"
 #include "kuai/Renderer/Material.h"
 #include "kuai/Util/ModelLoader.h"
+
+#include "kuai/Sound/AudioClip.h"

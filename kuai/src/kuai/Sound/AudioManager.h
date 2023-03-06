@@ -1,19 +1,58 @@
 #pragma once
 
-struct ALCdevice;
-struct ALCcontext;
+#define AL_LIBTYPE_STATIC
+#include <AL/al.h>
+#include <AL/alc.h>
+
+#include <glm/glm.hpp>
 
 namespace kuai {
+	const uint32_t BUFS_PER_SOURCE = 4;
+	const uint32_t BUF_SIZE = 32768;
+
+	// Forward Declaration
+	class AudioClip;
+
 	class AudioManager
 	{
 	public:
+		enum Property
+		{
+			Pitch		= AL_PITCH,
+			Gain		= AL_GAIN,
+			MaxDist		= AL_MAX_DISTANCE,
+			Rolloff		= AL_ROLLOFF_FACTOR,
+			RefDist     = AL_REFERENCE_DISTANCE,
+			Position	= AL_POSITION,
+			Direction	= AL_DIRECTION,
+			Orientation = AL_ORIENTATION,
+			Velocity	= AL_VELOCITY,
+			Loop		= AL_LOOPING,
+			Buffer		= AL_BUFFER,
+			State		= AL_SOURCE_STATE
+		};
+
 		static void init();
 		static void cleanup();
 
-		static uint32_t createAudioSource();
-		static void playAudioSource(uint32_t sourceId);
+		static void createAudioListener();
 
-		static void update();
+		static void setListenerProperty(Property property, int val);
+		static void setListenerProperty(Property property, float val);
+		static void setListenerProperty(Property property, glm::vec3& val);
+		static void setListenerProperty(Property property, std::vector<float>& vals);
+
+		static ALuint createAudioSource();
+		static void playAudioSource(ALuint sourceId);
+		static void stopAudioSource(ALuint sourceId);
+
+		static void setSourceProperty(ALuint sourceId, Property property, int val);
+		static void setSourceProperty(ALuint sourceId, Property property, float val);
+		static void setSourceProperty(ALuint sourceId, Property property, glm::vec3& val);
+
+		static void setSourceAudioClip(ALuint sourceId, std::shared_ptr<AudioClip> audioClip);
+
+		static void updateStream(ALuint sourceId);
 	private:
 		static bool checkAlErrors();
 		static bool checkAlcErrors(ALCdevice* device);
@@ -22,7 +61,8 @@ namespace kuai {
 		static ALCdevice* device;
 		static ALCcontext* context;
 
-		static std::vector<uint32_t> sourceIds;
+		static std::unordered_map<ALuint, ALuint*> sourceBufMap;
+		static std::unordered_map<ALuint, std::shared_ptr<AudioClip>> sourceClipMap;
 	};
 }
 

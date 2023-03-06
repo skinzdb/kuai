@@ -2,6 +2,7 @@
 #include "Scene.h"
 
 #include "kuai/Renderer/Renderer.h"
+#include "kuai/Sound/AudioManager.h"
 #include "kuai/Core/App.h"
 
 namespace kuai {
@@ -13,6 +14,8 @@ namespace kuai {
 		ECS->registerComponent<Camera>();
 		ECS->registerComponent<Light>();
 		ECS->registerComponent<MeshMaterial>();
+		ECS->registerComponent<AudioListener>();
+		ECS->registerComponent<AudioSource>();
 
 		this->lightSys = ECS->registerSystem<LightSystem>(this);
 		ECS->setSystemMask<LightSystem>(BIT(ECS->getComponentType<Light>()));
@@ -20,8 +23,8 @@ namespace kuai {
 		this->renderSys = ECS->registerSystem<RenderSystem>(this);
 		ECS->setSystemMask<RenderSystem>(BIT(ECS->getComponentType<MeshMaterial>()));
 		
-		//this->cameraSys = ECS->RegisterSystem<CameraSystem>(this);
-		//ECS->setSystemMask<CameraSystem>(BIT(ECS->getComponentType<Camera>()));
+		this->audioSys = ECS->registerSystem<AudioSystem>(this);
+		ECS->setSystemMask<AudioSystem>(BIT(ECS->getComponentType<AudioSource>()));
 
 		mainCam = createEntity();
 		mainCam->addComponent<Camera>(
@@ -31,6 +34,7 @@ namespace kuai {
 			0.1f,
 			100.0f
 		);
+		mainCam->addComponent<AudioListener>();
 	}
 
 	Scene::~Scene()
@@ -69,6 +73,7 @@ namespace kuai {
 	{
 		lightSys->update(dt);
 		renderSys->update(dt);
+		audioSys->update(dt);
 	}
 
 	void RenderSystem::update(float dt)
@@ -85,12 +90,11 @@ namespace kuai {
 		Renderer::setLights(entities);
 	}
 
-	//void CameraSystem::update(float dt)
-	//{
-	//	for (auto& entity : entities)
-	//	{
-	//		Renderer::setCamera(entity->getComponent<Camera>(), entity->getTransform().getPos());
-	//	}
-	//}
-
+	void AudioSystem::update(float dt)
+	{
+		for (auto& entity : entities)
+		{
+			AudioManager::updateStream(entity->getComponent<AudioSource>().getId());
+		}
+	}
 }
