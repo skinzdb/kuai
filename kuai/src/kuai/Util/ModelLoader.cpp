@@ -4,7 +4,7 @@
 #include <tiny_obj_loader.h>
 
 namespace kuai {
-    std::shared_ptr<Mesh> ModelLoader::LoadObj(std::string filename)
+    std::shared_ptr<Mesh> ModelLoader::loadObj(const std::string& filename)
     {
         tinyobj::ObjReaderConfig reader_config;
         reader_config.mtl_search_path = "./"; // Path to material files

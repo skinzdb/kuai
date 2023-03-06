@@ -1,7 +1,7 @@
 #include "kpch.h"
 #include "FileUtil.h"
 
-std::string FileUtil::Load(const char* filename)
+std::string FileUtil::load(const std::string& filename)
 {
 	std::ifstream file(filename);
 	std::stringstream ss;

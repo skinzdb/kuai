@@ -7,7 +7,7 @@ namespace kuai {
 	class ModelLoader
 	{
 	public:
-		static std::shared_ptr<Mesh> LoadObj(std::string filename);
+		static std::shared_ptr<Mesh> loadObj(const std::string& filename);
 	};
 }
 

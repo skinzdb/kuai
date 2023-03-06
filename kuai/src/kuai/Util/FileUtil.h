@@ -5,6 +5,6 @@
 class FileUtil
 {
 public:
-	static std::string Load(const char* filename);
+	static std::string load(const std::string& filename);
 };
 

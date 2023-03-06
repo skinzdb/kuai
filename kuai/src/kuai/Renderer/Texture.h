@@ -4,7 +4,7 @@ namespace kuai {
 	class Texture {
 	public:
 		Texture();
-		Texture(const char* filename);
+		Texture(const std::string& filename);
 		~Texture();
 
 		uint32_t getId();

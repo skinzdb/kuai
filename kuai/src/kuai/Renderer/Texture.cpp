@@ -15,7 +15,7 @@ namespace kuai {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	}
 
-	Texture::Texture(const char* filename)
+	Texture::Texture(const std::string& filename)
 	{
 		glGenTextures(1, &textureId);
 		glBindTexture(GL_TEXTURE_2D, textureId);
@@ -23,7 +23,7 @@ namespace kuai {
 		// Load file using stbi library
 		int width, height, colourChannels;
 		stbi_set_flip_vertically_on_load(true);
-		unsigned char* data = stbi_load(filename, &width, &height, &colourChannels, 0);
+		unsigned char* data = stbi_load(filename.c_str(), &width, &height, &colourChannels, 0);
 	
 		if (data)
 		{
