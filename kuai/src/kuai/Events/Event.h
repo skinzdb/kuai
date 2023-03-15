@@ -11,7 +11,8 @@ namespace kuai {
 		None = 0,
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMove,
 		KeyPress, KeyRelease,
-		MouseBtnPress, MouseBtnRelease, MouseMove, MouseScroll
+		MouseBtnPress, MouseBtnRelease, MouseMove, MouseScroll,
+		LightChanged
 	};
 
 	enum EventCategory

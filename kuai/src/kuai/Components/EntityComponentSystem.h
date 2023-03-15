@@ -10,49 +10,72 @@
 
 namespace kuai {
 
+	class IFnHandler
+	{
+	public:
+		void exec(Event* event) { call(event); }
+	private:
+		virtual void call(Event* event) = 0;
+	};
+	
+	// Class to hold reference to member function and offset of method to be called
+	template<class T, class EventType>
+	class FnHandler : public IFnHandler
+	{
+	public:
+		typedef void (T::* MemberFn)(EventType*);
+
+		FnHandler(T* instance, MemberFn memberFn) : instance{ instance }, memberFn{ memberFn } {}
+
+		void call(Event* event)
+		{
+			// Cast event to the correct type and call member function
+			(instance->*memberFn)(static_cast<EventType*>(event));
+		}
+	private:
+		T* instance; // Pointer to instance class
+
+		MemberFn memberFn;
+	};
+
+	using HandlerList = std::list<IFnHandler*>;
+
 	class EventBus
 	{
 	public:
-		using EventCallbackFn = std::function<void(Event&)>;
-
 		template<typename EventType>
-		void notify(EventType& event)
+		void notify(EventType* event)
 		{
-			auto pos = subscribers.find(typeid(EventType).name());
+			HandlerList* handlers = subscribers[typeid(EventType).name()];
+			
+			if (!handlers)
+				return;
 
-			KU_CORE_ASSERT(pos != subscribers.end(), "No callback set for this event type");
-
-			auto callbacks = pos->second;
-			for (auto& c : callbacks)
-				c(event);
+			for (auto& handler : *handlers) 
+			{
+				if (handler != nullptr) 
+				{
+					handler->exec(event);
+				}
+			}
 		}
 
 		template<typename T, typename EventType>
-		void subscribe(T& instance, EventCallbackFn fn)
+		void subscribe(T* instance, void (T::*memberFn)(EventType*))
 		{
-			auto callbacks = subscribers.at(typeid(EventType).name()); // get callbacks or insert and initialise new list if entry does not exist
-			callbacks->push_back(fn);
+			HandlerList* handlers = subscribers[typeid(EventType).name()];
+
+			if (!handlers) // First time init
+			{
+				handlers = new HandlerList();
+				subscribers[typeid(EventType).name()] = handlers;
+			}
+			
+			handlers->push_back(new FnHandler<T, EventType>(instance, memberFn));
 		}
 	private:
-		std::unordered_map<const char*, std::vector<EventCallbackFn>> subscribers;
+		std::unordered_map<const char*, HandlerList*> subscribers;
 	};
-
-	//class IFnHandler
-	//{
-	//public:
-	//	void exec(Event& e)
-	//	{
-	//		call(e);
-	//	}
-
-	//private:
-	//	virtual void call(Event& e) = 0;
-	//};
-
-	//class FnHandler : IFnHandler
-	//{
-
-	//};
 
 	class EntityComponentSystem
 	{
@@ -103,7 +126,7 @@ namespace kuai {
 		template<typename T>
 		void removeComponent(EntityID entity)
 		{
-			componentManager->RemoveComponent(entity);
+			componentManager->removeComponent(entity);
 
 			auto componentMask = entityManager->getComponentMask(entity);
 			componentMask &= BIT(componentManager->getComponentType<T>()) ^ std::numeric_limits<ComponentMask>::max();
@@ -155,10 +178,16 @@ namespace kuai {
 		// *** Event Management (of systems) **********************************
 
 		template<typename EventType>
-		void notifySystems(EventType& event);
+		void notifySystems(EventType* event)
+		{
+			eventBus->notify(event);
+		}
 
 		template<typename T, typename EventType>
-		void subscribeSystem(T& instance, EventType& event);
+		void subscribeSystem(T* instance, void (T::* memberFn)(EventType*))
+		{
+			eventBus->subscribe(instance, memberFn);
+		}
 
 	private:
 		std::unique_ptr<EntityManager> entityManager;

@@ -17,10 +17,26 @@ namespace kuai {
 
 		std::shared_ptr<Entity> createEntity();
 		std::shared_ptr<Entity> getEntityById(EntityID entity);
+		std::shared_ptr<Entity> getEntityByName(const std::string& name) { KU_CORE_ASSERT(0, "Not yet implemented"); } // TODO: implement
 		void destroyEntity(EntityID entity);
+
+		template<typename EventType>
+		void notifySystems(EventType* event)
+		{
+			ECS->notifySystems(event);
+		}
+
+		template<typename T, typename EventType>
+		void subscribeSystem(T* instance, void (T::* memberFn)(EventType*))
+		{
+			ECS->subscribeSystem(instance, memberFn);
+		}
 
 		Camera& getMainCam();
 		void setMainCam(Camera& cam);
+
+		Light& getMainLight();
+		void setMainLight(Light& light);
 
 		std::vector<std::shared_ptr<Entity>>::iterator begin() { return entities.begin(); }
 		std::vector<std::shared_ptr<Entity>>::iterator end() { return entities.end(); }
@@ -28,6 +44,7 @@ namespace kuai {
 		void update(float dt);
 	private:
 		std::shared_ptr<Entity> mainCam;
+		std::shared_ptr<Entity> mainLight;
 
 		EntityComponentSystem* ECS;
 		std::vector<std::shared_ptr<Entity>> entities;
@@ -48,7 +65,9 @@ namespace kuai {
 	class RenderSystem : public System
 	{
 	public:
-		RenderSystem(Scene* scene) : System(scene) { acceptsSubset = true; }
+		RenderSystem(Scene* scene);
+
+		void onLightChanged(LightChangedEvent* event);
 
 		virtual void update(float dt);
 	};

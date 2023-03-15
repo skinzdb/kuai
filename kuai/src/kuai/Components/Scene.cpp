@@ -13,7 +13,7 @@ namespace kuai {
 		ECS->registerComponent<Transform>();
 		ECS->registerComponent<Camera>();
 		ECS->registerComponent<Light>();
-		ECS->registerComponent<MeshMaterial>();
+		ECS->registerComponent<MeshRenderer>();
 		ECS->registerComponent<AudioListener>();
 		ECS->registerComponent<AudioSource>();
 
@@ -21,7 +21,7 @@ namespace kuai {
 		ECS->setSystemMask<LightSystem>(BIT(ECS->getComponentType<Light>()));
 
 		this->renderSys = ECS->registerSystem<RenderSystem>(this);
-		ECS->setSystemMask<RenderSystem>(BIT(ECS->getComponentType<MeshMaterial>()));
+		ECS->setSystemMask<RenderSystem>(BIT(ECS->getComponentType<MeshRenderer>()));
 		
 		this->audioSys = ECS->registerSystem<AudioSystem>(this);
 		ECS->setSystemMask<AudioSystem>(BIT(ECS->getComponentType<AudioSource>()));
@@ -35,6 +35,10 @@ namespace kuai {
 			100.0f
 		);
 		mainCam->addComponent<AudioListener>();
+
+		mainLight = createEntity();
+		mainLight->addComponent<Light>(0.1f);
+		mainLight->getTransform().setRot(-60.0f, -60.0f, 0.0f);
 	}
 
 	Scene::~Scene()
@@ -52,6 +56,7 @@ namespace kuai {
 
 	std::shared_ptr<Entity> Scene::getEntityById(EntityID entity)
 	{
+		KU_PROFILE_FUNCTION();
 		return std::make_shared<Entity>(ECS, entity);
 	}
 
@@ -70,6 +75,16 @@ namespace kuai {
 		this->mainCam->getComponent<Camera>() = cam;
 	}
 
+	Light& Scene::getMainLight()
+	{
+		return mainLight->getComponent<Light>();
+	}
+
+	void Scene::setMainLight(Light& light)
+	{
+		this->mainLight->getComponent<Light>() = light;
+	}
+
 	void Scene::update(float dt)
 	{
 		lightSys->update(dt);
@@ -77,20 +92,52 @@ namespace kuai {
 		audioSys->update(dt);
 	}
 
+	RenderSystem::RenderSystem(Scene* scene) : System(scene)
+	{
+		acceptsSubset = true;
+		scene->subscribeSystem(this, &RenderSystem::onLightChanged);
+	}
+
 	void RenderSystem::update(float dt)
 	{
 		KU_PROFILE_FUNCTION();
+
 		Renderer::clear();
 		for (auto& entity : entities)
 		{
-			Renderer::render(entity->getComponent<MeshMaterial>(), entity->getTransform().getModelMatrix());
+			MeshRenderer m = entity->getComponent<MeshRenderer>();
+			for (auto& mesh : m.getModel()->getMeshes())
+			{
+				Renderer::render(*mesh, entity->getTransform().getModelMatrix());
+			}
+		}
+	}
+
+	void RenderSystem::onLightChanged(LightChangedEvent* event)
+	{
+		for (auto& entity : entities)
+		{
+			MeshRenderer m = entity->getComponent<MeshRenderer>();
+			for (auto& mesh : m.getModel()->getMeshes())
+			{
+				mesh->getMaterial()->getShader()->setLight(event->lightEntity);
+			}
 		}
 	}
 
 	void LightSystem::update(float dt)
 	{
 		KU_PROFILE_FUNCTION();
-		Renderer::setLights(entities);
+		for (auto& entity : entities)
+		{
+			Light l = entity->getComponent<Light>();
+			if (l.changed)
+			{
+				LightChangedEvent e(entity.get());
+				scene->notifySystems(&e);
+				l.changed = false;
+			}
+		}
 	}
 
 	void AudioSystem::update(float dt)

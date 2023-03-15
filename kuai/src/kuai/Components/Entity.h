@@ -30,6 +30,7 @@ namespace kuai {
 		template<class T>
 		T& getComponent()
 		{	
+			KU_PROFILE_FUNCTION();
 			return ECS->getComponent<T>(id);
 		}
 
@@ -40,9 +41,9 @@ namespace kuai {
 		}
 
 		template<class T>
-		void RemoveComponent()
+		void removeComponent()
 		{
-			ECS->RemoveComponent(id);
+			ECS->removeComponent(id);
 		}
 
 		Transform& getTransform()
