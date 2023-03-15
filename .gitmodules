@@ -28,3 +28,9 @@
 [submodule "kuai/vendor/libsndfile"]
 	path = kuai/vendor/libsndfile
 	url = git@github.com:libsndfile/libsndfile.git
+[submodule "kuai/vendor/assimp"]
+	path = kuai/vendor/assimp
+	url = git@github.com:assimp/assimp.git
+[submodule "kuai/vendor/box2d"]
+	path = kuai/vendor/box2d
+	url = git@github.com:erincatto/box2d.git

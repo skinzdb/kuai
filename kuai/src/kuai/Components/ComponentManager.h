@@ -37,7 +37,7 @@ namespace kuai {
 		{
 			KU_CORE_ASSERT(entityToIndex.find(entity) != entityToIndex.end(), "Removing component that does not exist");
 
-			// update mappings s.t. entity of last component in array points to removed index and vice-versa
+			// Update mappings s.t. entity of last component in array points to removed index and vice-versa
 			size_t removeIndex = entityToIndex[entity];
 
 			EntityID lastElementEntity = indexToEntity[currentComponents - 1];
@@ -105,7 +105,7 @@ namespace kuai {
 		template<typename T>
 		void removeComponent(EntityID entity)
 		{
-			getComponentContainer<T>()->Remove(entity);
+			getComponentContainer<T>()->remove(entity);
 		}
 		
 		template<typename T>

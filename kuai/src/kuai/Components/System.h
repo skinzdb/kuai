@@ -19,7 +19,7 @@ namespace kuai {
 
 		virtual void insertEntity(EntityID entity);
 
-		virtual void RemoveEntity(EntityID entity);
+		virtual void removeEntity(EntityID entity);
 
 		std::vector<std::shared_ptr<Entity>>& getEntities();
 

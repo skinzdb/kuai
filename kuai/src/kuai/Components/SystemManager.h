@@ -39,7 +39,7 @@ namespace kuai {
 			for (auto const& pair : systems)
 			{
 				auto const& system = pair.second;
-				system->RemoveEntity(entity);
+				system->removeEntity(entity);
 			}
 		}
 
@@ -56,7 +56,7 @@ namespace kuai {
 				if (entityComponentMask == systemComponentMask || (system->acceptsSubset && (entityComponentMask & systemComponentMask)))
 					system->insertEntity(entity);
 				else
-					system->RemoveEntity(entity);
+					system->removeEntity(entity);
 			}
 		}
 

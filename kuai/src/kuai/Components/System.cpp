@@ -11,7 +11,7 @@ namespace kuai {
 		entities.push_back(scene->getEntityById(entity));
 	}
 
-	void System::RemoveEntity(EntityID entity)
+	void System::removeEntity(EntityID entity)
 	{
 		entities.erase(std::remove(entities.begin(), entities.end(), scene->getEntityById(entity)), entities.end());
 	}
