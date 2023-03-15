@@ -1,166 +1,107 @@
 #include "kpch.h"
 #include "Shader.h"
 
-#include "kuai/Util/FileUtil.h" // REMOVE after creating shaders properly
-
-#include <glad/glad.h>
+#include "kuai/Components/Entity.h"
+#include "kuai/Components/Components.h"
 
 namespace kuai {
-	Shader::Shader(const char* vertSrc, const char* fragSrc)
+	std::string VERT_HEADER = R"(
+		#version 460
+		layout (location = 0) in vec3 pos;
+		layout (location = 1) in vec3 normal;
+		layout (location = 2) in vec2 texCoord;
+
+		//layout (shared) uniform Matrices
+		//{
+		//	mat4 projectionMatrix;
+		//	mat4 viewMatrix;
+		//};
+
+		uniform mat4 projectionMatrix;
+		uniform mat4 viewMatrix;
+
+		uniform mat4 modelMatrix;
+		uniform mat3 model3x3InvTransp; // Used to calculate proper world position of normals		
+	)";
+
+	std::string FRAG_HEADER = R"(
+		#version 460
+		#define MAX_LIGHTS 10
+
+		struct Light
+		{
+			int type;
+
+			vec3 pos;
+			vec3 dir;
+			vec3 col;
+    
+			float intensity;
+			float linear;
+			float quadratic;
+			float cutoff;
+		};
+
+		uniform Light lights[MAX_LIGHTS];
+		//layout (shared) uniform Lights
+		//{
+		//	Light lights[MAX_LIGHTS];
+		//};
+	)";
+
+	Shader::Shader(const std::string& vertSrc, const std::string& fragSrc)
+		: ShaderProgram(VERT_HEADER + vertSrc, FRAG_HEADER + fragSrc)
 	{
-		programId = glCreateProgram();
-		vertShaderId = createShader(vertSrc, GL_VERTEX_SHADER);
-		fragShaderId = createShader(fragSrc, GL_FRAGMENT_SHADER);
-		link();
+		bind();
+
+		createUniform("projectionMatrix");
+		createUniform("viewMatrix");
+
+		createUniform("modelMatrix");
+		createUniform("model3x3InvTransp");
+
+		for (int i = 0; i < MAX_LIGHTS; i++)
+		{
+			createUniform("lights[" + std::to_string(i) + "].type");
+
+			createUniform("lights[" + std::to_string(i) + "].pos");
+			createUniform("lights[" + std::to_string(i) + "].dir");
+			createUniform("lights[" + std::to_string(i) + "].col");
+
+			createUniform("lights[" + std::to_string(i) + "].intensity");
+
+			createUniform("lights[" + std::to_string(i) + "].linear");
+			createUniform("lights[" + std::to_string(i) + "].quadratic");
+
+			createUniform("lights[" + std::to_string(i) + "].cutoff");
+		}		
 	}
 
 	Shader::~Shader()
 	{
-		unbind();
-		if (programId)
-			glDeleteProgram(programId);
 	}
 
-	void Shader::createUniform(const std::string& name)
+	void Shader::setLight(Entity* light)
 	{
-		int uniformLoc = glGetUniformLocation(programId, name.c_str());
-		if (uniformLoc == -1)
-			KU_CORE_ERROR("[Shader {0}] Could not find the uniform {1}", programId, name);
-		uniforms[name] = uniformLoc;
-	}
+		Light l = light->getComponent<Light>();
+		uint32_t id = l.getId();
 
-	void Shader::createUniformBlock(const std::string& name, const std::vector<const char*>& memberNames, uint32_t size)
-	{
-		KU_CORE_ASSERT(memberNames.size(), "No member names entered for uniform block.");
+		KU_CORE_ASSERT(id < MAX_LIGHTS, "Exceeded maximum number of lights");
 
-		// Create uniform buffer object
-		unsigned int ubo;
-		glGenBuffers(1, &ubo);
-		glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-		glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
-		glBindBufferRange(GL_UNIFORM_BUFFER, 0, ubo, 0, size);
+		bind();
 
-		// Define the range of the buffer that links to a uniform binding point
-
-		uniforms[name] = ubo;
-
-		// Get indices of uniforms within block
-		unsigned int* indices = new unsigned int[memberNames.size()];
-		glGetUniformIndices(programId, memberNames.size(), memberNames.data(), indices);
-		// Get offsets for uniforms in bytes
-		int* offsets = new int[std::max(1, (int)memberNames.size())];
-		glGetActiveUniformsiv(programId, memberNames.size(), indices, GL_UNIFORM_OFFSET, offsets);
-
-		for (int i = 0; i < memberNames.size(); i++)
-		{
-			uniformOffsets[memberNames[i]] = offsets[i];
-		}
-
-		delete[] indices;
-		delete[] offsets;
-	}
-
-	void Shader::setUniform(const std::string& name, int val) const
-	{
-		glUniform1i(uniforms.at(name), val);
-	}
-
-	void Shader::setUniform(const std::string& name, float val) const
-	{
-		glUniform1f(uniforms.at(name), val);
-	}
-
-	void Shader::setUniform(const std::string& name, const glm::vec2& val) const
-	{
-		glUniform2f(uniforms.at(name), val.x, val.y);
-	}
-
-	void Shader::setUniform(const std::string& name, const glm::vec3& val) const
-	{
-		glUniform3f(uniforms.at(name), val.x, val.y, val.z);
-	}
-
-	void Shader::setUniform(const std::string& name, const glm::vec4& val) const
-	{
-		glUniform4f(uniforms.at(name), val.x, val.y, val.z, val.w);
-	}
-
-	void Shader::setUniform(const std::string& name, const glm::mat3& val) const
-	{
-		glUniformMatrix3fv(uniforms.at(name), 1, GL_FALSE, &val[0][0]);
-	}
-
-	void Shader::setUniform(const std::string& name, const glm::mat4& val) const
-	{
-		glUniformMatrix4fv(uniforms.at(name), 1, GL_FALSE, &val[0][0]);
-	}
-
-	void Shader::setUniform(const std::string& blockName, const std::string& memberName, const glm::mat4& val) const
-	{
-		glBindBuffer(GL_UNIFORM_BUFFER, uniforms.at(blockName));
-		glBufferSubData(GL_UNIFORM_BUFFER, uniformOffsets.at(memberName), sizeof(glm::mat4), &val[0][0]);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	}
-
-	void Shader::bind()
-	{
-		glUseProgram(programId);
-	}
-
-	void Shader::unbind()
-	{
-		glUseProgram(GL_NONE);
-	}
-
-	int Shader::createShader(const char* src, int type)
-	{
-		int shaderId = glCreateShader(type);
-		if (!shaderId)
-			KU_CORE_ERROR("[Shader {0}] Failed to create shader ({1})", programId, type);
-
-		glShaderSource(shaderId, 1, &src, nullptr);
-		glCompileShader(shaderId);
-
-		int compileSuccess;
-		glGetShaderiv(shaderId, GL_COMPILE_STATUS, &compileSuccess);
-		if (!compileSuccess)
-		{
-			char errStr[1024];
-			glGetShaderInfoLog(shaderId, 1024, nullptr, errStr); // Set max length of character buffer to 1024
-			KU_CORE_ERROR("[Shader {0}] Error compiling shader code: {1}", programId, errStr);
-		}
-
-		glAttachShader(programId, shaderId);
-
-		return shaderId;
-	}
-
-	void Shader::link()
-	{
-		glLinkProgram(programId);
-		int linkSuccess;
-		glGetProgramiv(programId, GL_LINK_STATUS, &linkSuccess);
-		if (!linkSuccess)
-		{
-			char errStr[1024];
-			glGetProgramInfoLog(programId, 1024, nullptr, errStr);
-			KU_CORE_ERROR("[Shader {0}] Error linking shader code: {1}", programId, errStr);
-		}
-
-		if (vertShaderId)
-			glDetachShader(programId, vertShaderId);
-		if (fragShaderId)
-			glDetachShader(programId, fragShaderId);
-
-		glValidateProgram(programId);
-		int validateSuccess;
-		glGetProgramiv(programId, GL_VALIDATE_STATUS, &validateSuccess);
-		if (!validateSuccess)
-		{
-			char errStr[1024];
-			glGetProgramInfoLog(programId, 1024, nullptr, errStr);
-			KU_CORE_ERROR("[Shader {0}] Error validating shader code: {1}", programId, errStr);
-		}
+		setUniform("lights[" + std::to_string(id) + "].type", (int)l.getType());
+											   
+		setUniform("lights[" + std::to_string(id) + "].pos", light->getTransform().getPos());
+		setUniform("lights[" + std::to_string(id) + "].dir", light->getTransform().getForward());
+		setUniform("lights[" + std::to_string(id) + "].col", l.getCol());
+											   
+		setUniform("lights[" + std::to_string(id) + "].intensity", l.getIntensity());
+											   
+		setUniform("lights[" + std::to_string(id) + "].linear", l.getLinear());
+		setUniform("lights[" + std::to_string(id) + "].quadratic", l.getQuadratic());
+											   
+		setUniform("lights[" + std::to_string(id) + "].cutoff", glm::cos(glm::radians(l.getAngle())));
 	}
 }
 

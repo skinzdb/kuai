@@ -1,26 +1,27 @@
 #include "kpch.h"
 #include "Renderer.h"
 
-#include "StaticShader.h"
-
 #include <glad/glad.h>
 #include <glm/gtc/matrix_inverse.hpp>
 
+#include "StaticShader.h"
+
 namespace kuai {
     std::unique_ptr<Renderer::CameraData> Renderer::camData = std::make_unique<Renderer::CameraData>();
-    std::vector<std::shared_ptr<Entity>> Renderer::lights = std::vector<std::shared_ptr<Entity>>();
 
     void Renderer::init()
     {
-        StaticShader::init();
-
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
+
+        glEnable(GL_CULL_FACE);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glEnable(GL_FRAMEBUFFER_SRGB); // TODO: IMPLEMENT THIS MANUALLY IN SHADER AND TEXTURES 
+
+        StaticShader::init();
     }
 
     void Renderer::cleanup()
@@ -50,43 +51,28 @@ namespace kuai {
         camData->viewPos = viewPos;
     }
 
-    void Renderer::setLights(std::vector<std::shared_ptr<Entity>>& lights)
+    void Renderer::render(Mesh& mesh, glm::mat4& transform)
     {
-        Renderer::lights = lights;
-    }
-
-    void Renderer::render(MeshMaterial& meshMat, glm::mat4& transform)
-    {
-        Shader* shader = meshMat.material->shader;
+        KU_PROFILE_FUNCTION();
+        Shader* shader = mesh.getMaterial()->getShader();
 
         shader->bind();
 
-        for (int i = 0; i < lights.size(); i++)
         {
-            Light light = lights[i]->getComponent<Light>();
+            KU_PROFILE_SCOPE("Renderer - set MVP matrices");
 
-            shader->setUniform("lights[" + std::to_string(i) + "].type", (int)light.getType());
+            shader->setUniform("projectionMatrix", camData->projectionMatrix);
+            shader->setUniform("viewMatrix", camData->viewMatrix);
 
-            shader->setUniform("lights[" + std::to_string(i) + "].pos", lights[i]->getTransform().getPos());
-            shader->setUniform("lights[" + std::to_string(i) + "].dir", lights[i]->getTransform().getRot());
-            shader->setUniform("lights[" + std::to_string(i) + "].col", light.getCol());
+            shader->setUniform("viewPos", camData->viewPos);
 
-            shader->setUniform("lights[" + std::to_string(i) + "].intensity", light.getIntensity());
+            shader->setUniform("modelMatrix", transform);
+            shader->setUniform("model3x3InvTransp", glm::inverseTranspose(glm::mat3(transform)));
 
-            shader->setUniform("lights[" + std::to_string(i) + "].linear", light.getLinear());
-            shader->setUniform("lights[" + std::to_string(i) + "].quadratic", light.getQuadratic());
-
-            shader->setUniform("lights[" + std::to_string(i) + "].cutoff", glm::cos(glm::radians(light.getAngle())));
+            shader->update();
         }
 
-        shader->setUniform("projectionMatrix", camData->projectionMatrix);
-        shader->setUniform("viewMatrix", camData->viewMatrix);
-        shader->setUniform("viewPos", camData->viewPos);
-              
-        shader->setUniform("modelMatrix", transform);
-        shader->setUniform("model3x3InvTransp", glm::inverseTranspose(glm::mat3(transform)));
-           
-        meshMat.Render();
+        mesh.render();
     }
 }
 

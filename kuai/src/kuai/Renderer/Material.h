@@ -1,60 +1,68 @@
 #pragma once
-
 #include "Shader.h"
-#include "StaticShader.h"
 #include "Texture.h"
-#include "glm/glm.hpp"
+#include "Cubemap.h"
+#include "StaticShader.h"
+
+#include <glm/glm.hpp>
 
 namespace kuai {
 	class Material
 	{
 	public:
 		virtual void render() = 0;
+
+		void setShader(Shader* shader) { this->shader = shader; };
+		Shader* getShader() { return shader; }
+
+	protected:
 		Shader* shader = nullptr;
 	};
 
-	class PhongMaterial : public Material
+	class DefaultMaterial : public Material
 	{
 	public:
-		PhongMaterial(std::shared_ptr<Texture> diffuse, std::shared_ptr<Texture> specular, float shininess) :
-			shininess(shininess), diffuse(diffuse), specular(specular)
+		DefaultMaterial(std::shared_ptr<Texture> diffuse, std::shared_ptr<Texture> specular, float specularAmount)
+			: diffuse(diffuse), specular(specular), specularAmount(specularAmount)
 		{
-			shader = StaticShader::Phong;
+			shader = StaticShader::default;
 		}
 
 		virtual void render()
 		{
-			StaticShader::Phong->setUniforms(shininess);
+			//shader->setUniform();
 
 			diffuse->bind(0);
 			specular->bind(1);
 		}
 
+		void setDiffuse(std::shared_ptr<Texture> diffuse) { this->diffuse = diffuse; }
+		void setSpecular(std::shared_ptr<Texture> specular) { this->specular = specular; }
+
 	private:
 		std::shared_ptr<Texture> diffuse;
 		std::shared_ptr<Texture> specular;
 
-		float shininess = 1.0f;
+		float specularAmount;
+
+		friend class Model;
 	};
 
-	class SimpleMaterial : public Material {
+	class SkyboxMaterial : public Material
+	{
 	public:
-		SimpleMaterial()
+		SkyboxMaterial(std::shared_ptr<Cubemap> cubemap) : cubemap(cubemap)
 		{
-			shader = StaticShader::Simple;
+			shader = StaticShader::skybox;
 		}
 
-		SimpleMaterial(glm::vec3& col) : col(col)
+		virtual void render()
 		{
-			SimpleMaterial();
-		}
-
-		virtual void render() 
-		{
-			StaticShader::Simple->setUniforms(col);
+			cubemap->bind();
 		}
 
 	private:
-		glm::vec3 col = { 1.0f, 1.0f, 1.0f };
+		std::shared_ptr<Cubemap> cubemap;
+
 	};
 }

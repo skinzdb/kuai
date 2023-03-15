@@ -4,14 +4,26 @@
 #include <glad/glad.h>
 
 namespace kuai {
+	Mesh::Mesh(const std::vector<float>& positions, const std::vector<float>& normals, const std::vector<float>& texCoords, const std::vector<uint32_t>& indices, std::shared_ptr<Material> material) :
+		Mesh(positions, normals, texCoords, indices)
+	{
+		this->material = material;
+	}
+
 	Mesh::Mesh(const std::vector<float>& positions, const std::vector<float>& normals, const std::vector<float>& texCoords, const std::vector<uint32_t>& indices)
 	{
+		KU_PROFILE_FUNCTION();
+
 		vertCount = indices.size();
 
 		glGenVertexArrays(1, &vaoId);
 		glBindVertexArray(vaoId);
 
 		glGenBuffers(4, vboIds);
+
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
 
 		// Positions
 		glBindBuffer(GL_ARRAY_BUFFER, vboIds[0]);
@@ -34,12 +46,14 @@ namespace kuai {
 
 		glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
 		glBindVertexArray(GL_NONE);
+
+		// Default material
+		auto tex = std::make_shared<Texture>();
+		material = std::make_shared<DefaultMaterial>(tex, tex, 10.0f);
 	}
 
 	Mesh::~Mesh()
 	{
-		glDisableVertexAttribArray(GL_NONE);
-
 		// Delete VBOs
 		glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
 		glDeleteBuffers(4, vboIds);
@@ -51,20 +65,29 @@ namespace kuai {
 
 	void Mesh::render()
 	{
+		material->render();
+
 		glBindVertexArray(vaoId);
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
+		//glEnableVertexAttribArray(0);
+		//glEnableVertexAttribArray(1);
+		//glEnableVertexAttribArray(2);
 
 		glDrawElements(GL_TRIANGLES, vertCount, GL_UNSIGNED_INT, 0);
 
 		// Restore state
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(2);
+		//glDisableVertexAttribArray(0);
+		//glDisableVertexAttribArray(1);
+		//glDisableVertexAttribArray(2);
 
 		//glBindVertexArray(GL_NONE); // No need to unbind every time
 		//glBindTexture(GL_TEXTURE_2D, GL_NONE);
+	}
+
+	void Mesh::setTexCoords(std::vector<float>& texCoords)
+	{
+		glBindVertexArray(vaoId);
+		glBindBuffer(GL_ARRAY_BUFFER, vboIds[2]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * texCoords.size(), texCoords.data(), GL_STATIC_DRAW);
 	}
 
 }

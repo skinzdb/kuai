@@ -1,41 +1,25 @@
 #pragma once
 
-#include "kpch.h"
-#include "glm/mat4x4.hpp"
+#include "ShaderProgram.h"
 
 namespace kuai {
-	class Shader
+	// Forward declaration
+	class Entity;
+
+	const uint32_t MAX_LIGHTS = 10;
+
+	class Shader : public ShaderProgram
 	{
 	public:
-		Shader(const char* vertSrc, const char* fragSrc);
+		Shader(const std::string& vertSrc, const std::string& fragSrc);
 		~Shader();
 
-		void createUniform(const std::string& name);
-		void createUniformBlock(const std::string& name, const std::vector<const char*>& memberNames, uint32_t size);
-
-		void setUniform(const std::string& name, int val) const;
-		void setUniform(const std::string& name, float val) const;
-		void setUniform(const std::string& name, const glm::vec2& val) const;
-		void setUniform(const std::string& name, const glm::vec3& val) const;
-		void setUniform(const std::string& name, const glm::vec4& val) const;
-		void setUniform(const std::string& name, const glm::mat3& val) const;
-		void setUniform(const std::string& name, const glm::mat4& val) const;
-		
-		void setUniform(const std::string& blockName, const std::string& name, const glm::mat4& val) const;
-
-		void bind();
-		void unbind();
+		virtual void update() = 0;
 
 	private:
-		int createShader(const char* src, int type);
-		void link();
+		void setLight(Entity* light);
 
-		int programId;
-		int vertShaderId;
-		int fragShaderId;
-
-		std::unordered_map<std::string, int> uniforms;
-		std::unordered_map<std::string, int> uniformOffsets;
+		friend class RenderSystem;
 	};
 }
 
