@@ -35,11 +35,16 @@ namespace kuai {
 		while (running) 
 		{
 			float elapsedTime = timer.getElapsed(); // Time since last frame
+			// KU_CORE_INFO("FPS: {0}", 1.0f / elapsedTime);
 						
 			if (!minimised)
 			{
-				for (Layer* layer : layerStack)
-					layer->update(elapsedTime);
+				{
+					KU_PROFILE_SCOPE("LayerStack update");
+
+					for (Layer* layer : layerStack)
+						layer->update(elapsedTime);
+				}
 			}
 
 			window->update();

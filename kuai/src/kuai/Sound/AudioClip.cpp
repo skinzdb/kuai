@@ -9,6 +9,8 @@ namespace kuai {
 
 	AudioClip::AudioClip(const std::string& filename)
 	{
+		KU_PROFILE_FUNCTION();
+
 		SndfileHandle file(filename);
 
 		if (file.channels() == 1 && file.format() & SF_FORMAT_PCM_S8)

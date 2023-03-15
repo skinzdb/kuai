@@ -139,6 +139,8 @@ namespace kuai {
 			MouseMoveEvent event((float)xpos, (float)ypos);
 			data.eventCallback(&event);
 		});
+
+		//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 
 	void WinWindow::cleanup()

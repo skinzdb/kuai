@@ -1,3 +1,6 @@
+
+#ifdef KU_BUILD_INSTRUMENTOR
+
 #pragma once
 
 #include "kuai/Core/Log.h"
@@ -202,7 +205,7 @@ namespace kuai {
 	}
 }
 
-#define KU_PROFILE 1
+#define KU_PROFILE 0
 #if KU_PROFILE
 // Resolve which function signature macro will be used. Note that this only
 // is resolved when the (pre)compiler starts, so the syntax highlighting
@@ -237,4 +240,13 @@ namespace kuai {
 #define KU_PROFILE_END_SESSION()
 #define KU_PROFILE_SCOPE(name)
 #define KU_PROFILE_FUNCTION()
+#endif
+
+#else
+
+#define KU_PROFILE_BEGIN_SESSION(name, filepath)
+#define KU_PROFILE_END_SESSION()
+#define KU_PROFILE_SCOPE(name)
+#define KU_PROFILE_FUNCTION()
+
 #endif

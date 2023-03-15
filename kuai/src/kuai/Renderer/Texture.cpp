@@ -17,6 +17,8 @@ namespace kuai {
 
 	Texture::Texture(const std::string& filename)
 	{
+		KU_PROFILE_FUNCTION();
+
 		glGenTextures(1, &textureId);
 		glBindTexture(GL_TEXTURE_2D, textureId);
 

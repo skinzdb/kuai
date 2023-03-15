@@ -35,9 +35,6 @@ project "kuai"
 
 		"%{prj.name}/vendor/stb_image/stb_image.h",
 		"%{prj.name}/vendor/stb_image/stb_image.cpp",
-
-		"%{prj.name}/vendor/tinyobjloader/tiny_obj_loader.h",
-		"%{prj.name}/vendor/tinyobjloader/tiny_obj_loader.cpp"
 	}
 
 	includedirs
@@ -48,16 +45,19 @@ project "kuai"
 		"%{prj.name}/vendor/Glad/include",
 		"%{prj.name}/vendor/glm",
 		"%{prj.name}/vendor/stb_image",
-		"%{prj.name}/vendor/tinyobjloader",
 		--"%{prj.name}/vendor/mono/include",
 		"%{prj.name}/vendor/openal-soft/include",
-		"%{prj.name}/vendor/libsndfile/include"
+		"%{prj.name}/vendor/libsndfile/include",
+		"%{prj.name}/vendor/assimp/include"
 	}
 
 	libdirs
 	{
 		--"%{prj.name}/vendor/mono/lib",
-		"%{prj.name}/vendor/openal-soft/build/Debug/"
+		"%{prj.name}/vendor/openal-soft/build/Debug",
+		"%{prj.name}/vendor/libsndfile/build/Debug",
+		"%{prj.name}/vendor/assimp/build/lib/Debug",
+		"%{prj.name}/vendor/assimp/contrib/zlib/Debug"
 	}
 
 	links
@@ -65,7 +65,9 @@ project "kuai"
 		"GLFW",
 		"Glad",
 		"opengl32.lib",
-		"OpenAL32.lib"
+		"OpenAL32.lib",
+		"sndfile.lib",
+
 		--"libmono-static-sgen.lib"
 	}
 
@@ -80,11 +82,39 @@ project "kuai"
 		}
 
 	filter "configurations:Debug"
+		libdirs
+		{
+			"%{prj.name}/vendor/openal-soft/build/Debug",
+			"%{prj.name}/vendor/libsndfile/build/Debug",
+			"%{prj.name}/vendor/assimp/build/lib/Debug",
+			"%{prj.name}/vendor/assimp/contrib/zlib/Debug"
+		}
+
+		links
+		{
+			"assimp-vc142-mtd.lib",
+			"zlibstaticd.lib"	-- building assimp statically requires you to include zlib too
+		}
+
 		defines "KU_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
+		libdirs
+		{
+			"%{prj.name}/vendor/openal-soft/build/Release",
+			"%{prj.name}/vendor/libsndfile/build/Release",
+			"%{prj.name}/vendor/assimp/build/lib/Release",
+			"%{prj.name}/vendor/assimp/contrib/zlib/Release"
+		}
+
+		links
+		{
+			"assimp-vc142-mt.lib",
+			"zlibstatic.lib"	-- building assimp statically requires you to include zlib too
+		}
+
 		defines "KU_RELEASE"
 		runtime "Release"
 		optimize "on"	

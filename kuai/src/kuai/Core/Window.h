@@ -14,8 +14,8 @@ namespace kuai {
 		uint32_t height;
 
 		WindowProps(const std::string& title = "Demo",
-			uint32_t width = 640,
-			uint32_t height = 480)
+			uint32_t width = 1280,
+			uint32_t height = 720)
 		{
 			this->title = title;
 			this->width = width;
