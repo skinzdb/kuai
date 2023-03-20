@@ -90,7 +90,7 @@ namespace kuai {
 		return std::make_shared<Mesh>(vertices, normals, texCoords, indices);
 	}
 
-	std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type)
+	std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, const aiTextureType& type)
 	{
 		std::vector<Texture> textures;
 

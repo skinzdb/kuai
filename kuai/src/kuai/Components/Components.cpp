@@ -107,17 +107,17 @@ namespace kuai {
 		AudioManager::setSourceProperty(sourceId, AudioManager::Loop, loop);
 	}
 
-	void AudioSource::setPos(glm::vec3& pos)
+	void AudioSource::setPos(const glm::vec3& pos)
 	{
 		AudioManager::setSourceProperty(sourceId, AudioManager::Position, pos);
 	}
 
-	void AudioSource::setDir(glm::vec3& dir)
+	void AudioSource::setDir(const glm::vec3& dir)
 	{
 		AudioManager::setSourceProperty(sourceId, AudioManager::Direction, dir);
 	}
 
-	void AudioSource::setVel(glm::vec3& vel)
+	void AudioSource::setVel(const glm::vec3& vel)
 	{
 		AudioManager::setSourceProperty(sourceId, AudioManager::Velocity, vel);
 	}
@@ -136,18 +136,18 @@ namespace kuai {
 		AudioManager::setListenerProperty(AudioManager::Gain, gain);
 	}
 
-	void AudioListener::setPos(glm::vec3& pos)
+	void AudioListener::setPos(const glm::vec3& pos)
 	{
 		AudioManager::setListenerProperty(AudioManager::Position, pos);
 	}
 
-	void AudioListener::setOrientation(glm::vec3& at, glm::vec3& up)
+	void AudioListener::setOrientation(const glm::vec3& at, const glm::vec3& up)
 	{
 		std::vector<float> data = { at.x, at.y, at.z, up.x, up.y, up.z };
 		AudioManager::setListenerProperty(AudioManager::Orientation, data);
 	}
 
-	void AudioListener::setVel(glm::vec3& vel)
+	void AudioListener::setVel(const glm::vec3& vel)
 	{
 		AudioManager::setListenerProperty(AudioManager::Velocity, vel);
 	}

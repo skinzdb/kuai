@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory>
+#include <list>
+
 #include "EntityManager.h"
 #include "ComponentManager.h"
 #include "SystemManager.h"
@@ -126,7 +129,7 @@ namespace kuai {
 		template<typename T>
 		void removeComponent(EntityID entity)
 		{
-			componentManager->removeComponent(entity);
+			componentManager->removeComponent<T>(entity);
 
 			auto componentMask = entityManager->getComponentMask(entity);
 			componentMask &= BIT(componentManager->getComponentType<T>()) ^ std::numeric_limits<ComponentMask>::max();

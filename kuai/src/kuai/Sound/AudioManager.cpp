@@ -125,12 +125,12 @@ namespace kuai {
 		alListenerf(property, val);
 	}
 
-	void AudioManager::setListenerProperty(Property property, std::vector<float>& vals)
+	void AudioManager::setListenerProperty(Property property, const std::vector<float>& vals)
 	{
 		alListenerfv(property, vals.data());
 	}
 
-	void AudioManager::setListenerProperty(Property property, glm::vec3& val)
+	void AudioManager::setListenerProperty(Property property, const glm::vec3& val)
 	{
 		alListener3f(property, val.x, val.y, val.z);
 	}
@@ -168,7 +168,7 @@ namespace kuai {
 		alSourcef(sourceId, property, val);
 	}
 
-	void AudioManager::setSourceProperty(ALuint sourceId, Property property, glm::vec3& val)
+	void AudioManager::setSourceProperty(ALuint sourceId, Property property, const glm::vec3& val)
 	{
 		alSource3f(sourceId, property, val.x, val.y, val.z);
 	}

@@ -39,8 +39,8 @@ namespace kuai {
 
 		static void setListenerProperty(Property property, int val);
 		static void setListenerProperty(Property property, float val);
-		static void setListenerProperty(Property property, glm::vec3& val);
-		static void setListenerProperty(Property property, std::vector<float>& vals);
+		static void setListenerProperty(Property property, const glm::vec3& val);
+		static void setListenerProperty(Property property, const std::vector<float>& vals);
 
 		static ALuint createAudioSource();
 		static void playAudioSource(ALuint sourceId);
@@ -48,7 +48,7 @@ namespace kuai {
 
 		static void setSourceProperty(ALuint sourceId, Property property, int val);
 		static void setSourceProperty(ALuint sourceId, Property property, float val);
-		static void setSourceProperty(ALuint sourceId, Property property, glm::vec3& val);
+		static void setSourceProperty(ALuint sourceId, Property property, const glm::vec3& val);
 
 		static void setSourceAudioClip(ALuint sourceId, std::shared_ptr<AudioClip> audioClip);
 

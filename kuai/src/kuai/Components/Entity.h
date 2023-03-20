@@ -43,7 +43,7 @@ namespace kuai {
 		template<class T>
 		void removeComponent()
 		{
-			ECS->removeComponent(id);
+			ECS->removeComponent<T>(id);
 		}
 
 		Transform& getTransform()

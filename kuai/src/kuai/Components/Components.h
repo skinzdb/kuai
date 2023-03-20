@@ -54,22 +54,46 @@ namespace kuai {
 		Transform(Entity* entity, glm::vec3& pos) : Component(entity), pos(pos) {}
 
 		glm::vec3 getPos() { return pos; }
-		void setPos(glm::vec3& pos) { this->pos = pos; updateComponents(); calcModelMatrix(); }
-		void setPos(float x, float y, float z) { setPos(glm::vec3(x, y, z)); }
+		void setPos(const glm::vec3& pos) 
+		{ 
+			this->pos = pos; 
+			updateComponents(); 
+			calcModelMatrix(); 
+		}
+		void setPos(float x, float y, float z) { setPos({ x, y, z }); }
 
-		void translate(glm::vec3& amount) { this->pos += amount; updateComponents(); calcModelMatrix(); }
-		void translate(float x, float y, float z) { translate(glm::vec3(x, y, z)); }
+		void translate(const glm::vec3& amount) 
+		{ 
+			this->pos += amount; 
+			updateComponents(); 
+			calcModelMatrix(); 
+		}
+		void translate(float x, float y, float z) { translate({ x, y, z }); }
 
 		glm::vec3 getRot() { return glm::degrees(rot); }
-		void setRot(glm::vec3& rot) { this->rot = glm::radians(rot); updateComponents(); calcModelMatrix(); }
-		void setRot(float x, float y, float z) { setRot(glm::vec3(x, y, z)); }
+		void setRot(const glm::vec3& rot) 
+		{ 
+			this->rot = glm::radians(rot); 
+			updateComponents(); 
+			calcModelMatrix(); 
+		}
+		void setRot(float x, float y, float z) { setRot({ x, y, z }); }
 
-		void rotate(glm::vec3& amount) { this->rot += glm::radians(amount); updateComponents(); calcModelMatrix(); }
-		void rotate(float x, float y, float z) { rotate(glm::vec3(x, y, z)); }
+		void rotate(const glm::vec3& amount) 
+		{ 
+			this->rot += glm::radians(amount);
+			updateComponents(); 
+			calcModelMatrix();
+		}
+		void rotate(float x, float y, float z) { rotate({ x, y, z }); }
 
 		glm::vec3 getScale() { return scale; }
-		void setScale(glm::vec3& scale) { this->scale = scale; calcModelMatrix(); }
-		void setScale(float x, float y, float z) { setScale(glm::vec3(x, y, z)); }
+		void setScale(const glm::vec3& scale)
+		{ 
+			this->scale = scale; 
+			calcModelMatrix(); 
+		}
+		void setScale(float x, float y, float z) { setScale({ x, y, z }); }
 
 		glm::vec3 getUp() { return glm::rotate(glm::quat(rot), glm::vec3(0.0f, 1.0f, 0.0f)); }
 		glm::vec3 getRight() { return glm::rotate(glm::quat(rot), glm::vec3(1.0f, 0.0f, 0.0f)); }
@@ -207,8 +231,12 @@ namespace kuai {
 		void setType(LightType type) { this->type = type; changed = true; }
 
 		glm::vec3 getCol() { return col; }
-		void setCol(glm::vec3& col) { this->col = col; changed = true; }
-		void setCol(float x, float y, float z) { this->col = glm::vec3(x, y, z); changed = true; }
+		void setCol(const glm::vec3& col) 
+		{ 
+			this->col = col; 
+			changed = true;
+		}
+		void setCol(float x, float y, float z) { setCol({ x, y, z }); }
 
 		float getIntensity() { return intensity; }
 		void setIntensity(float intensity) { this->intensity = intensity; changed = true; }
@@ -321,9 +349,9 @@ namespace kuai {
 		void setGain(float gain);
 
 	private:
-		void setPos(glm::vec3& pos);
-		void setOrientation(glm::vec3& at, glm::vec3& up);
-		void setVel(glm::vec3& vel);
+		void setPos(const glm::vec3& pos);
+		void setOrientation(const glm::vec3& at, const glm::vec3& up);
+		void setVel(const glm::vec3& vel);
 
 	private:
 		float gain = 1.0f;
@@ -359,9 +387,9 @@ namespace kuai {
 		uint32_t getId() { return sourceId; }
 
 	private:
-		void setPos(glm::vec3& pos);
-		void setDir(glm::vec3& dir);
-		void setVel(glm::vec3& vel);
+		void setPos(const glm::vec3& pos);
+		void setDir(const glm::vec3& dir);
+		void setVel(const glm::vec3& vel);
 
 	private:
 		std::shared_ptr<AudioClip> audioClip = nullptr;
