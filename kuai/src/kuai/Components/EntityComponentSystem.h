@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory>
+#include <list>
+
 #include "EntityManager.h"
 #include "ComponentManager.h"
 #include "SystemManager.h"

@@ -54,6 +54,7 @@ namespace kuai {
 		Transform(Entity* entity, glm::vec3& pos) : Component(entity), pos(pos) {}
 
 		glm::vec3 getPos() { return pos; }
+    
 		void setPos(const glm::vec3& pos) { this->pos = pos; updateComponents(); calcModelMatrix(); }
 		void setPos(float x, float y, float z) { setPos(glm::vec3(x, y, z)); }
 
@@ -207,8 +208,12 @@ namespace kuai {
 		void setType(LightType type) { this->type = type; changed = true; }
 
 		glm::vec3 getCol() { return col; }
-		void setCol(glm::vec3& col) { this->col = col; changed = true; }
-		void setCol(float x, float y, float z) { this->col = glm::vec3(x, y, z); changed = true; }
+		void setCol(const glm::vec3& col) 
+		{ 
+			this->col = col; 
+			changed = true;
+		}
+		void setCol(float x, float y, float z) { setCol({ x, y, z }); }
 
 		float getIntensity() { return intensity; }
 		void setIntensity(float intensity) { this->intensity = intensity; changed = true; }
@@ -321,9 +326,9 @@ namespace kuai {
 		void setGain(float gain);
 
 	private:
-		void setPos(glm::vec3& pos);
-		void setOrientation(glm::vec3& at, glm::vec3& up);
-		void setVel(glm::vec3& vel);
+		void setPos(const glm::vec3& pos);
+		void setOrientation(const glm::vec3& at, const glm::vec3& up);
+		void setVel(const glm::vec3& vel);
 
 	private:
 		float gain = 1.0f;
@@ -359,9 +364,9 @@ namespace kuai {
 		uint32_t getId() { return sourceId; }
 
 	private:
-		void setPos(glm::vec3& pos);
-		void setDir(glm::vec3& dir);
-		void setVel(glm::vec3& vel);
+		void setPos(const glm::vec3& pos);
+		void setDir(const glm::vec3& dir);
+		void setVel(const glm::vec3& vel);
 
 	private:
 		std::shared_ptr<AudioClip> audioClip = nullptr;

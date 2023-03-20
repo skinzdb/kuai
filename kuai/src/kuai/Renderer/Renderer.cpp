@@ -44,14 +44,14 @@ namespace kuai {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    void Renderer::setCamera(Camera& cam, glm::vec3& viewPos)
+    void Renderer::setCamera(Camera& cam, const glm::vec3& viewPos)
     {
         camData->projectionMatrix = cam.getProjectionMatrix();
         camData->viewMatrix = cam.getViewMatrix();
         camData->viewPos = viewPos;
     }
 
-    void Renderer::render(Mesh& mesh, glm::mat4& transform)
+    void Renderer::render(Mesh& mesh, const glm::mat4& transform)
     {
         KU_PROFILE_FUNCTION();
         Shader* shader = mesh.getMaterial()->getShader();
