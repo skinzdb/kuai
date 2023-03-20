@@ -10,7 +10,7 @@ struct aiNode;
 struct aiScene;
 struct aiMesh;
 struct aiMaterial;
-enum aiTextureType;
+enum aiTextureType : unsigned int;
 
 namespace kuai {
 	class Model

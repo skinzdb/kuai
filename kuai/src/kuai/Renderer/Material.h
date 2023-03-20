@@ -5,6 +5,7 @@
 #include "StaticShader.h"
 
 #include <glm/glm.hpp>
+#include <memory>
 
 namespace kuai {
 	class Material
