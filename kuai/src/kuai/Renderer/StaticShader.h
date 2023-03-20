@@ -26,7 +26,7 @@ namespace kuai {
 		static void init();
 		static void cleanup();
 
-		static Shader* default;
+		static Shader* basic;
 		static Shader* skybox;
 	};
 }

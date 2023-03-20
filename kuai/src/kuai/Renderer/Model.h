@@ -10,7 +10,7 @@ struct aiNode;
 struct aiScene;
 struct aiMesh;
 struct aiMaterial;
-enum aiTextureType;
+enum aiTextureType : unsigned int;
 
 namespace kuai {
 	class Model
@@ -26,7 +26,7 @@ namespace kuai {
 	private:
 		void processNode(aiNode* node, const aiScene* scene);
 		std::shared_ptr<Mesh> processMesh(aiMesh* mesh, const aiScene* scene);
-		std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type);
+		std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType& type);
 
 	private:
 		std::vector<std::shared_ptr<Mesh>> meshes;

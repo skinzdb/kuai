@@ -5,6 +5,7 @@
 #include "StaticShader.h"
 
 #include <glm/glm.hpp>
+#include <memory>
 
 namespace kuai {
 	class Material
@@ -25,7 +26,7 @@ namespace kuai {
 		DefaultMaterial(std::shared_ptr<Texture> diffuse, std::shared_ptr<Texture> specular, float specularAmount)
 			: diffuse(diffuse), specular(specular), specularAmount(specularAmount)
 		{
-			shader = StaticShader::default;
+			shader = StaticShader::basic;
 		}
 
 		virtual void render()

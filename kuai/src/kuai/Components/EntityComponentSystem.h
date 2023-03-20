@@ -7,6 +7,7 @@
 #include "kuai/Events/Event.h"
 #include "kuai/Events/KeyEvent.h"
 #include "Components.h"
+#include <list>
 
 namespace kuai {
 
@@ -126,7 +127,7 @@ namespace kuai {
 		template<typename T>
 		void removeComponent(EntityID entity)
 		{
-			componentManager->removeComponent(entity);
+			componentManager->removeComponent<T>(entity);
 
 			auto componentMask = entityManager->getComponentMask(entity);
 			componentMask &= BIT(componentManager->getComponentType<T>()) ^ std::numeric_limits<ComponentMask>::max();

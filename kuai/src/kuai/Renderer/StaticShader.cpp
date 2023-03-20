@@ -3,7 +3,7 @@
 
 using namespace kuai;
 
-Shader* StaticShader::default = nullptr;
+Shader* StaticShader::basic = nullptr;
 Shader* StaticShader::skybox = nullptr;
 
 const char* DEFAULT_VERT = R"(
@@ -137,13 +137,13 @@ void DefaultShader::update()
 
 void StaticShader::init()
 {
-	default = new DefaultShader();
+	basic = new DefaultShader();
 	skybox = new SkyboxShader();
 }
 
 void StaticShader::cleanup()
 {
-	delete default;
+	delete basic;
 	delete skybox;
 }
 
