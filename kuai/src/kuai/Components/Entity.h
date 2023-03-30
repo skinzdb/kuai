@@ -23,32 +23,32 @@ namespace kuai {
 		T& addComponent(Args&& ...args)
 		{
 			// Send a reference of this entity to the component
-			ECS->addComponent<T>(id, this, std::forward<Args>(args)...);
-			return ECS->getComponent<T>(id);
+			ECS->template addComponent<T>(id, this, std::forward<Args>(args)...);
+			return ECS->template getComponent<T>(id);
 		}
 
 		template<class T>
 		T& getComponent()
 		{	
 			KU_PROFILE_FUNCTION();
-			return ECS->getComponent<T>(id);
+			return ECS->template getComponent<T>(id);
 		}
 
 		template<class T>
 		bool hasComponent()
 		{
-			return ECS->hasComponent<T>(id);
+			return ECS->template hasComponent<T>(id);
 		}
 
 		template<class T>
 		void removeComponent()
 		{
-			ECS->removeComponent<T>(id);
+			ECS->template removeComponent<T>(id);
 		}
 
 		Transform& getTransform()
 		{
-			return ECS->getComponent<Transform>(id);
+			return ECS->template getComponent<Transform>(id);
 		}
 
 		EntityID getId() const

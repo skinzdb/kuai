@@ -9,6 +9,7 @@
 #include "kuai/Renderer/Material.h"
 #include "kuai/Sound/AudioClip.h"
 #include "kuai/Events/Event.h"
+//#include "Entity.h"
 
 namespace kuai {
 	// Forward Declarations
@@ -36,12 +37,6 @@ namespace kuai {
 	private:
 		Entity* entity = nullptr;
 	};
-
-	template<typename T>
-	bool Component::hasComponent() { return entity->hasComponent<T>(); }
-
-	template<typename T>
-	T& Component::getComponent() { return entity->getComponent<T>(); }
 
 	// Forward Declarations
 	class Camera;
@@ -382,4 +377,15 @@ namespace kuai {
 
 		friend class Transform;
 	};
+}
+
+#include "Entity.h"
+
+namespace kuai
+{
+	template<typename T>
+	bool Component::hasComponent() { return entity->template hasComponent<T>(); }
+
+	template<typename T>
+	T& Component::getComponent() { return entity->template getComponent<T>(); }
 }
