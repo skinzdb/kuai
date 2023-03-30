@@ -37,12 +37,6 @@ namespace kuai {
 		Entity* entity = nullptr;
 	};
 
-	template<typename T>
-	bool Component::hasComponent() { return entity->hasComponent<T>(); }
-
-	template<typename T>
-	T& Component::getComponent() { return entity->getComponent<T>(); }
-
 	// Forward Declarations
 	class Camera;
 
@@ -54,23 +48,46 @@ namespace kuai {
 		Transform(Entity* entity, glm::vec3& pos) : Component(entity), pos(pos) {}
 
 		glm::vec3 getPos() { return pos; }
-    
-		void setPos(const glm::vec3& pos) { this->pos = pos; updateComponents(); calcModelMatrix(); }
-		void setPos(float x, float y, float z) { setPos(glm::vec3(x, y, z)); }
+		void setPos(const glm::vec3& pos) 
+		{ 
+			this->pos = pos; 
+			updateComponents(); 
+			calcModelMatrix(); 
+		}
+		void setPos(float x, float y, float z) { setPos({ x, y, z }); }
 
-		void translate(const glm::vec3& amount) { this->pos += amount; updateComponents(); calcModelMatrix(); }
-		void translate(float x, float y, float z) { translate(glm::vec3(x, y, z)); }
+		void translate(const glm::vec3& amount) 
+		{ 
+			this->pos += amount; 
+			updateComponents(); 
+			calcModelMatrix(); 
+		}
+		void translate(float x, float y, float z) { translate({ x, y, z }); }
 
 		glm::vec3 getRot() { return glm::degrees(rot); }
-		void setRot(const glm::vec3& rot) { this->rot = glm::radians(rot); updateComponents(); calcModelMatrix(); }
-		void setRot(float x, float y, float z) { setRot(glm::vec3(x, y, z)); }
+		void setRot(const glm::vec3& rot) 
+		{ 
+			this->rot = glm::radians(rot); 
+			updateComponents(); 
+			calcModelMatrix(); 
+		}
+		void setRot(float x, float y, float z) { setRot({ x, y, z }); }
 
-		void rotate(const glm::vec3& amount) { this->rot += glm::radians(amount); updateComponents(); calcModelMatrix(); }
-		void rotate(float x, float y, float z) { rotate(glm::vec3(x, y, z)); }
+		void rotate(const glm::vec3& amount) 
+		{ 
+			this->rot += glm::radians(amount);
+			updateComponents(); 
+			calcModelMatrix();
+		}
+		void rotate(float x, float y, float z) { rotate({ x, y, z }); }
 
 		glm::vec3 getScale() { return scale; }
-		void setScale(const glm::vec3& scale) { this->scale = scale; calcModelMatrix(); }
-		void setScale(float x, float y, float z) { setScale(glm::vec3(x, y, z)); }
+		void setScale(const glm::vec3& scale)
+		{ 
+			this->scale = scale; 
+			calcModelMatrix(); 
+		}
+		void setScale(float x, float y, float z) { setScale({ x, y, z }); }
 
 		glm::vec3 getUp() { return glm::rotate(glm::quat(rot), glm::vec3(0.0f, 1.0f, 0.0f)); }
 		glm::vec3 getRight() { return glm::rotate(glm::quat(rot), glm::vec3(1.0f, 0.0f, 0.0f)); }
@@ -382,4 +399,10 @@ namespace kuai {
 
 		friend class Transform;
 	};
+
+	template<typename T>
+	inline bool Component::hasComponent() { return entity->hasComponent<T>(); }
+
+	template<typename T>
+	inline T& Component::getComponent() { return entity->getComponent<T>(); }
 }

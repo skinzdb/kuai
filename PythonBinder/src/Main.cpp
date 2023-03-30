@@ -4,6 +4,8 @@
 
 #include <kuai.h>
 
+#include <glm/glm.hpp>
+
 using namespace kuai;
 namespace py = pybind11;
 
@@ -167,9 +169,9 @@ PYBIND11_MODULE(pykuai, m)
         .def("getScale", &Transform::getScale, py::return_value_policy::copy)
         .def("setScale", py::overload_cast<float, float, float>(&Transform::setScale))
         .def("translate", py::overload_cast<float, float, float>(&Transform::translate))
-        .def("translate", py::overload_cast<glm::vec3&>(&Transform::translate))
+        .def("translate", py::overload_cast<const glm::vec3&>(&Transform::translate))
         .def("rotate", py::overload_cast<float, float, float>(&Transform::rotate))
-        .def("rotate", py::overload_cast<glm::vec3&>(&Transform::rotate));
+        .def("rotate", py::overload_cast<const glm::vec3&>(&Transform::rotate));
 
     py::enum_<Light::LightType>(m, "LightType")
         .value("DIR", Light::LightType::Directional)
@@ -186,7 +188,7 @@ PYBIND11_MODULE(pykuai, m)
         .def("getLinear", &Light::getLinear, py::return_value_policy::copy)
         .def("getQuadratic", &Light::getQuadratic, py::return_value_policy::copy)
         .def("setType", &Light::setType)
-        .def("setCol", py::overload_cast<glm::vec3&>(&Light::setCol))
+        .def("setCol", py::overload_cast<const glm::vec3&>(&Light::setCol))
         .def("setCol", py::overload_cast<float, float, float>(&Light::setCol))
         .def("setIntensity", &Light::setIntensity)
         .def("setAttenuation", &Light::setAttenuation);
