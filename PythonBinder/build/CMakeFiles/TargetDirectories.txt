@@ -1,4 +1,0 @@
-C:/Users/David/source/repos/kuai/PythonBinder/build/CMakeFiles/pykuai.dir
-C:/Users/David/source/repos/kuai/PythonBinder/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/David/source/repos/kuai/PythonBinder/build/CMakeFiles/ZERO_CHECK.dir
-C:/Users/David/source/repos/kuai/PythonBinder/build/vendor/pybind11/CMakeFiles/ALL_BUILD.dir

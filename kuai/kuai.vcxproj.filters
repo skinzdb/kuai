@@ -16,6 +16,9 @@
     <Filter Include="src\kuai\Events">
       <UniqueIdentifier>{4ADF746F-B66A-E233-BF7B-65282B863E34}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\kuai\Physics">
+      <UniqueIdentifier>{98A3958D-849C-B4DF-ADCE-9964992694EB}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\kuai\Platform">
       <UniqueIdentifier>{3AE1473C-A6F7-45D2-EF6E-D1F35BC4165A}</UniqueIdentifier>
     </Filter>
@@ -39,9 +42,6 @@
     </Filter>
     <Filter Include="vendor\stb_image">
       <UniqueIdentifier>{0DA0BA59-F998-D9AB-22CB-BE300E23B9B7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vendor\tinyobjloader">
-      <UniqueIdentifier>{386CC32A-24FB-4CF4-CD19-61EFB9875D9A}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -117,8 +117,14 @@
     <ClInclude Include="src\kuai\Events\MouseEvent.h">
       <Filter>src\kuai\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\kuai\Physics\Physics2D.h">
+      <Filter>src\kuai\Physics</Filter>
+    </ClInclude>
     <ClInclude Include="src\kuai\Platform\Windows\WinWindow.h">
       <Filter>src\kuai\Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Renderer\Cubemap.h">
+      <Filter>src\kuai\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\kuai\Renderer\Geometry.h">
       <Filter>src\kuai\Renderer</Filter>
@@ -129,10 +135,22 @@
     <ClInclude Include="src\kuai\Renderer\Mesh.h">
       <Filter>src\kuai\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\kuai\Renderer\Model.h">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\kuai\Renderer\Renderer.h">
       <Filter>src\kuai\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\kuai\Renderer\Shader.h">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Renderer\ShaderProgram.h">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Renderer\Skybox.h">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kuai\Renderer\StaticShader.h">
       <Filter>src\kuai\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\kuai\Renderer\Texture.h">
@@ -156,12 +174,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\kuai\Renderer\Model.h" />
-    <ClInclude Include="src\kuai\Physics\Physics2D.h" />
-    <ClInclude Include="src\kuai\Renderer\ShaderProgram.h" />
-    <ClInclude Include="src\kuai\Renderer\StaticShader.h" />
-    <ClInclude Include="src\kuai\Renderer\Cubemap.h" />
-    <ClInclude Include="src\kuai\Renderer\Skybox.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\kpch.cpp">
@@ -194,13 +206,28 @@
     <ClCompile Include="src\kuai\Platform\Windows\WinWindow.cpp">
       <Filter>src\kuai\Platform\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="src\kuai\Renderer\Cubemap.cpp">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\kuai\Renderer\Mesh.cpp">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Renderer\Model.cpp">
       <Filter>src\kuai\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\kuai\Renderer\Renderer.cpp">
       <Filter>src\kuai\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\kuai\Renderer\Shader.cpp">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Renderer\ShaderProgram.cpp">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Renderer\Skybox.cpp">
+      <Filter>src\kuai\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kuai\Renderer\StaticShader.cpp">
       <Filter>src\kuai\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\kuai\Renderer\Texture.cpp">
@@ -221,15 +248,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\kuai\Renderer\Model.cpp" />
-    <ClCompile Include="src\kuai\Renderer\ShaderProgram.cpp" />
-    <ClCompile Include="src\kuai\Renderer\StaticShader.cpp" />
-    <ClCompile Include="src\kuai\Renderer\Cubemap.cpp" />
-    <ClCompile Include="src\kuai\Renderer\Skybox.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="assets\sphere.obj" />
-    <CopyFileToFolders Include="assets\cube.obj" />
-    <CopyFileToFolders Include="assets\plane.obj" />
   </ItemGroup>
 </Project>

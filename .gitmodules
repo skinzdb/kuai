@@ -34,3 +34,6 @@
 [submodule "kuai/vendor/box2d"]
 	path = kuai/vendor/box2d
 	url = git@github.com:erincatto/box2d.git
+[submodule "PythonBinder/vendor/pybind11"]
+	path = PythonBinder/vendor/pybind11
+	url = git@github.com:pybind/pybind11.git
