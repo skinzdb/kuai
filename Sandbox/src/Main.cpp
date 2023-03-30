@@ -1,4 +1,4 @@
-#include <kuai.h>
+#include "kuai.h"
 
 #include <random>
 #include <glm/gtx/string_cast.hpp>

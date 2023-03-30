@@ -400,12 +400,6 @@ namespace kuai {
 
 		friend class Transform;
 	};
-
-	template<typename T>
-	inline bool Component::hasComponent() { return entity->hasComponent<T>(); }
-
-	template<typename T>
-	inline T& Component::getComponent() { return entity->getComponent<T>(); }
 }
 
 #include "Entity.h"
