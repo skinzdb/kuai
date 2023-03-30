@@ -8,9 +8,6 @@
 #include "SystemManager.h"
 
 #include "kuai/Events/Event.h"
-#include "kuai/Events/KeyEvent.h"
-#include "Components.h"
-#include <list>
 
 namespace kuai {
 

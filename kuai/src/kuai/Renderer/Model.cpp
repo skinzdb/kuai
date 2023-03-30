@@ -90,14 +90,14 @@ namespace kuai {
 		return std::make_shared<Mesh>(vertices, normals, texCoords, indices);
 	}
 
-	std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, const aiTextureType& type)
+	std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, uint64_t type)
 	{
 		std::vector<Texture> textures;
 
-		for (size_t i = 0; i < mat->GetTextureCount(type); i++)
+		for (size_t i = 0; i < mat->GetTextureCount((aiTextureType)type); i++)
 		{
 			aiString str;
-			mat->GetTexture(type, i, &str);
+			mat->GetTexture((aiTextureType)type, i, &str);
 			std::string filename = directory + str.C_Str();
 
 			if (loadedTexMap.find(filename) == loadedTexMap.end())

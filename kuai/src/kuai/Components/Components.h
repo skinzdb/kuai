@@ -9,6 +9,7 @@
 #include "kuai/Renderer/Material.h"
 #include "kuai/Sound/AudioClip.h"
 #include "kuai/Events/Event.h"
+//#include "Entity.h"
 
 namespace kuai {
 	// Forward Declarations
@@ -405,4 +406,15 @@ namespace kuai {
 
 	template<typename T>
 	inline T& Component::getComponent() { return entity->getComponent<T>(); }
+}
+
+#include "Entity.h"
+
+namespace kuai
+{
+	template<typename T>
+	bool Component::hasComponent() { return entity->template hasComponent<T>(); }
+
+	template<typename T>
+	T& Component::getComponent() { return entity->template getComponent<T>(); }
 }
