@@ -61,8 +61,8 @@ add_library(${PROJECT_NAME}
     src/kuai/Renderer/Renderer.cpp
     src/kuai/Renderer/Shader.h
     src/kuai/Renderer/Shader.cpp
-    src/kuai/Renderer/ShaderProgram.h
-    src/kuai/Renderer/ShaderProgram.cpp
+    src/kuai/Renderer/Shader.h
+    src/kuai/Renderer/Shader.cpp
     src/kuai/Renderer/Skybox.h
     src/kuai/Renderer/Skybox.cpp
     src/kuai/Renderer/StaticShader.h

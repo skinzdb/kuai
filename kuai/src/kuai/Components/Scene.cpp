@@ -5,6 +5,8 @@
 #include "kuai/Sound/AudioManager.h"
 #include "kuai/Core/App.h"
 
+#include "kuai/Renderer/StaticShader.h"
+
 namespace kuai {
 	Scene::Scene()
 	{
@@ -17,12 +19,15 @@ namespace kuai {
 		ECS->registerComponent<AudioListener>();
 		ECS->registerComponent<AudioSource>();
 
+		this->renderSys = ECS->registerSystem<RenderSystem>(this);
+		ECS->setSystemMask<RenderSystem>(BIT(ECS->getComponentType<MeshRenderer>()));
+
+		this->cameraSys = ECS->registerSystem<CameraSystem>(this);
+		ECS->setSystemMask<CameraSystem>(BIT(ECS->getComponentType<Camera>()));
+
 		this->lightSys = ECS->registerSystem<LightSystem>(this);
 		ECS->setSystemMask<LightSystem>(BIT(ECS->getComponentType<Light>()));
 
-		this->renderSys = ECS->registerSystem<RenderSystem>(this);
-		ECS->setSystemMask<RenderSystem>(BIT(ECS->getComponentType<MeshRenderer>()));
-		
 		this->audioSys = ECS->registerSystem<AudioSystem>(this);
 		ECS->setSystemMask<AudioSystem>(BIT(ECS->getComponentType<AudioSource>()));
 
@@ -88,6 +93,7 @@ namespace kuai {
 	void Scene::update(float dt)
 	{
 		lightSys->update(dt);
+		cameraSys->update(dt);
 		renderSys->update(dt);
 		audioSys->update(dt);
 	}
@@ -96,6 +102,7 @@ namespace kuai {
 	{
 		acceptsSubset = true;
 		scene->subscribeSystem(this, &RenderSystem::onLightChanged);
+		scene->subscribeSystem(this, &RenderSystem::onCameraChanged);
 	}
 
 	void RenderSystem::update(float dt)
@@ -108,7 +115,10 @@ namespace kuai {
 			MeshRenderer m = entity->getComponent<MeshRenderer>();
 			for (auto& mesh : m.getModel()->getMeshes())
 			{
-				Renderer::render(*mesh, entity->getTransform().getModelMatrix());
+				mesh->getMaterial()->getShader()->getData()->modelMatrix = entity->getTransform().getModelMatrix();
+				mesh->getMaterial()->getShader()->updateTransform();
+
+				Renderer::render(*mesh);
 			}
 		}
 	}
@@ -120,20 +130,49 @@ namespace kuai {
 			MeshRenderer m = entity->getComponent<MeshRenderer>();
 			for (auto& mesh : m.getModel()->getMeshes())
 			{
-				mesh->getMaterial()->getShader()->setLight(event->lightEntity);
+				mesh->getMaterial()->getShader()->getData()->light = event->light;
+				mesh->getMaterial()->getShader()->updateLight();
+			}
+		}
+	}
+
+	void RenderSystem::onCameraChanged(CameraChangedEvent* event)
+	{
+		for (auto& entity : entities)
+		{
+			MeshRenderer m = entity->getComponent<MeshRenderer>();
+			for (auto& mesh : m.getModel()->getMeshes())
+			{
+				mesh->getMaterial()->getShader()->getData()->projectionMatrix = event->cam->getProjectionMatrix();
+				mesh->getMaterial()->getShader()->getData()->viewMatrix = event->cam->getViewMatrix();
+
+				mesh->getMaterial()->getShader()->updateCamera();
+			}
+		}
+	}
+
+	void CameraSystem::update(float dt)
+	{
+		for (auto& entity : entities)
+		{
+			Camera c = entity->getComponent<Camera>();
+			if (c.changed)
+			{
+				CameraChangedEvent e(&c);
+				scene->notifySystems(&e);
+				c.changed = false;
 			}
 		}
 	}
 
 	void LightSystem::update(float dt)
 	{
-		KU_PROFILE_FUNCTION();
 		for (auto& entity : entities)
 		{
 			Light l = entity->getComponent<Light>();
 			if (l.changed)
 			{
-				LightChangedEvent e(entity.get());
+				LightChangedEvent e(&l);
 				scene->notifySystems(&e);
 				l.changed = false;
 			}
@@ -142,7 +181,6 @@ namespace kuai {
 
 	void AudioSystem::update(float dt)
 	{
-		KU_PROFILE_FUNCTION();
 		for (auto& entity : entities)
 		{
 			AudioManager::updateStream(entity->getComponent<AudioSource>().getId());

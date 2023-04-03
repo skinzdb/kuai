@@ -1,8 +1,8 @@
 #pragma once
-#include "Shader.h"
+
+#include "StaticShader.h"
 #include "Texture.h"
 #include "Cubemap.h"
-#include "StaticShader.h"
 
 #include <glm/glm.hpp>
 #include <memory>
@@ -13,11 +13,11 @@ namespace kuai {
 	public:
 		virtual void render() = 0;
 
-		void setShader(Shader* shader) { this->shader = shader; };
-		Shader* getShader() { return shader; }
+		void setShader(IShader* shader) { this->shader = shader; };
+		IShader* getShader() { return shader; }
 
 	protected:
-		Shader* shader = nullptr;
+		IShader* shader = nullptr;
 	};
 
 	class DefaultMaterial : public Material
@@ -31,7 +31,7 @@ namespace kuai {
 
 		virtual void render()
 		{
-			//shader->setUniform();
+			shader->update();
 
 			diffuse->bind(0);
 			specular->bind(1);
@@ -59,11 +59,12 @@ namespace kuai {
 
 		virtual void render()
 		{
+			shader->update();
+
 			cubemap->bind();
 		}
 
 	private:
 		std::shared_ptr<Cubemap> cubemap;
-
 	};
 }

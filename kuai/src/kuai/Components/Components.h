@@ -9,7 +9,6 @@
 #include "kuai/Renderer/Material.h"
 #include "kuai/Sound/AudioClip.h"
 #include "kuai/Events/Event.h"
-//#include "Entity.h"
 
 namespace kuai {
 	// Forward Declarations
@@ -261,14 +260,15 @@ namespace kuai {
 		uint32_t lightId = 0;
 	};
 
-	struct LightChangedEvent : public Event
+	class LightChangedEvent : public Event
 	{
-		LightChangedEvent(Entity* lightEntity) : lightEntity(lightEntity) {}
+	public:
+		LightChangedEvent(Light* light) : light(light) {}
 
 		EVENT_CLASS_TYPE(EventType::LightChanged);
 		EVENT_CLASS_CATEGORY(0);
 
-		Entity* lightEntity;
+		Light* light;
 	};
 	
 	class Camera : public Component
@@ -280,7 +280,7 @@ namespace kuai {
 			Ortho
 		};
 
-		Camera(Entity* entity) : Component(entity) {}
+		Camera(Entity* entity) : Component(entity) { changed = true; }
 
 		Camera(Entity* entity, float fov, float width, float height, float zNear, float zFar) 
 			: Component(entity), aspect(width / height) 
@@ -333,6 +333,16 @@ namespace kuai {
 		// Ortho params
 		float orthoSize = 10.0f;
 		float orthoNear = -1.0f, orthoFar = 1.0f;
+	};
+
+	struct CameraChangedEvent : public Event
+	{
+		CameraChangedEvent(Camera* cam) : cam(cam) {}
+
+		EVENT_CLASS_TYPE(EventType::CameraChanged);
+		EVENT_CLASS_CATEGORY(0);
+
+		Camera* cam;
 	};
 
 	class AudioListener : public Component

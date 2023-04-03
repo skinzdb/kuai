@@ -43,6 +43,10 @@ public:
 		myEntity->addComponent<kuai::MeshRenderer>(model);
 		myEntity->getTransform().translate(0, -0.6f, -5);
 
+		auto pointLight = scene->createEntity();
+		pointLight->addComponent<kuai::Light>();
+		pointLight->getTransform().setPos(0, 1, -4);
+
 		std::vector<std::string> faces =
 		{
 			"C:/Users/David/Pictures/skybox/right.jpg",
@@ -59,15 +63,15 @@ public:
 		auto skyboxEntity = scene->createEntity();
 		skyboxEntity->addComponent<kuai::MeshRenderer>(skybox);
 
-		auto audio = std::make_shared<kuai::AudioClip>("C:/Users/David/Music/htdc.wav");
+		auto audio = std::make_shared<kuai::AudioClip>("C:/Users/David/Music/jigsaw.wav");
 
 		myEntity->addComponent<kuai::AudioSource>();
 		auto a = myEntity->getComponent<kuai::AudioSource>();
 
-		//a.setAudioClip(audio);
-		//a.setPitch(1.0f);
-		//a.setLoop(false);
-		//a.play();
+		a.setAudioClip(audio);
+		a.setPitch(1.0f);
+		a.setLoop(false);
+		a.play();
 
 		/*std::default_random_engine generator;
 		std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
