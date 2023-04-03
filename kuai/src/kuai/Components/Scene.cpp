@@ -145,6 +145,7 @@ namespace kuai {
 			{
 				mesh->getMaterial()->getShader()->getData()->projectionMatrix = event->cam->getProjectionMatrix();
 				mesh->getMaterial()->getShader()->getData()->viewMatrix = event->cam->getViewMatrix();
+				mesh->getMaterial()->getShader()->getData()->viewPos = event->cam->getTransform().getPos();
 
 				mesh->getMaterial()->getShader()->updateCamera();
 			}

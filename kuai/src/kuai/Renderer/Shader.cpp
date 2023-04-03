@@ -75,8 +75,6 @@ namespace kuai {
 		glGenBuffers(1, &ubo);
 		glNamedBufferData(ubo, blockSize, nullptr, GL_STATIC_DRAW);
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
-
-		KU_CORE_WARN(ubo);
 		
 		return ubo;
 	}

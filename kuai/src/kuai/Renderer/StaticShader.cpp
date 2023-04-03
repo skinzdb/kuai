@@ -221,8 +221,7 @@ namespace kuai {
 	{
 		IShader::updateCamera();
 
-		// Last column of modelMatrix is the position
-		setUniform("viewPos", glm::vec3(shaderData->modelMatrix[3]));
+		setUniform("viewPos", shaderData->viewPos);
 	}
 
 	const char* SKYBOX_VERT = R"(

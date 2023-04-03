@@ -98,15 +98,15 @@ namespace kuai {
 		{
 			aiString str;
 			mat->GetTexture((aiTextureType)type, i, &str);
-			std::string filename = directory + str.C_Str();
+			std::string filename = directory + "/" + str.C_Str();
 
-			if (loadedTexMap.find(filename) == loadedTexMap.end())
+			if (loadedTexMap.find(filename) != loadedTexMap.end())
 			{
 				textures.push_back(loadedTexMap[filename]);
 			}
 			else
 			{
-				Texture tex(directory + str.C_Str());
+				Texture tex(filename);
 				textures.push_back(tex);
 				loadedTexMap.insert(std::pair<std::string, Texture>(filename, tex));
 			}

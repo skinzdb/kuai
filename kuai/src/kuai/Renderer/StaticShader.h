@@ -26,6 +26,8 @@ namespace kuai {
 			glm::mat4 viewMatrix;
 			glm::mat4 modelMatrix;
 
+			glm::vec3 viewPos;
+
 			Light* light;
 		};
 
