@@ -3,6 +3,8 @@
 #include "AudioManager.h"
 #include "AudioClip.h"
 
+#include <filesystem>
+
 namespace kuai {
 
 	ALCdevice* AudioManager::device = AL_NONE;
@@ -27,8 +29,8 @@ namespace kuai {
 	{
 		for (auto it = sourceBufMap.begin(); it != sourceBufMap.end(); it++)
 		{
-			alDeleteSources(1, &it->first);
-			alDeleteBuffers(BUFS_PER_SOURCE, it->second);
+			alCheck(alDeleteSources(1, &it->first));
+			alCheck(alDeleteBuffers(BUFS_PER_SOURCE, it->second));
 			delete[] it->second;
 		}
 
@@ -40,66 +42,6 @@ namespace kuai {
 		}
 
 		alcCloseDevice(device);
-	}
-
-	bool AudioManager::checkAlErrors()
-	{
-		ALenum error = alGetError();
-		if (error != AL_NO_ERROR)
-		{
-			switch (error)
-			{
-			case AL_INVALID_NAME:
-				KU_CORE_ERROR("AL_INVALID_NAME: invalid ID passed to an OpenAL function");
-				break;
-			case AL_INVALID_ENUM:
-				KU_CORE_ERROR("AL_INVALID_ENUM: invalid enum value passed to an OpenAL function");
-				break;
-			case AL_INVALID_VALUE:
-				KU_CORE_ERROR("AL_INVALID_VALUE: an invalid value was passed to an OpenAL function");
-				break;
-			case AL_INVALID_OPERATION:
-				KU_CORE_ERROR("AL_INVALID_OPERATION: the requested operation is not valid");
-				break;
-			case AL_OUT_OF_MEMORY:
-				KU_CORE_ERROR("AL_OUT_OF_MEMORY");
-				break;
-			default:
-				KU_CORE_ERROR("Unknown OpenAL error occurred");
-			}
-			return false;
-		}
-		return true;
-	}
-
-	bool AudioManager::checkAlcErrors(ALCdevice* device)
-	{
-		ALCenum error = alcGetError(device);
-		if (error != ALC_NO_ERROR)
-		{
-			switch (error)
-			{
-			case ALC_INVALID_VALUE:
-				KU_CORE_ERROR("ALC_INVALID_VALUE: an invalid value was passed to an OpenAL function");
-				break;
-			case ALC_INVALID_DEVICE:
-				KU_CORE_ERROR("ALC_INVALID_DEVICE: a bad device was passed to an OpenAL function");
-				break;
-			case ALC_INVALID_CONTEXT:
-				KU_CORE_ERROR("ALC_INVALID_CONTEXT: a bad context was passed to an OpenAL function");
-				break;
-			case ALC_INVALID_ENUM:
-				KU_CORE_ERROR("ALC_INVALID_ENUM: an unknown enum value was passed to an OpenAL function");
-				break;
-			case ALC_OUT_OF_MEMORY:
-				KU_CORE_ERROR("ALC_OUT_OF_MEMORY");
-				break;
-			default:
-				KU_CORE_ERROR("Unknown OpenAL context error occurred");
-			}
-			return false;
-		}
-		return true;
 	}
 
 	void AudioManager::createAudioListener()
@@ -117,31 +59,31 @@ namespace kuai {
 
 	void AudioManager::setListenerProperty(Property property, int val)
 	{
-		alListeneri(property, val);
+		alCheck(alListeneri(property, val));
 	}
 
 	void AudioManager::setListenerProperty(Property property, float val)
 	{
-		alListenerf(property, val);
+		alCheck(alListenerf(property, val));
 	}
 
 	void AudioManager::setListenerProperty(Property property, const std::vector<float>& vals)
 	{
-		alListenerfv(property, vals.data());
+		alCheck(alListenerfv(property, vals.data()));
 	}
 
 	void AudioManager::setListenerProperty(Property property, const glm::vec3& val)
 	{
-		alListener3f(property, val.x, val.y, val.z);
+		alCheck(alListener3f(property, val.x, val.y, val.z));
 	}
 
 	uint32_t AudioManager::createAudioSource()
 	{
 		ALuint source;
-		alGenSources(1, &source);
+		alCheck(alGenSources(1, &source));
 
 		ALuint* bufs = new ALuint[BUFS_PER_SOURCE];	// Have X buffers per audio source for streaming
-		alGenBuffers(BUFS_PER_SOURCE, bufs);
+		alCheck(alGenBuffers(BUFS_PER_SOURCE, bufs));
 
 		sourceBufMap.insert(std::pair<ALuint, ALuint*>(source, bufs));
 
@@ -150,27 +92,27 @@ namespace kuai {
 
 	void AudioManager::playAudioSource(ALuint sourceId)
 	{
-		alSourcePlay(sourceId);
+		alCheck(alSourcePlay(12));
 	}
 
 	void AudioManager::stopAudioSource(ALuint sourceId)
 	{
-		alSourceStop(sourceId);
+		alCheck(alSourceStop(sourceId));
 	}
 
 	void AudioManager::setSourceProperty(ALuint sourceId, Property property, int val)
 	{
-		alSourcei(sourceId, property, val);
+		alCheck(alSourcei(sourceId, property, val));
 	}
 
 	void AudioManager::setSourceProperty(ALuint sourceId, Property property, float val)
 	{
-		alSourcef(sourceId, property, val);
+		alCheck(alSourcef(sourceId, property, val));
 	}
 
 	void AudioManager::setSourceProperty(ALuint sourceId, Property property, const glm::vec3& val)
 	{
-		alSource3f(sourceId, property, val.x, val.y, val.z);
+		alCheck(alSource3f(sourceId, property, val.x, val.y, val.z));
 	}
 
 	void AudioManager::setSourceAudioClip(ALuint sourceId, std::shared_ptr<AudioClip> clip)
@@ -183,8 +125,8 @@ namespace kuai {
 
 		//if (BUFS_PER_SOURCE * BUF_SIZE > clip->data.size())
 		//{
-		alBufferData(sourceBufMap[sourceId][0], clip->format, &clip->data[0], clip->data.size() * 2, clip->samplerate);
-		alSourcei(sourceId, AL_BUFFER, sourceBufMap[sourceId][0]);
+		alCheck(alBufferData(sourceBufMap[sourceId][0], clip->format, &clip->data[0], clip->data.size() * 2, clip->samplerate));
+		alCheck(alSourcei(sourceId, AL_BUFFER, sourceBufMap[sourceId][0]));
 		//	return;
 		//}
 
@@ -234,5 +176,90 @@ namespace kuai {
 
 		//	delete[] data;
 		//}
+	}
+
+	/*bool AudioManager::checkAlcErrors(ALCdevice* device)
+	{
+		ALCenum error = alcGetError(device);
+		if (error != ALC_NO_ERROR)
+		{
+			switch (error)
+			{
+			case ALC_INVALID_VALUE:
+				KU_CORE_ERROR("ALC_INVALID_VALUE: an invalid value was passed to an OpenAL function");
+				break;
+			case ALC_INVALID_DEVICE:
+				KU_CORE_ERROR("ALC_INVALID_DEVICE: a bad device was passed to an OpenAL function");
+				break;
+			case ALC_INVALID_CONTEXT:
+				KU_CORE_ERROR("ALC_INVALID_CONTEXT: a bad context was passed to an OpenAL function");
+				break;
+			case ALC_INVALID_ENUM:
+				KU_CORE_ERROR("ALC_INVALID_ENUM: an unknown enum value was passed to an OpenAL function");
+				break;
+			case ALC_OUT_OF_MEMORY:
+				KU_CORE_ERROR("ALC_OUT_OF_MEMORY");
+				break;
+			default:
+				KU_CORE_ERROR("Unknown OpenAL context error occurred");
+			}
+			return false;
+		}
+		return true;
+	}*/
+
+	void checkAlErrors(const std::filesystem::path& file, unsigned int line, std::string_view expression)
+	{
+		// Get the last error
+		ALenum errorCode = alGetError();
+
+		if (errorCode != AL_NO_ERROR)
+		{
+			std::string error = "Unknown error";
+			std::string description = "No description";
+
+			// Decode the error code
+			switch (errorCode)
+			{
+			case AL_INVALID_NAME:
+			{
+				error = "AL_INVALID_NAME";
+				description = "A bad name (ID) has been specified.";
+				break;
+			}
+
+			case AL_INVALID_ENUM:
+			{
+				error = "AL_INVALID_ENUM";
+				description = "An unacceptable value has been specified for an enumerated argument.";
+				break;
+			}
+
+			case AL_INVALID_VALUE:
+			{
+				error = "AL_INVALID_VALUE";
+				description = "A numeric argument is out of range.";
+				break;
+			}
+
+			case AL_INVALID_OPERATION:
+			{
+				error = "AL_INVALID_OPERATION";
+				description = "The specified operation is not allowed in the current state.";
+				break;
+			}
+
+			case AL_OUT_OF_MEMORY:
+			{
+				error = "AL_OUT_OF_MEMORY";
+				description = "There is not enough memory left to execute the command.";
+				break;
+			}
+			}
+
+			// Log the error
+			KU_CORE_ERROR("An internal OpenAL call failed in {0}({1}).\nExpression:\n  {2}\nError Description:\n  {3} - {4}",
+				file.filename(), line, expression, error, description);
+		}
 	}
 }

@@ -52,9 +52,6 @@ namespace kuai {
 		static void setSourceAudioClip(ALuint sourceId, std::shared_ptr<AudioClip> audioClip);
 
 		static void updateStream(ALuint sourceId);
-	private:
-		static bool checkAlErrors();
-		static bool checkAlcErrors(ALCdevice* device);
 
 	private:
 		static ALCdevice* device;
@@ -63,6 +60,22 @@ namespace kuai {
 		static std::unordered_map<ALuint, ALuint*> sourceBufMap;
 		static std::unordered_map<ALuint, std::shared_ptr<AudioClip>> sourceClipMap;
 	};
+	
+	// SFML - Simple and Fast Multimedia Library
+	// Copyright (C) 2007-2023 Laurent Gomila (laurent@sfml-dev.org)
+	// The do-while loop is needed so that alCheck can be used as a single statement in if/else branches
+	//#ifdef KU_DEBUG
+		#define alCheck(expr)                                      \
+			do                                                     \
+			{                                                      \
+				expr;                                              \
+				kuai::checkAlErrors(__FILE__, __LINE__, #expr);	   \
+			} while (false)
+	//#else
+	//	#define alCheck(expr) expr
+	//#endif
+
+	void checkAlErrors(const std::filesystem::path& file, unsigned int line, std::string_view expression);
 }
 
 
