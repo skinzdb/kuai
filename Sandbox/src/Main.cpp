@@ -36,6 +36,8 @@ public:
 		//auto tex = std::make_shared<kuai::Texture>("C:/Users/David/Pictures/billy.png");
 		//auto material = new kuai::DefaultMaterial(tex, tex, 40);
 		auto model = std::make_shared<kuai::Model>("C:/Users/David/Documents/cs310/backpack/backpack.obj");
+		//auto model = std::make_shared<kuai::Model>("C:/Users/David/Documents/bunny.obj");
+
 
 		//model->getMeshes()[0]->setMaterial(material);
 
