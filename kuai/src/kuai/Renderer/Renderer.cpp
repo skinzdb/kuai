@@ -2,7 +2,6 @@
 #include "Renderer.h"
 
 #include <glad/glad.h>
-#include <glm/gtc/matrix_inverse.hpp>
 
 #include "StaticShader.h"
 
@@ -44,34 +43,11 @@ namespace kuai {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    void Renderer::setCamera(Camera& cam, const glm::vec3& viewPos)
-    {
-        camData->projectionMatrix = cam.getProjectionMatrix();
-        camData->viewMatrix = cam.getViewMatrix();
-        camData->viewPos = viewPos;
-    }
-
-    void Renderer::render(Mesh& mesh, const glm::mat4& transform)
+    void Renderer::render(Mesh& mesh)
     {
         KU_PROFILE_FUNCTION();
-        Shader* shader = mesh.getMaterial()->getShader();
 
-        shader->bind();
-
-        {
-            KU_PROFILE_SCOPE("Renderer - set MVP matrices");
-
-            shader->setUniform("projectionMatrix", camData->projectionMatrix);
-            shader->setUniform("viewMatrix", camData->viewMatrix);
-
-            shader->setUniform("viewPos", camData->viewPos);
-
-            shader->setUniform("modelMatrix", transform);
-            shader->setUniform("model3x3InvTransp", glm::inverseTranspose(glm::mat3(transform)));
-
-            shader->update();
-        }
-
+        mesh.getMaterial()->getShader()->bind();
         mesh.render();
     }
 }

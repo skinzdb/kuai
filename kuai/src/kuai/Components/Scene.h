@@ -5,8 +5,10 @@
 #include "Components.h"
 
 namespace kuai {
-	class LightSystem;
+	// Forward declarations
 	class RenderSystem;
+	class CameraSystem;
+	class LightSystem;
 	class AudioSystem;
 
 	class Scene
@@ -49,17 +51,10 @@ namespace kuai {
 		EntityComponentSystem* ECS;
 		std::vector<std::shared_ptr<Entity>> entities;
 
-		std::shared_ptr<LightSystem> lightSys;
 		std::shared_ptr<RenderSystem> renderSys;
+		std::shared_ptr<CameraSystem> cameraSys;
+		std::shared_ptr<LightSystem> lightSys;
 		std::shared_ptr<AudioSystem> audioSys;
-	};
-
-	class LightSystem : public System
-	{
-	public:
-		LightSystem(Scene* scene) : System(scene) { acceptsSubset = true; }
-
-		virtual void update(float dt);
 	};
 
 	class RenderSystem : public System
@@ -68,6 +63,23 @@ namespace kuai {
 		RenderSystem(Scene* scene);
 
 		void onLightChanged(LightChangedEvent* event);
+		void onCameraChanged(CameraChangedEvent* event);
+
+		virtual void update(float dt);
+	};
+
+	class CameraSystem : public System
+	{
+	public:
+		CameraSystem(Scene* scene) : System(scene) { acceptsSubset = true; }
+
+		virtual void update(float dt);
+	};
+
+	class LightSystem : public System
+	{
+	public:
+		LightSystem(Scene* scene) : System(scene) { acceptsSubset = true; }
 
 		virtual void update(float dt);
 	};

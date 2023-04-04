@@ -25,11 +25,11 @@ namespace kuai {
 	private:
 		void processNode(aiNode* node, const aiScene* scene);
 		std::shared_ptr<Mesh> processMesh(aiMesh* mesh, const aiScene* scene);
-		std::vector<Texture> loadMaterialTextures(aiMaterial* mat, uint64_t type);
+		std::vector<Texture*> loadMaterialTextures(aiMaterial* mat, uint64_t type);
 
 	private:
 		std::vector<std::shared_ptr<Mesh>> meshes;
 		std::string directory;
-		std::unordered_map<std::string, Texture> loadedTexMap;
+		std::unordered_map<std::string, Texture*> loadedTexMap;
 	};
 }

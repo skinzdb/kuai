@@ -51,9 +51,9 @@ namespace kuai {
 	{
 		std::vector<float> vertices((size_t)mesh->mNumVertices * 3);
 		std::vector<float> normals((size_t)mesh->mNumVertices * 3);
-		std::vector<float> texCoords((size_t)mesh->mNumVertices * 2);
+		std::vector<float> texCoords;
 		std::vector<uint32_t> indices;
-		std::vector<Texture> textures;
+		std::vector<Texture*> textures;
 
 		// Vertices and Normals
 		memcpy(vertices.data(), &mesh->mVertices[0], mesh->mNumVertices * sizeof(float) * 3);
@@ -62,8 +62,16 @@ namespace kuai {
 		// Texture Coords
 		if (mesh->mTextureCoords[0])
 		{
-			memcpy(texCoords.data(), &mesh->mTextureCoords[0][0], mesh->mNumVertices * sizeof(float) * 2);
+			for (int i = 0; i < mesh->mNumVertices; i++)
+			{
+				texCoords.push_back(mesh->mTextureCoords[0][i].x);
+				texCoords.push_back(mesh->mTextureCoords[0][i].y);
+
+				// TODO: load tangents and bitangents
+			}
 		}
+		else
+			texCoords.resize((size_t)mesh->mNumVertices * 2);
 
 		// Indices
 		for (size_t i = 0; i < mesh->mNumFaces; i++)
@@ -78,37 +86,40 @@ namespace kuai {
 		{
 			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-			std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE);
+			std::vector<Texture*> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE);
 			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-			std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR);
+			std::vector<Texture*> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR);
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
-			// TODO: add loaded textures to material
+			// TODO: normal maps and height maps
+
+			std::shared_ptr<Material> mat = std::make_shared<DefaultMaterial>(std::make_shared<Texture>(*textures[0]), std::make_shared<Texture>(*textures[1]), 20.0f);
+			return std::make_shared<Mesh>(vertices, normals, texCoords, indices, mat);
 		}
 
 		return std::make_shared<Mesh>(vertices, normals, texCoords, indices);
 	}
 
-	std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, uint64_t type)
+	std::vector<Texture*> Model::loadMaterialTextures(aiMaterial* mat, uint64_t type)
 	{
-		std::vector<Texture> textures;
+		std::vector<Texture*> textures;
 
 		for (size_t i = 0; i < mat->GetTextureCount((aiTextureType)type); i++)
 		{
 			aiString str;
 			mat->GetTexture((aiTextureType)type, i, &str);
-			std::string filename = directory + str.C_Str();
+			std::string filename = directory + "/" + str.C_Str();
 
-			if (loadedTexMap.find(filename) == loadedTexMap.end())
+			if (loadedTexMap.find(filename) != loadedTexMap.end())
 			{
 				textures.push_back(loadedTexMap[filename]);
 			}
 			else
 			{
-				Texture tex(directory + str.C_Str());
+				Texture* tex = new Texture(filename);
 				textures.push_back(tex);
-				loadedTexMap.insert(std::pair<std::string, Texture>(filename, tex));
+				loadedTexMap.insert(std::pair<std::string, Texture*>(filename, tex));
 			}
 		}
 

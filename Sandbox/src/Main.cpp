@@ -35,13 +35,19 @@ public:
 		
 		//auto tex = std::make_shared<kuai::Texture>("C:/Users/David/Pictures/billy.png");
 		//auto material = new kuai::DefaultMaterial(tex, tex, 40);
+		//auto model = std::make_shared<kuai::Model>("C:/Users/David/Documents/cs310/backpack/backpack.obj");
 		auto model = std::make_shared<kuai::Model>("C:/Users/David/Documents/bunny.obj");
+
 
 		//model->getMeshes()[0]->setMaterial(material);
 
 		myEntity = scene->createEntity();
 		myEntity->addComponent<kuai::MeshRenderer>(model);
 		myEntity->getTransform().translate(0, -0.6f, -5);
+
+		auto pointLight = scene->createEntity();
+		pointLight->addComponent<kuai::Light>();
+		pointLight->getTransform().setPos(0, 1, -4);
 
 		std::vector<std::string> faces =
 		{
@@ -59,15 +65,15 @@ public:
 		auto skyboxEntity = scene->createEntity();
 		skyboxEntity->addComponent<kuai::MeshRenderer>(skybox);
 
-		auto audio = std::make_shared<kuai::AudioClip>("C:/Users/David/Music/htdc.wav");
+		auto audio = std::make_shared<kuai::AudioClip>("C:/Users/David/Music/jigsaw.wav");
 
 		myEntity->addComponent<kuai::AudioSource>();
 		auto a = myEntity->getComponent<kuai::AudioSource>();
 
-		//a.setAudioClip(audio);
-		//a.setPitch(1.0f);
-		//a.setLoop(false);
-		//a.play();
+		a.setAudioClip(audio);
+		a.setPitch(1.0f);
+		a.setLoop(false);
+		a.play();
 
 		/*std::default_random_engine generator;
 		std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
@@ -133,14 +139,14 @@ public:
 			scene->getMainCam().getTransform().translate(
 				-scene->getMainCam().getTransform().getForward() * velocity);
 		}
-		/*if (kuai::Input::isKeyPressed(kuai::Key::Space))
+		if (kuai::Input::isKeyPressed(kuai::Key::Space))
 		{
 			scene->getMainCam().getTransform().translate(0, 0.5f, 0);
 		}
 		if (kuai::Input::isKeyPressed(kuai::Key::LeftShift))
 		{
 			scene->getMainCam().getTransform().translate(0, -0.5f, 0);
-		}*/
+		}
 
 		//myEntity->getTransform().translate(0, 0, -0.05);
 	}
