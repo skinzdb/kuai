@@ -26,27 +26,21 @@ namespace kuai {
 	{
 		bind();
 
-		//setUniform(StaticShader::getUboId("Matrices"), &shaderData->projectionMatrix[0][0], sizeof(glm::mat4));
-		//setUniform(StaticShader::getUboId("Matrices"), &shaderData->viewMatrix[0][0], sizeof(glm::mat4), sizeof(glm::mat4));
-	
-		setUniform("projectionMatrix", shaderData->projectionMatrix);
-		setUniform("viewMatrix", shaderData->viewMatrix);
+		setUniform(StaticShader::getUboId("Matrices"), &shaderData->projectionMatrix[0][0], sizeof(glm::mat4));
+		setUniform(StaticShader::getUboId("Matrices"), &shaderData->viewMatrix[0][0], sizeof(glm::mat4), sizeof(glm::mat4));
 	}
 
 	const char* DEFAULT_VERT = R"(
-		#version 460
+		#version 450
 		layout (location = 0) in vec3 pos;
 		layout (location = 1) in vec3 normal;
 		layout (location = 2) in vec2 texCoord;
 
-		//layout (std140, binding = 0) uniform Matrices
-		//{
-		//	mat4 projectionMatrix;
-		//	mat4 viewMatrix;
-		//};
-
-		uniform mat4 projectionMatrix;
-		uniform mat4 viewMatrix;		
+		layout (std140, binding = 0) uniform Matrices
+		{
+			mat4 projectionMatrix;
+			mat4 viewMatrix;
+		};		
 
 		uniform mat4 modelMatrix;
 		uniform mat3 model3x3InvTransp; // Used to calculate proper world position of normals		
@@ -162,9 +156,6 @@ namespace kuai {
 	{
 		bind();
 
-		createUniform("projectionMatrix");
-		createUniform("viewMatrix");
-
 		createUniform("modelMatrix");
 		createUniform("model3x3InvTransp");
 
@@ -225,17 +216,14 @@ namespace kuai {
 	}
 
 	const char* SKYBOX_VERT = R"(
-		#version 460
+		#version 450
 		layout (location = 0) in vec3 pos;
 
-		//layout (std140, binding = 0) uniform Matrices
-		//{
-		//	mat4 projectionMatrix;
-		//	mat4 viewMatrix;
-		//};
-
-		uniform mat4 projectionMatrix;
-		uniform mat4 viewMatrix;		
+		layout (std140, binding = 0) uniform Matrices
+		{
+			mat4 projectionMatrix;
+			mat4 viewMatrix;
+		};	
 
 		out vec3 texCoords;
 
@@ -266,9 +254,6 @@ namespace kuai {
 	{
 		bind();
 
-		createUniform("projectionMatrix");
-		createUniform("viewMatrix");
-
 		createUniform("skybox");
 		setUniform("skybox", 0);
 	}
@@ -276,14 +261,15 @@ namespace kuai {
 	void StaticShader::init()
 	{
 		basic = new DefaultShader();
-		//ubos["Matrices"] = basic->createUniformBlock("Matrices");
+		ubos["Matrices"] = basic->createUniformBlock("Matrices", 0);
 
 		skybox = new SkyboxShader();
 	}
 
 	void StaticShader::cleanup()
 	{
-		//basic->deleteBuffer(ubos.at("Matrices"));
+		basic->bind();
+		basic->deleteBuffer(ubos.at("Matrices"));
 		delete basic;
 
 		delete skybox;

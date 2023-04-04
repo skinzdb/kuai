@@ -19,7 +19,7 @@ namespace kuai {
 		void setUniform(const std::string& name, const glm::mat3& val) const;
 		void setUniform(const std::string& name, const glm::mat4& val) const;
 
-		uint32_t createUniformBlock(const std::string& name);
+		uint32_t createUniformBlock(const std::string& name, uint32_t binding);
 		void setUniform(uint32_t bufId, const void* data, uint32_t size, uint32_t offset = 0) const;
 
 		void deleteBuffer(uint32_t bufId);

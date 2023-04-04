@@ -63,19 +63,20 @@ namespace kuai {
 		glUniformMatrix4fv(uniforms.at(name), 1, GL_FALSE, &val[0][0]);
 	}
 
-	uint32_t Shader::createUniformBlock(const std::string& name)
+	uint32_t Shader::createUniformBlock(const std::string& name, uint32_t binding)
 	{
-		// Get binding index and block size
+		// Get block index and block size
 		uint32_t blockIndex = glGetUniformBlockIndex(programId, name.c_str());
 		int blockSize;
-		glGetActiveUniformBlockiv(programId, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+		glGetActiveUniformBlockiv(programId, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);	
 
 		// Create uniform buffer object
 		uint32_t ubo;
 		glGenBuffers(1, &ubo);
-		glNamedBufferData(ubo, blockSize, nullptr, GL_STATIC_DRAW);
-		glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
-		
+		glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+		glBufferData(GL_UNIFORM_BUFFER, blockSize, nullptr, GL_STATIC_DRAW);
+		glBindBufferBase(GL_UNIFORM_BUFFER, binding, ubo);
+
 		return ubo;
 	}
 
