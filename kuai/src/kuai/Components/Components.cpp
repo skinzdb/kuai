@@ -2,8 +2,12 @@
 #include "Components.h"
 
 #include "Entity.h"
+
 #include "kuai/Renderer/Renderer.h"
+
 #include "kuai/Sound/AudioManager.h"
+#include "kuai/Sound/AudioSource.h"
+#include "kuai/Sound/MusicSource.h"
 
 namespace kuai {
 	uint32_t LightCounter::lightCount = 0;
@@ -22,14 +26,12 @@ namespace kuai {
 
 		if (hasComponent<AudioListener>())
 		{
-			getComponent<AudioListener>().setPos(pos);
-			getComponent<AudioListener>().setOrientation(getForward(), getUp());
+			getComponent<AudioListener>().update();
 		}
 
-		if (hasComponent<AudioSource>())
+		if (hasComponent<AudioSourceComponent>())
 		{
-			getComponent<AudioSource>().setPos(pos);
-			getComponent<AudioSource>().setDir(getForward());
+			getComponent<AudioSourceComponent>().update();
 		}
 	}
 
@@ -54,104 +56,24 @@ namespace kuai {
 		changed = true;
 	}
 
-	AudioSource::AudioSource(Entity* entity) : Component(entity)
-	{
-		sourceId = AudioManager::createAudioSource();
-		setPitch(pitch);
-		setGain(gain);
-		setPos(getTransform().getPos());
-		setDir(getTransform().getForward());
-	}
-
-	void AudioSource::play()
-	{
-		AudioManager::playAudioSource(sourceId);
-	}
-
-	void AudioSource::stop()
-	{
-		AudioManager::stopAudioSource(sourceId);
-	}
-
-	void AudioSource::setAudioClip(std::shared_ptr<AudioClip> audioClip)
-	{
-		this->audioClip = audioClip;
-		AudioManager::setSourceAudioClip(sourceId, audioClip);
-	}
-
-	void AudioSource::setGain(float gain)
-	{
-		this->gain = gain;
-		AudioManager::setSourceProperty(sourceId, AudioManager::Gain, gain);
-	}
-
-	void AudioSource::setPitch(float pitch)
-	{
-		this->pitch = pitch;
-		AudioManager::setSourceProperty(sourceId, AudioManager::Pitch, pitch);
-	}
-
-	void AudioSource::setRolloff(float rolloff)
-	{
-		this->rolloff = rolloff;
-		AudioManager::setSourceProperty(sourceId, AudioManager::Rolloff, rolloff);
-	}
-
-	void AudioSource::setRefDist(float refDist)
-	{
-		this->refDist = refDist;
-		AudioManager::setSourceProperty(sourceId, AudioManager::RefDist, refDist);
-	}
-
-	void AudioSource::setLoop(bool loop)
-	{
-		this->loop = loop;
-		AudioManager::setSourceProperty(sourceId, AudioManager::Loop, loop);
-	}
-
-	void AudioSource::setPos(const glm::vec3& pos)
-	{
-		AudioManager::setSourceProperty(sourceId, AudioManager::Position, pos);
-	}
-
-	void AudioSource::setDir(const glm::vec3& dir)
-	{
-		AudioManager::setSourceProperty(sourceId, AudioManager::Direction, dir);
-	}
-
-	void AudioSource::setVel(const glm::vec3& vel)
-	{
-		AudioManager::setSourceProperty(sourceId, AudioManager::Velocity, vel);
-	}
-
 	AudioListener::AudioListener(Entity* entity) : Component(entity)
 	{
-		AudioManager::createAudioListener();
-		setGain(gain);
-		setPos(getTransform().getPos());
-		setOrientation(getTransform().getForward(), getTransform().getUp());
 	}
 
-	void AudioListener::setGain(float gain)
+	void AudioListener::update()
 	{
-		this->gain = gain;
-		AudioManager::setListenerProperty(AudioManager::Gain, gain);
+		AudioManager::setPos(getTransform().getPos());
+		AudioManager::setOrientation(getTransform().getForward(), getTransform().getUp());
 	}
 
-	void AudioListener::setPos(const glm::vec3& pos)
+	AudioSourceComponent::AudioSourceComponent(Entity* entity, bool stream) : Component(entity)
 	{
-		AudioManager::setListenerProperty(AudioManager::Position, pos);
+		source = AudioManager::createAudioSource(stream);
 	}
 
-	void AudioListener::setOrientation(const glm::vec3& at, const glm::vec3& up)
+	void AudioSourceComponent::update()
 	{
-		std::vector<float> data = { at.x, at.y, at.z, up.x, up.y, up.z };
-		AudioManager::setListenerProperty(AudioManager::Orientation, data);
+		source->setPos(getTransform().getPos());
+		source->setDir(getTransform().getForward());
 	}
-
-	void AudioListener::setVel(const glm::vec3& vel)
-	{
-		AudioManager::setListenerProperty(AudioManager::Velocity, vel);
-	}
-
 }

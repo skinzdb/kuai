@@ -11,6 +11,8 @@
 #include <sstream>
 #include <vector>
 
+#include <filesystem>
+
 #include "kuai/Core/Log.h"
 #include "kuai/Util/Instrumentor.h"
 

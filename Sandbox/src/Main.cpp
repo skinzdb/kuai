@@ -38,7 +38,6 @@ public:
 		//auto model = std::make_shared<kuai::Model>("C:/Users/David/Documents/cs310/backpack/backpack.obj");
 		auto model = std::make_shared<kuai::Model>("C:/Users/David/Documents/bunny.obj");
 
-
 		//model->getMeshes()[0]->setMaterial(material);
 
 		myEntity = scene->createEntity();
@@ -67,13 +66,13 @@ public:
 
 		auto audio = std::make_shared<kuai::AudioClip>("C:/Users/David/Music/jigsaw.wav");
 
-		myEntity->addComponent<kuai::AudioSource>();
-		auto a = myEntity->getComponent<kuai::AudioSource>();
+		myEntity->addComponent<kuai::AudioSourceComponent>(false);
+		auto a = myEntity->getComponent<kuai::AudioSourceComponent>();
 
-		a.setAudioClip(audio);
-		a.setPitch(1.0f);
-		a.setLoop(false);
-		a.play();
+		a.source->setAudioClip(audio);
+		a.source->setPitch(1.05f);
+		a.source->setLoop(false);
+		a.source->play();
 
 		/*std::default_random_engine generator;
 		std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
