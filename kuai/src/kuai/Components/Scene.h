@@ -9,7 +9,6 @@ namespace kuai {
 	class RenderSystem;
 	class CameraSystem;
 	class LightSystem;
-	class AudioSystem;
 
 	class Scene
 	{
@@ -54,7 +53,6 @@ namespace kuai {
 		std::shared_ptr<RenderSystem> renderSys;
 		std::shared_ptr<CameraSystem> cameraSys;
 		std::shared_ptr<LightSystem> lightSys;
-		std::shared_ptr<AudioSystem> audioSys;
 	};
 
 	class RenderSystem : public System
@@ -83,16 +81,6 @@ namespace kuai {
 
 		virtual void update(float dt);
 	};
-
-	class AudioSystem : public System
-	{
-	public:
-		AudioSystem(Scene* scene) : System(scene) { acceptsSubset = true; }
-
-		virtual void update(float dt);
-	};
-
-	//scene.addSystem<mask>(
 
 	//class PhysicsSystem : public System
 	//{

@@ -1,67 +1,34 @@
 #pragma once
 
-#include <AL/al.h>
-#include <AL/alc.h>
+#include "AL/al.h"
+#include "AL/alc.h"
+#include "glm/glm.hpp"
 
-#include <glm/glm.hpp>
+#include "AudioSource.h"
 
 namespace kuai {
-	const uint32_t BUFS_PER_SOURCE = 4;
-	const uint32_t BUF_SIZE = 32768;
-
-	// Forward Declaration
-	class AudioClip;
-
 	class AudioManager
 	{
 	public:
-		enum Property
-		{
-			Pitch		= AL_PITCH,
-			Gain		= AL_GAIN,
-			MaxDist		= AL_MAX_DISTANCE,
-			Rolloff		= AL_ROLLOFF_FACTOR,
-			RefDist     = AL_REFERENCE_DISTANCE,
-			Position	= AL_POSITION,
-			Direction	= AL_DIRECTION,
-			Orientation = AL_ORIENTATION,
-			Velocity	= AL_VELOCITY,
-			Loop		= AL_LOOPING,
-			Buffer		= AL_BUFFER,
-			State		= AL_SOURCE_STATE
-		};
-
 		static void init();
 		static void cleanup();
 
-		static void createAudioListener();
+		static AudioSource* createAudioSource(bool stream = false);
 
-		static void setListenerProperty(Property property, int val);
-		static void setListenerProperty(Property property, float val);
-		static void setListenerProperty(Property property, const glm::vec3& val);
-		static void setListenerProperty(Property property, const std::vector<float>& vals);
+		static float getGlobalGain();
+		static void setGlobalGain(float gain);
 
-		static ALuint createAudioSource();
-		static void playAudioSource(ALuint sourceId);
-		static void stopAudioSource(ALuint sourceId);
-
-		static void setSourceProperty(ALuint sourceId, Property property, int val);
-		static void setSourceProperty(ALuint sourceId, Property property, float val);
-		static void setSourceProperty(ALuint sourceId, Property property, const glm::vec3& val);
-
-		static void setSourceAudioClip(ALuint sourceId, std::shared_ptr<AudioClip> audioClip);
-
-		static void updateStream(ALuint sourceId);
+		static void setPos(const glm::vec3& pos);
+		static void setOrientation(const glm::vec3& at, const glm::vec3& up);
 
 	private:
 		static ALCdevice* device;
 		static ALCcontext* context;
 
-		static std::unordered_map<ALuint, ALuint*> sourceBufMap;
-		static std::unordered_map<ALuint, std::shared_ptr<AudioClip>> sourceClipMap;
+		static std::unordered_map<uint32_t, AudioSource*> sourceMap;
 	};
 	
-	// SFML - Simple and Fast Multimedia Library
+	// This is based on SFML - Simple and Fast Multimedia Library
 	// Copyright (C) 2007-2023 Laurent Gomila (laurent@sfml-dev.org)
 	// The do-while loop is needed so that alCheck can be used as a single statement in if/else branches
 	//#ifdef KU_DEBUG

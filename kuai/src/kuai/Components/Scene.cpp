@@ -2,7 +2,6 @@
 #include "Scene.h"
 
 #include "kuai/Renderer/Renderer.h"
-#include "kuai/Sound/AudioManager.h"
 #include "kuai/Core/App.h"
 
 #include "kuai/Renderer/StaticShader.h"
@@ -17,7 +16,7 @@ namespace kuai {
 		ECS->registerComponent<Light>();
 		ECS->registerComponent<MeshRenderer>();
 		ECS->registerComponent<AudioListener>();
-		ECS->registerComponent<AudioSource>();
+		ECS->registerComponent<AudioSourceComponent>();
 
 		this->renderSys = ECS->registerSystem<RenderSystem>(this);
 		ECS->setSystemMask<RenderSystem>(BIT(ECS->getComponentType<MeshRenderer>()));
@@ -27,9 +26,6 @@ namespace kuai {
 
 		this->lightSys = ECS->registerSystem<LightSystem>(this);
 		ECS->setSystemMask<LightSystem>(BIT(ECS->getComponentType<Light>()));
-
-		this->audioSys = ECS->registerSystem<AudioSystem>(this);
-		ECS->setSystemMask<AudioSystem>(BIT(ECS->getComponentType<AudioSource>()));
 
 		mainCam = createEntity();
 		mainCam->addComponent<Camera>(
@@ -95,7 +91,6 @@ namespace kuai {
 		lightSys->update(dt);
 		cameraSys->update(dt);
 		renderSys->update(dt);
-		audioSys->update(dt);
 	}
 
 	RenderSystem::RenderSystem(Scene* scene) : System(scene)
@@ -177,14 +172,6 @@ namespace kuai {
 				scene->notifySystems(&e);
 				l.changed = false;
 			}
-		}
-	}
-
-	void AudioSystem::update(float dt)
-	{
-		for (auto& entity : entities)
-		{
-			AudioManager::updateStream(entity->getComponent<AudioSource>().getId());
 		}
 	}
 }

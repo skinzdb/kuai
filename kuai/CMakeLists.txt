@@ -74,6 +74,10 @@ add_library(${PROJECT_NAME}
     src/kuai/Sound/AudioClip.cpp
     src/kuai/Sound/AudioManager.h
     src/kuai/Sound/AudioManager.cpp
+    src/kuai/Sound/AudioSource.h
+    src/kuai/Sound/AudioSource.cpp
+    src/kuai/Sound/MusicSource.h
+    src/kuai/Sound/MusicSource.cpp
 
     vendor/stb_image/stb_image.h
     vendor/stb_image/stb_image.cpp

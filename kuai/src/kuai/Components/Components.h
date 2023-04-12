@@ -345,68 +345,30 @@ namespace kuai {
 		Camera* cam;
 	};
 
+	// Forward declarations
+	class Listener;
+	class AudioSource;
+
 	class AudioListener : public Component
 	{
 	public:
 		AudioListener(Entity* entity);
 
-		float getGain() { return gain; }
-		void setGain(float gain);
-
 	private:
-		void setPos(const glm::vec3& pos);
-		void setOrientation(const glm::vec3& at, const glm::vec3& up);
-		void setVel(const glm::vec3& vel);
-
-	private:
-		float gain = 1.0f;
+		void update();
 
 		friend class Transform;
 	};
 
-	class AudioSource : public Component
+	class AudioSourceComponent : public Component
 	{
 	public:
-		AudioSource(Entity* entity);
+		AudioSourceComponent(Entity* entity, bool stream = false);
 
-		void play();
-		void stop();
-
-		void setAudioClip(std::shared_ptr<AudioClip> audioClip);
-
-		float getPitch() { return pitch; }
-		void setPitch(float pitch);
-
-		float getGain() { return gain; }
-		void setGain(float gain);
-
-		float getRolloff() { return rolloff; }
-		void setRolloff(float rolloff);
-
-		float getRefDist() { return refDist; }
-		void setRefDist(float refDist);
-
-		bool isLoop() { return loop; }
-		void setLoop(bool loop);
-
-		uint32_t getId() { return sourceId; }
+		AudioSource* source;
 
 	private:
-		void setPos(const glm::vec3& pos);
-		void setDir(const glm::vec3& dir);
-		void setVel(const glm::vec3& vel);
-
-	private:
-		std::shared_ptr<AudioClip> audioClip = nullptr;
-
-		float gain = 1.0f;
-		float pitch = 1.0f;
-		float rolloff = 1.0f;
-		float refDist = 1.0f;
-
-		bool loop = false;
-
-		uint32_t sourceId = 0;
+		void update();
 
 		friend class Transform;
 	};

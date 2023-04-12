@@ -26,3 +26,4 @@
 #include "kuai/Renderer/Skybox.h"
 
 #include "kuai/Sound/AudioClip.h"
+#include "kuai/Sound/AudioSource.h"
