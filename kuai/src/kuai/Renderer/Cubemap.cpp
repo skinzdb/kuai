@@ -53,9 +53,15 @@ namespace kuai {
 			}
 		}
 	}
+
 	Cubemap::~Cubemap()
 	{
 		glDeleteTextures(1, &textureId);
+	}
+
+	uint32_t Cubemap::getId()
+	{
+		return textureId;
 	}
 	
 	void Cubemap::bind()

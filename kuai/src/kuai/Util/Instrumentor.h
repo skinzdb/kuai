@@ -14,6 +14,7 @@
 #include <mutex>
 #include <sstream>
 
+// @cond
 namespace kuai {
 
 	using FloatingPointMicroseconds = std::chrono::duration<double, std::micro>;
@@ -250,3 +251,5 @@ namespace kuai {
 #define KU_PROFILE_FUNCTION()
 
 #endif
+
+// @endcond

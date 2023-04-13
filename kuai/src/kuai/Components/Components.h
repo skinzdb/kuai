@@ -15,12 +15,13 @@ namespace kuai {
 	class Entity;
 	class Transform;
 
-	/**
-	* Base class for all components
+	/** \class Component
+	*	\brief Base class for all components
 	*/
 	class Component
 	{
 	public:
+		/// @private
 		Component(Entity* entity) : entity(entity) {}
 
 		template<typename T>
@@ -40,6 +41,9 @@ namespace kuai {
 	// Forward Declarations
 	class Camera;
 
+	/** \class Transform
+	*	\brief Describes 3D world position, rotation and scale of an object.
+	*/
 	class Transform : public Component
 	{
 	public:
@@ -166,6 +170,9 @@ namespace kuai {
 		float friction = 0.5f;
 	};
 
+	/** \class MeshRenderer
+	*	\brief Renders models or meshes to the screen.
+	*/
 	class MeshRenderer : public Component
 	{
 	public:
@@ -196,6 +203,9 @@ namespace kuai {
 		static uint32_t lightCount;
 	};
 
+	/** \class Light
+	*	\brief 
+	*/
 	class Light : public Component
 	{
 	public:
@@ -271,6 +281,9 @@ namespace kuai {
 		Light* light;
 	};
 	
+	/** \class Camera
+	*	\brief
+	*/
 	class Camera : public Component
 	{
 	public:
@@ -349,6 +362,9 @@ namespace kuai {
 	class Listener;
 	class AudioSource;
 
+	/** \class AudioListener
+	*	\brief
+	*/
 	class AudioListener : public Component
 	{
 	public:
@@ -360,6 +376,9 @@ namespace kuai {
 		friend class Transform;
 	};
 
+	/** \class AudioSourceComponent
+	*	\brief
+	*/
 	class AudioSourceComponent : public Component
 	{
 	public:

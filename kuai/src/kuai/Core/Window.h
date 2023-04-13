@@ -7,6 +7,9 @@
 
 namespace kuai {
 
+	/**
+	* Properties of a window, i.e., title, width and height.
+	*/
 	struct WindowProps
 	{
 		std::string title;
@@ -23,7 +26,9 @@ namespace kuai {
 		}
 	};
 
-	// Interface for representing a desktop window
+	/**
+	* Interface for representing a desktop window
+	*/
 	class Window
 	{
 	public:

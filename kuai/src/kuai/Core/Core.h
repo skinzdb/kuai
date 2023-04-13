@@ -1,5 +1,7 @@
 #pragma once
 
+// @cond
+
 #define KU_ENABLE_ASSERTS // TODO: add to premake for debug configurations
 
 #ifdef KU_PLATFORM_WINDOWS
@@ -18,3 +20,5 @@
 #endif
 
 #define BIT(x) (1 << x)
+
+// @endcond

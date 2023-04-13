@@ -9,6 +9,7 @@
 
 #include "kuai/Events/Event.h"
 
+// @cond
 namespace kuai {
 
 	class IFnHandler
@@ -199,3 +200,4 @@ namespace kuai {
 		std::unique_ptr<EventBus> eventBus;
 	};
 }
+//@endcond

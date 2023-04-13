@@ -6,6 +6,7 @@
 
 #include "AudioSource.h"
 
+// @cond
 namespace kuai {
 	class AudioManager
 	{
@@ -44,5 +45,4 @@ namespace kuai {
 
 	void checkAlErrors(const std::filesystem::path& file, unsigned int line, std::string_view expression);
 }
-
-
+// @endcond

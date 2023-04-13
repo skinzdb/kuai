@@ -1,10 +1,9 @@
 #pragma once
 
-#include "kpch.h"
-
+// @cond
 class FileUtil
 {
 public:
 	static std::string load(const std::string& filename);
 };
-
+// @endcond

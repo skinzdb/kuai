@@ -9,24 +9,48 @@ namespace kuai {
 	class RenderSystem;
 	class CameraSystem;
 	class LightSystem;
-
+	
+	/** \class Scene
+	*	\brief Represents a game scene by holding a list of entity objects. The scene owns a main camera; the view of this camera gets rendered to the viewport.
+	*	The scene owns a collection of systems that update game logic.
+		@see Entity  
+	*/
 	class Scene
 	{
 	public:
 		Scene();
 		~Scene();
 
+		/** 
+		* Adds new entity to scene.
+		*/
 		std::shared_ptr<Entity> createEntity();
+
+		/**
+		* Finds an entity by its ID and returns a reference if it exists.
+		*/
 		std::shared_ptr<Entity> getEntityById(EntityID entity);
 		std::shared_ptr<Entity> getEntityByName(const std::string& name) { KU_CORE_ASSERT(0, "Not yet implemented"); } // TODO: implement
+		/**
+		* Removes entity from the scene.
+		*/
 		void destroyEntity(EntityID entity);
 
+		/**
+		* Notify all systems of an event.
+		* @param event Event that gets sent to subscribing systems.
+		*/
 		template<typename EventType>
 		void notifySystems(EventType* event)
 		{
 			ECS->notifySystems(event);
 		}
 
+		/**
+		* Subscribe to a callback function that gets activated whenever its event happens.
+		* @param instance The instance that owns the function.
+		* @param memberFn The callback function.
+		*/
 		template<typename T, typename EventType>
 		void subscribeSystem(T* instance, void (T::* memberFn)(EventType*))
 		{

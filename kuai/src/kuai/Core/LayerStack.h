@@ -3,6 +3,7 @@
 #include "kuai/Core/Core.h"
 #include "Layer.h"
 
+// @cond
 namespace kuai {
 	class LayerStack
 	{
@@ -23,5 +24,5 @@ namespace kuai {
 		std::vector<Layer*>::iterator layerInsert;
 	};
 }
-
+// @endcond
 

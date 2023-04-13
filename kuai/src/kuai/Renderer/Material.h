@@ -8,6 +8,9 @@
 #include <memory>
 
 namespace kuai {
+	/** \class Material 
+	*   \brief Base class for materials. Every material has a shader that sets rendering properties in each render loop.
+	*/
 	class Material
 	{
 	public:

@@ -1,5 +1,6 @@
 #pragma once
 
+// @cond
 namespace kuai {
 	class ScriptEngine
 	{
@@ -10,3 +11,4 @@ namespace kuai {
 	private:
 	};
 }
+// @endcond

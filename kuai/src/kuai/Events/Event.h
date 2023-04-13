@@ -31,6 +31,9 @@ namespace kuai {
 
 #define EVENT_CLASS_CATEGORY(category) virtual int getCategoryFlags() const override { return category; }
 
+	/**
+	* Base class for events.
+	*/
 	class Event
 	{
 		friend class EventDispatcher;

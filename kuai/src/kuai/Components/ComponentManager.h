@@ -4,8 +4,8 @@
 
 #include "EntityManager.h"
 
+// @cond
 namespace kuai {
-
 	using ComponentType = uint8_t;
 
 	class IComponentContainer
@@ -165,3 +165,4 @@ namespace kuai {
 		}
 	};
 }
+// @endcond

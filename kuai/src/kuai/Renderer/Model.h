@@ -12,14 +12,27 @@ struct aiMesh;
 struct aiMaterial;
 
 namespace kuai {
+	/** \class Model
+	*   \brief A 3D object that is comprised of a collection of meshes.
+	*/
 	class Model
 	{
 	public:
+		/**
+		* Load model from a 3D object file.
+		*/
 		Model(const std::string& filename);
+		/**
+		* Create model by specifying a singlular mesh.
+		*/
 		Model(std::shared_ptr<Mesh> mesh);
 
+		/// @private
 		void render();
 
+		/**
+		* Returns list of meshes this model is made of.
+		*/
 		std::vector<std::shared_ptr<Mesh>> getMeshes() { return meshes; }
 
 	private:

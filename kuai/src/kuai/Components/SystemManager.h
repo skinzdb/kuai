@@ -3,6 +3,7 @@
 #include "EntityManager.h"
 #include "System.h"
 
+// @cond
 namespace kuai {
 	class Scene; // Forward declaration
 	/**
@@ -67,3 +68,4 @@ namespace kuai {
 		std::unordered_map<const char*, std::shared_ptr<System>> systems;
 	};
 }
+// @endcond

@@ -1,5 +1,6 @@
 #pragma once
 
+// @cond
 namespace kuai {
 
 	const uint32_t MAX_ENTITIES = 65536;
@@ -65,3 +66,4 @@ namespace kuai {
 		ComponentMask componentMasks[MAX_ENTITIES];
 	};
 }
+// @endcond

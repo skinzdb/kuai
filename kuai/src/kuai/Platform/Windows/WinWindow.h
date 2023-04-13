@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+// @cond
 namespace kuai {
 	class WinWindow : public Window
 	{
@@ -43,3 +44,4 @@ namespace kuai {
 		WindowData data;
 	};
 }
+// @endcond

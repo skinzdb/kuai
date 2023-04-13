@@ -4,6 +4,7 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"
 
+// @cond
 namespace kuai {
 	class Log
 	{
@@ -36,3 +37,5 @@ namespace kuai {
 #define KU_INFO(...) ::kuai::Log::getClientLogger()->info(__VA_ARGS__)
 #define KU_TRACE(...) ::kuai::Log::getClientLogger()->trace(__VA_ARGS__)
 #define KU_CRITICAL(...) ::kuai::Log::getClientLogger()->critical(__VA_ARGS__)
+
+// @endcond
