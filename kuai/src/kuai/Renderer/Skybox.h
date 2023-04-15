@@ -12,7 +12,7 @@ namespace kuai {
 		Skybox(std::shared_ptr<Cubemap> cubemap);
 		~Skybox();
 
-		// @private
+		/// @private
 		virtual void render() override;
 	
 	};
