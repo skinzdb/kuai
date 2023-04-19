@@ -33,44 +33,52 @@ public:
 		KU_PROFILE_FUNCTION();
 
 		//kuai::Mesh* mesh = new kuai::Mesh(quadPositions, quadNormals, quadTexCoords, quadIndices);
-		//auto tex = std::make_shared<kuai::Texture>();
+		auto whiteTex = std::make_shared<kuai::Texture>();
+
+		std::vector<std::string> faces =
+		{
+			"C:/Users/David/Pictures/skybox/right.jpg",
+			"C:/Users/David/Pictures/skybox/left.jpg",
+			"C:/Users/David/Pictures/skybox/top.jpg",
+			"C:/Users/David/Pictures/skybox/bottom.jpg",
+			"C:/Users/David/Pictures/skybox/front.jpg",
+			"C:/Users/David/Pictures/skybox/back.jpg"
+		};
+
+		auto cubemap = std::make_shared<kuai::Cubemap>(faces);
+		auto skybox = std::make_shared<kuai::Skybox>(cubemap);
+
+		auto skyboxEntity = scene->createEntity();
+		skyboxEntity->addComponent<kuai::MeshRenderer>(skybox);
+
 		
-		//auto tex = std::make_shared<kuai::Texture>("C:/Users/David/Pictures/billy.png");
-		//auto material = new kuai::DefaultMaterial(tex, tex, 40);
+		auto grassTex = std::make_shared<kuai::Texture>("C:/Users/David/Pictures/grass.png");
+		auto grassMat = std::make_shared<kuai::DefaultMaterial>(grassTex, grassTex, 10.0f);
+
+		auto plane = std::make_shared<kuai::Model>("C:/Users/David/Documents/plane.obj");
+
+		plane->getMeshes()[0]->setMaterial(grassMat);
+		std::vector<float> texCoords = { 0, 0, 5, 0, 5, 5, 0, 5 };
+		plane->getMeshes()[0]->setTexCoords(texCoords);
+
+		auto planeEntity = scene->createEntity();
+		planeEntity->addComponent<kuai::MeshRenderer>(plane);
+		planeEntity->getTransform().setPos(0, -1, -2);
+		planeEntity->getTransform().setScale(5, 0.5f, 5);
+
 		//auto model = std::make_shared<kuai::Model>("C:/Users/David/Documents/cs310/backpack/backpack.obj");
 		auto model = std::make_shared<kuai::Model>("C:/Users/David/Documents/bunny.obj");
-		auto cube = std::make_shared<kuai::Model>("C:/Users/David/Documents/cube.obj");
-
-		//model->getMeshes()[0]->setMaterial(material);
-
+		auto modelMat = std::make_shared<kuai::DefaultMaterial>(whiteTex, whiteTex, 30.0f);
+		modelMat->setReflection(cubemap);
+		model->getMeshes()[0]->setMaterial(modelMat);
+		
 		myEntity = scene->createEntity();
 		myEntity->addComponent<kuai::MeshRenderer>(model);
-		myEntity->getTransform().translate(0, -0.1f, -2);
+		myEntity->getTransform().translate(0, -1, -2);
 
-		auto cubeEntity = scene->createEntity();
-		cubeEntity->addComponent<kuai::MeshRenderer>(cube);
-		cubeEntity->getTransform().setPos(0, -2, -2);
-		cubeEntity->getTransform().setScale(5, 0.5f, 5);
-
-		// pointLight = scene->createEntity();
-		// pointLight->addComponent<kuai::Light>().setIntensity(0.5f);
-		// pointLight->getTransform().setPos(0, 1, -4);
-
-		// std::vector<std::string> faces =
-		// {
-		// 	"C:/Users/David/Pictures/skybox/right.jpg",
-		// 	"C:/Users/David/Pictures/skybox/left.jpg",
-		// 	"C:/Users/David/Pictures/skybox/top.jpg",
-		// 	"C:/Users/David/Pictures/skybox/bottom.jpg",
-		// 	"C:/Users/David/Pictures/skybox/front.jpg",
-		// 	"C:/Users/David/Pictures/skybox/back.jpg"
-		// };
-
-		// auto cubemap = std::make_shared<kuai::Cubemap>(faces);
-		// auto skybox = std::make_shared<kuai::Skybox>(cubemap);
-
-		// auto skyboxEntity = scene->createEntity();
-		// skyboxEntity->addComponent<kuai::MeshRenderer>(skybox);
+		pointLight = scene->createEntity();
+		pointLight->addComponent<kuai::Light>().setIntensity(0.5f);
+		pointLight->getTransform().setPos(-1, 4, -2);
 
 		//auto audio = std::make_shared<kuai::AudioClip>("C:/Users/David/Music/baka.wav");
 

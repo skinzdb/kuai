@@ -80,6 +80,8 @@ namespace kuai {
 		{
 			sampler2D diffuse;
 			sampler2D specular;
+			samplerCube reflectionMap;
+			int reflections;
 			float shininess;
 		};
 		uniform Material material;
@@ -94,7 +96,7 @@ namespace kuai {
 
 			float closestDepth = texture(shadowMap, projCoords.xy).r;
 			float currentDepth = projCoords.z;
-			
+
 			// Add bias to remove shadow acne
 			float bias = max(0.05 * (1.0 - dot(worldNorm, lightDir)), 0.005);  
 
@@ -106,7 +108,7 @@ namespace kuai {
 				for(int y = -1; y <= 1; y++)
 				{
 					float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
-					shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+					shadow += currentDepth - bias > pcfDepth ? 0.75 : 0.0;        
 				}    
 			}
 			shadow /= 9.0;
@@ -121,6 +123,7 @@ namespace kuai {
 		{
 			vec3 norm = normalize(worldNorm);
 			vec3 viewDir = normalize(viewPos - worldPos.xyz);
+			vec3 viewReflectDir = reflect(-viewDir, norm);
 			vec3 lightDir = vec3(0.0, 0.0, 0.0);
 			float factor = 1.0;
 
@@ -131,7 +134,6 @@ namespace kuai {
 				if (lights[i].type == 0) // Directional Light
 				{
 					lightDir = normalize(-lights[i].dir);
-					//lightDir = normalize(lights[i].pos - worldPos.xyz);
 					factor = lights[i].intensity;
 				} 
 				else
@@ -141,6 +143,7 @@ namespace kuai {
 					// Attenuation
 					float distance = length(lights[i].pos - worldPos.xyz);
 					factor = 1.0 / (1.0 + lights[i].linear * distance + lights[i].quadratic * (distance * distance));    
+					factor *= lights[i].intensity;
 
 					if (lights[i].type == 2) // Spotlight
 					{
@@ -165,13 +168,20 @@ namespace kuai {
 				float spec = pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
 				vec3 specular = spec * vec3(texture(material.specular, texCoords));
 
+				// Reflection Map
+				vec3 reflection = vec3(0.0);
+				if (material.reflections)
+				{
+					reflection = vec3(texture(material.reflectionMap, viewReflectDir));
+				}
+				
 				float shadow = 0.0;
 				if (lights[i].castShadows)
 				{
 					shadow = calcShadow(lightSpace, lightDir);      
 				}
 				 
-				finalCol += (ambient + (1.0 - shadow) * (diffuse + specular)) * factor;
+				finalCol += (ambient + (1.0 - shadow) * (diffuse + specular + reflection)) * factor;
 			}
 
 			fragCol = vec4(finalCol, 1.0);
@@ -219,11 +229,14 @@ namespace kuai {
 
 		createUniform("material.diffuse");
 		createUniform("material.specular");
+		createUniform("material.reflectionMap");
 		setUniform("material.diffuse", 0);
 		setUniform("material.specular", 1);
+		setUniform("material.reflectionMap", 4);
 
 		createUniform("material.shininess");
 		setUniform("material.shininess", 35.0f);
+		createUniform("material.reflections");
 
 		createUniform("lightSpaceMatrix");
 		createUniform("shadowMap");

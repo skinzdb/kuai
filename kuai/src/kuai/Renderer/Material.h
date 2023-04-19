@@ -27,7 +27,7 @@ namespace kuai {
 	{
 	public:
 		DefaultMaterial(std::shared_ptr<Texture> diffuse, std::shared_ptr<Texture> specular, float specularAmount)
-			: diffuse(diffuse), specular(specular), specularAmount(specularAmount)
+			: diffuse(diffuse), specular(specular), specularAmount(specularAmount), reflections(false)
 		{
 			shader = StaticShader::basic;
 		}
@@ -36,16 +36,21 @@ namespace kuai {
 		{
 			diffuse->bind(0);
 			specular->bind(1);
+			if (reflectionMap)
+				reflectionMap->bind(4);
 		}
 
 		void setDiffuse(std::shared_ptr<Texture> diffuse) { this->diffuse = diffuse; }
 		void setSpecular(std::shared_ptr<Texture> specular) { this->specular = specular; }
+		void setReflection(std::shared_ptr<Cubemap> reflection) { this->reflectionMap = reflection; reflections = true; }
+
+		float specularAmount;
+		bool reflections;
 
 	private:
 		std::shared_ptr<Texture> diffuse;
 		std::shared_ptr<Texture> specular;
-
-		float specularAmount;
+		std::shared_ptr<Cubemap> reflectionMap;
 
 		friend class Model;
 	};
@@ -60,7 +65,7 @@ namespace kuai {
 
 		virtual void render()
 		{
-			cubemap->bind();
+			cubemap->bind(0);
 		}
 
 	private:

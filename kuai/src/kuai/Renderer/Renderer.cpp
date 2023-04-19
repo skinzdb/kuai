@@ -102,11 +102,12 @@ namespace kuai {
 
 				if (shader == StaticShader::basic)
 				{
+                    DefaultMaterial* mat = (DefaultMaterial*)mesh->getMaterial().get();
 					shader->setUniform("modelMatrix", renderEntity->getTransform().getModelMatrix());
 					shader->setUniform("model3x3InvTransp", glm::inverseTranspose(glm::mat3(renderEntity->getTransform().getModelMatrix())));
+                    shader->setUniform("material.reflections", mat->reflections);
+                    shader->setUniform("material.shininess", mat->specularAmount);
 				}
-                glActiveTexture(GL_TEXTURE7);
-                glBindTexture(GL_TEXTURE_2D, shadowMap->getDepthAttachment());
                 mesh->render();
             }
         }
