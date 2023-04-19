@@ -193,10 +193,13 @@ namespace kuai {
 		std::shared_ptr<Model> getModel() { return model; }
 		void setModel(std::shared_ptr<Model> model) { this->model = model; }
 
+		bool castsShadows() { return shadows; }
+		void setShadows(bool shadows) { this->shadows = shadows; }
+
 	private:
 		std::shared_ptr<Model> model;
 		
-		bool castShadows = false;
+		bool shadows = true;
 	};
 
 	/** \class Camera

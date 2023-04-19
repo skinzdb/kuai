@@ -44,7 +44,7 @@ namespace kuai {
 		mainLight->addComponent<Light>().setType(Light::LightType::Directional);
 		mainLight->getComponent<Light>().setShadows(true);
 		mainLight->getComponent<Light>().setIntensity(0.5f);
-		mainLight->getTransform().setRot(-60.0f, -60.0f, 0.0f);
+		mainLight->getTransform().setRot(-45.0f, -140.0f, 0.0f);
 	}
 
 	Scene::~Scene()
@@ -157,7 +157,8 @@ namespace kuai {
 
 				shader->setUniform("lights[" + std::to_string(l->getId()) + "].castShadows", l->castsShadows());
 
-				shader->setUniform("lightSpaceMatrix", l->getLightSpaceMatrix());
+				if (l->castsShadows())
+					shader->setUniform("lightSpaceMatrix", l->getLightSpaceMatrix()); // TODO: lightSpaceMatrix per light 
 			}
 		}
 	}

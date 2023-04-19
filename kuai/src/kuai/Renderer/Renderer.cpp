@@ -117,11 +117,18 @@ namespace kuai {
         StaticShader::depth->bind();
         for (auto& renderEntity : renderData->renderEntities)
         {
+            MeshRenderer renderer = renderEntity->getComponent<MeshRenderer>();
+            if (!renderer.castsShadows())
+                continue;
+            
             for (auto& mesh : renderEntity->getComponent<MeshRenderer>().getModel()->getMeshes())
             {
-                StaticShader::depth->setUniform("modelMatrix", renderEntity->getTransform().getModelMatrix());
-                mesh->render();
+                    if (mesh->getMaterial()->getShader() == StaticShader::skybox)
+                        continue;
+                    StaticShader::depth->setUniform("modelMatrix", renderEntity->getTransform().getModelMatrix());
+                    mesh->render();
             }
+            
         } 
     }
 }

@@ -9,8 +9,8 @@
 
 namespace kuai {
 
-	static const uint32_t SHADOW_MAP_SIZE = 2048;	// Total square size of shadow map
-	static const uint32_t LIGHT_SHADOW_SIZE = 2048;  // Square size of each light in the shadow map
+	static const uint32_t SHADOW_MAP_SIZE = 1024;	// Total square size of shadow map
+	static const uint32_t LIGHT_SHADOW_SIZE = 1024;  // Square size of each light in the shadow map
 	static const uint32_t LIGHTS_PER_ROW = SHADOW_MAP_SIZE / LIGHT_SHADOW_SIZE;
 
 	class Renderer
