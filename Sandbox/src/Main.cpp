@@ -15,7 +15,7 @@ class BaseLayer : public kuai::Layer
 {
 public:
 	std::shared_ptr<kuai::Entity> myEntity;
-	std::shared_ptr<kuai::Entity> light;
+	std::shared_ptr<kuai::Entity> pointLight;
 
 	float lastX = (float)kuai::App::get().getWindow().getWidth() / 2.0;
 	float lastY = (float)kuai::App::get().getWindow().getHeight() / 2.0;
@@ -23,6 +23,8 @@ public:
 
 	float speed = 10.0f;
 	float sensitivity = 0.1f;
+
+	float counter = 0;
 
 	std::vector<std::shared_ptr<kuai::Entity>> entities;
 
@@ -37,42 +39,48 @@ public:
 		//auto material = new kuai::DefaultMaterial(tex, tex, 40);
 		//auto model = std::make_shared<kuai::Model>("C:/Users/David/Documents/cs310/backpack/backpack.obj");
 		auto model = std::make_shared<kuai::Model>("C:/Users/David/Documents/bunny.obj");
+		auto cube = std::make_shared<kuai::Model>("C:/Users/David/Documents/cube.obj");
 
 		//model->getMeshes()[0]->setMaterial(material);
 
 		myEntity = scene->createEntity();
 		myEntity->addComponent<kuai::MeshRenderer>(model);
-		myEntity->getTransform().translate(0, -0.6f, -5);
+		myEntity->getTransform().translate(0, -0.1f, -2);
 
-		auto pointLight = scene->createEntity();
-		pointLight->addComponent<kuai::Light>();
-		pointLight->getTransform().setPos(0, 1, -4);
+		auto cubeEntity = scene->createEntity();
+		cubeEntity->addComponent<kuai::MeshRenderer>(cube);
+		cubeEntity->getTransform().setPos(0, -2, -2);
+		cubeEntity->getTransform().setScale(5, 0.5f, 5);
 
-		std::vector<std::string> faces =
-		{
-			"C:/Users/David/Pictures/skybox/right.jpg",
-			"C:/Users/David/Pictures/skybox/left.jpg",
-			"C:/Users/David/Pictures/skybox/top.jpg",
-			"C:/Users/David/Pictures/skybox/bottom.jpg",
-			"C:/Users/David/Pictures/skybox/front.jpg",
-			"C:/Users/David/Pictures/skybox/back.jpg"
-		};
+		// pointLight = scene->createEntity();
+		// pointLight->addComponent<kuai::Light>().setIntensity(0.5f);
+		// pointLight->getTransform().setPos(0, 1, -4);
 
-		auto cubemap = std::make_shared<kuai::Cubemap>(faces);
-		auto skybox = std::make_shared<kuai::Skybox>(cubemap);
+		// std::vector<std::string> faces =
+		// {
+		// 	"C:/Users/David/Pictures/skybox/right.jpg",
+		// 	"C:/Users/David/Pictures/skybox/left.jpg",
+		// 	"C:/Users/David/Pictures/skybox/top.jpg",
+		// 	"C:/Users/David/Pictures/skybox/bottom.jpg",
+		// 	"C:/Users/David/Pictures/skybox/front.jpg",
+		// 	"C:/Users/David/Pictures/skybox/back.jpg"
+		// };
 
-		auto skyboxEntity = scene->createEntity();
-		skyboxEntity->addComponent<kuai::MeshRenderer>(skybox);
+		// auto cubemap = std::make_shared<kuai::Cubemap>(faces);
+		// auto skybox = std::make_shared<kuai::Skybox>(cubemap);
 
-		auto audio = std::make_shared<kuai::AudioClip>("C:/Users/David/Music/jigsaw.wav");
+		// auto skyboxEntity = scene->createEntity();
+		// skyboxEntity->addComponent<kuai::MeshRenderer>(skybox);
 
-		myEntity->addComponent<kuai::AudioSourceComponent>(false);
-		auto a = myEntity->getComponent<kuai::AudioSourceComponent>();
+		//auto audio = std::make_shared<kuai::AudioClip>("C:/Users/David/Music/baka.wav");
 
-		a.source->setAudioClip(audio);
-		a.source->setPitch(1.05f);
-		a.source->setLoop(false);
-		a.source->play();
+		//myEntity->addComponent<kuai::AudioSourceComponent>(true);
+		//auto a = myEntity->getComponent<kuai::AudioSourceComponent>();
+
+		//a.source->setAudioClip(audio);
+		//a.source->setPitch(0.5f);
+		//a.source->setLoop(false);
+		//a.source->play();
 
 		/*std::default_random_engine generator;
 		std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
@@ -106,8 +114,6 @@ public:
 
 
 		}*/
-
-	
 
 	}
 
@@ -147,6 +153,23 @@ public:
 			scene->getMainCam().getTransform().translate(0, -0.5f, 0);
 		}
 
+
+		if (kuai::Input::isKeyPressed(kuai::Key::R))
+		{
+			KU_CORE_WARN("{0},{1},{2}", scene->getMainLight().getTransform().getPos().x, scene->getMainLight().getTransform().getPos().y, scene->getMainLight().getTransform().getPos().z);
+
+		    		scene->getMainLight().getTransform().translate(0, 0.1f, 0);
+		}
+
+				if (kuai::Input::isKeyPressed(kuai::Key::F))
+		{
+			KU_CORE_WARN("{0},{1},{2}", scene->getMainLight().getTransform().getPos().x, scene->getMainLight().getTransform().getPos().y, scene->getMainLight().getTransform().getPos().z);
+
+		    		scene->getMainLight().getTransform().translate(0, -0.1f, 0);
+		}
+
+		counter += dt;
+		
 		//myEntity->getTransform().translate(0, 0, -0.05);
 	}
 

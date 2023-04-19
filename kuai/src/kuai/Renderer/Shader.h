@@ -19,10 +19,8 @@ namespace kuai {
 		void setUniform(const std::string& name, const glm::mat3& val) const;
 		void setUniform(const std::string& name, const glm::mat4& val) const;
 
-		uint32_t createUniformBlock(const std::string& name, uint32_t binding);
-		void setUniform(uint32_t bufId, const void* data, uint32_t size, uint32_t offset = 0) const;
-
-		void deleteBuffer(uint32_t bufId);
+		void createUniformBlock(const std::string& name, const std::vector<const char*>& members, uint32_t binding);
+		void setUniform(const std::string& name, const std::string& member, const void* data, uint32_t size) const;
 
 		void bind();
 		void unbind();
@@ -36,7 +34,9 @@ namespace kuai {
 		int fragShaderId;
 
 		std::unordered_map<std::string, uint32_t> uniforms;
-		//std::unordered_map<std::string, uint32_t> ubos;
+		// Static maps of UBOs and member offsets as they are shared between all shaders
+		static std::unordered_map<std::string, uint32_t> ubos;
+		static std::unordered_map<std::string, uint32_t> uboOffsets;
 
 		friend class StaticShader;
 	};

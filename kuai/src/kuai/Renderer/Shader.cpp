@@ -4,6 +4,9 @@
 #include <glad/glad.h>
 
 namespace kuai {
+	std::unordered_map<std::string, uint32_t> Shader::ubos = std::unordered_map<std::string, uint32_t>();
+	std::unordered_map<std::string, uint32_t> Shader::uboOffsets = std::unordered_map<std::string, uint32_t>();
+
 	Shader::Shader(const std::string& vertSrc, const std::string& fragSrc)
 	{
 		programId = glCreateProgram();
@@ -16,6 +19,9 @@ namespace kuai {
 	{
 		unbind();
 		
+		for (auto& pair : ubos)
+			glDeleteBuffers(1, &pair.second);
+
 		if (programId)
 			glDeleteProgram(programId);
 	}
@@ -63,12 +69,24 @@ namespace kuai {
 		glUniformMatrix4fv(uniforms.at(name), 1, GL_FALSE, &val[0][0]);
 	}
 
-	uint32_t Shader::createUniformBlock(const std::string& name, uint32_t binding)
+	void Shader::createUniformBlock(const std::string& name, const std::vector<const char*>& members, uint32_t binding)
 	{
 		// Get block index and block size
 		uint32_t blockIndex = glGetUniformBlockIndex(programId, name.c_str());
 		int blockSize;
-		glGetActiveUniformBlockiv(programId, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);	
+		glGetActiveUniformBlockiv(programId, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+
+		// Get indices of member variables, and then their offsets
+		GLuint* indices = new GLuint[members.size()];
+		glGetUniformIndices(programId, members.size(), &members[0], indices);
+		GLint* offsets = new GLint[members.size()];
+		glGetActiveUniformsiv(programId, members.size(), indices, GL_UNIFORM_OFFSET, offsets);
+
+		for (size_t i = 0; i < members.size(); i++)
+			uboOffsets[members[i]] = offsets[i];
+
+		delete[] indices;
+		delete[] offsets;
 
 		// Create uniform buffer object
 		uint32_t ubo;
@@ -77,17 +95,12 @@ namespace kuai {
 		glBufferData(GL_UNIFORM_BUFFER, blockSize, nullptr, GL_STATIC_DRAW);
 		glBindBufferBase(GL_UNIFORM_BUFFER, binding, ubo);
 
-		return ubo;
+		ubos[name] = ubo;
 	}
 
-	void Shader::setUniform(uint32_t bufId, const void* data, uint32_t size, uint32_t offset) const
+	void Shader::setUniform(const std::string& name, const std::string& member, const void* data, uint32_t size) const
 	{
-		glNamedBufferSubData(bufId, offset, size, data);
-	}
-
-	void Shader::deleteBuffer(uint32_t bufId)
-	{
-		glDeleteBuffers(1, &bufId);
+		glNamedBufferSubData(ubos.at(name), uboOffsets.at(member), size, data);
 	}
 
 	void Shader::bind()

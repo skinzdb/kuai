@@ -12,23 +12,25 @@ namespace kuai {
 		ECS = new EntityComponentSystem();
 
 		ECS->registerComponent<Transform>();
-		ECS->registerComponent<Camera>();
+		ECS->registerComponent<CameraComponent>();
 		ECS->registerComponent<Light>();
 		ECS->registerComponent<MeshRenderer>();
 		ECS->registerComponent<AudioListener>();
 		ECS->registerComponent<AudioSourceComponent>();
 
-		this->renderSys = ECS->registerSystem<RenderSystem>(this);
+		renderSys = ECS->registerSystem<RenderSystem>(this);
 		ECS->setSystemMask<RenderSystem>(BIT(ECS->getComponentType<MeshRenderer>()));
 
-		this->cameraSys = ECS->registerSystem<CameraSystem>(this);
-		ECS->setSystemMask<CameraSystem>(BIT(ECS->getComponentType<Camera>()));
-
-		this->lightSys = ECS->registerSystem<LightSystem>(this);
+		lightSys = ECS->registerSystem<LightSystem>(this);
 		ECS->setSystemMask<LightSystem>(BIT(ECS->getComponentType<Light>()));
+		lightSys->setRenderSystem(renderSys);
+
+		cameraSys = ECS->registerSystem<CameraSystem>(this);
+		ECS->setSystemMask<CameraSystem>(BIT(ECS->getComponentType<CameraComponent>()));
+		cameraSys->setRenderSystem(renderSys);
 
 		mainCam = createEntity();
-		mainCam->addComponent<Camera>(
+		mainCam->addComponent<CameraComponent>(
 			70.0f, 
 			(float)App::get().getWindow().getWidth(),
 			(float)App::get().getWindow().getHeight(),
@@ -36,9 +38,12 @@ namespace kuai {
 			100.0f
 		);
 		mainCam->addComponent<AudioListener>();
+		cameraSys->setMainCam(mainCam->getComponent<CameraComponent>());
 
 		mainLight = createEntity();
-		mainLight->addComponent<Light>(0.1f);
+		mainLight->addComponent<Light>().setType(Light::LightType::Directional);
+		mainLight->getComponent<Light>().setShadows(true);
+		mainLight->getComponent<Light>().setIntensity(0.5f);
 		mainLight->getTransform().setRot(-60.0f, -60.0f, 0.0f);
 	}
 
@@ -66,14 +71,15 @@ namespace kuai {
 		ECS->destroyEntity(entity);
 	}
 
-	Camera& Scene::getMainCam()
+	CameraComponent& Scene::getMainCam()
 	{
-		return mainCam->getComponent<Camera>();
+		return mainCam->getComponent<CameraComponent>();
 	}
 
-	void Scene::setMainCam(Camera& cam)
+	void Scene::setMainCam(CameraComponent& cam)
 	{
-		this->mainCam->getComponent<Camera>() = cam;
+		this->mainCam->getComponent<CameraComponent>() = cam;
+		cameraSys->setMainCam(cam);
 	}
 
 	Light& Scene::getMainLight()
@@ -90,7 +96,6 @@ namespace kuai {
 	{
 		lightSys->update(dt);
 		cameraSys->update(dt);
-		renderSys->update(dt);
 	}
 
 	RenderSystem::RenderSystem(Scene* scene) : System(scene)
@@ -104,18 +109,13 @@ namespace kuai {
 	{
 		KU_PROFILE_FUNCTION();
 
-		Renderer::clear();
-		for (auto& entity : entities)
-		{
-			MeshRenderer m = entity->getComponent<MeshRenderer>();
-			for (auto& mesh : m.getModel()->getMeshes())
-			{
-				mesh->getMaterial()->getShader()->getData()->modelMatrix = entity->getTransform().getModelMatrix();
-				mesh->getMaterial()->getShader()->updateTransform();
+		Renderer::updateShadowMap(scene->getMainLight()); // TODO: put in a function that gets called when objects change within light's range or light moves...
 
-				Renderer::render(*mesh);
-			}
-		}
+		Renderer::setViewport(0, 0, App::get().getWindow().getWidth(), App::get().getWindow().getHeight());
+		Renderer::clear();
+
+		Renderer::setMeshes(entities);
+		Renderer::render();
 	}
 
 	void RenderSystem::onLightChanged(LightChangedEvent* event)
@@ -125,8 +125,39 @@ namespace kuai {
 			MeshRenderer m = entity->getComponent<MeshRenderer>();
 			for (auto& mesh : m.getModel()->getMeshes())
 			{
-				mesh->getMaterial()->getShader()->getData()->light = event->light;
-				mesh->getMaterial()->getShader()->updateLight();
+				Shader* shader = mesh->getMaterial()->getShader();
+				if (shader != StaticShader::basic)
+					continue;
+
+				Light* l = event->light;
+
+				shader->bind();
+
+				// shader->setUniform("Lights", "lights[" + std::to_string(l->getId()) + "].type", &type, sizeof(int));
+
+				// shader->setUniform("Lights", "lights[" + std::to_string(l->getId()) + "].pos", &l->getTransform().getPos()[0], sizeof(glm::vec3));
+				// shader->setUniform("Lights", "lights[" + std::to_string(l->getId()) + "].dir", &l->getTransform().getForward()[0], sizeof(glm::vec3));
+				// shader->setUniform("Lights", "lights[" + std::to_string(l->getId()) + "].col", &l->getCol()[0], sizeof(glm::vec3));
+
+				// shader->setUniform("Lights", "lights[" + std::to_string(l->getId()) + "].intensity", &intensity, sizeof(float));
+				// shader->setUniform("Lights", "lights[" + std::to_string(l->getId()) + "].linear", &linear, sizeof(float));
+				// shader->setUniform("Lights", "lights[" + std::to_string(l->getId()) + "].quadratic", &quadratic, sizeof(float));
+				// shader->setUniform("Lights", "lights[" + std::to_string(l->getId()) + "].cutoff", &cutoff, sizeof(float));
+
+				shader->setUniform("lights[" + std::to_string(l->getId()) + "].type",  (int)l->getType());
+
+				shader->setUniform("lights[" + std::to_string(l->getId()) + "].pos", l->getTransform().getPos());
+				shader->setUniform("lights[" + std::to_string(l->getId()) + "].dir", l->getTransform().getForward());
+				shader->setUniform("lights[" + std::to_string(l->getId()) + "].col", l->getCol());
+
+				shader->setUniform("lights[" + std::to_string(l->getId()) + "].intensity", l->getIntensity());
+				shader->setUniform("lights[" + std::to_string(l->getId()) + "].linear", l->getLinear());
+				shader->setUniform("lights[" + std::to_string(l->getId()) + "].quadratic", l->getQuadratic());
+				shader->setUniform("lights[" + std::to_string(l->getId()) + "].cutoff", glm::cos(glm::radians(l->getAngle())));
+
+				shader->setUniform("lights[" + std::to_string(l->getId()) + "].castShadows", l->castsShadows());
+
+				shader->setUniform("lightSpaceMatrix", l->getLightSpaceMatrix());
 			}
 		}
 	}
@@ -138,25 +169,49 @@ namespace kuai {
 			MeshRenderer m = entity->getComponent<MeshRenderer>();
 			for (auto& mesh : m.getModel()->getMeshes())
 			{
-				mesh->getMaterial()->getShader()->getData()->projectionMatrix = event->cam->getProjectionMatrix();
-				mesh->getMaterial()->getShader()->getData()->viewMatrix = event->cam->getViewMatrix();
-				mesh->getMaterial()->getShader()->getData()->viewPos = event->cam->getTransform().getPos();
+				Shader* shader = mesh->getMaterial()->getShader();
+				CameraComponent* c = event->cam;
 
-				mesh->getMaterial()->getShader()->updateCamera();
+				shader->bind();
+
+				shader->setUniform("Matrices", "projectionMatrix", &c->cam.getProjectionMatrix()[0][0], sizeof(glm::mat4));
+				shader->setUniform("Matrices", "viewMatrix", &c->cam.getViewMatrix()[0][0], sizeof(glm::mat4));
+
+				if (shader == StaticShader::basic)
+					shader->setUniform("viewPos", c->getTransform().getPos());
 			}
 		}
+	}
+
+	void CameraSystem::setMainCam(CameraComponent& cam)
+	{
+		for (auto& entity : entities) 
+			entity->getComponent<CameraComponent>().isMain = false;
+
+		cam.isMain = true;
 	}
 
 	void CameraSystem::update(float dt)
 	{
 		for (auto& entity : entities)
 		{
-			Camera c = entity->getComponent<Camera>();
+			CameraComponent c = entity->getComponent<CameraComponent>();
+
 			if (c.changed)
 			{
 				CameraChangedEvent e(&c);
 				scene->notifySystems(&e);
 				c.changed = false;
+			}
+			if (c.cam.getTarget())
+			{
+				c.cam.getTarget()->bind();
+				renderSys->update(dt);
+				c.cam.getTarget()->unbind();
+			}
+			else if (c.isMain)
+			{
+				renderSys->update(dt);
 			}
 		}
 	}

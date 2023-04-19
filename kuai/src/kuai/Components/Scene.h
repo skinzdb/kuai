@@ -57,8 +57,8 @@ namespace kuai {
 			ECS->subscribeSystem(instance, memberFn);
 		}
 
-		Camera& getMainCam();
-		void setMainCam(Camera& cam);
+		CameraComponent& getMainCam();
+		void setMainCam(CameraComponent& cam);
 
 		Light& getMainLight();
 		void setMainLight(Light& light);
@@ -95,15 +95,27 @@ namespace kuai {
 	public:
 		CameraSystem(Scene* scene) : System(scene) { acceptsSubset = true; }
 
+		void setRenderSystem(std::shared_ptr<RenderSystem> renderSys) { this->renderSys = renderSys; }
+
+		void setMainCam(CameraComponent& cam);
+
 		virtual void update(float dt);
+
+	private:
+		std::shared_ptr<RenderSystem> renderSys;
 	};
 
 	class LightSystem : public System
 	{
 	public:
 		LightSystem(Scene* scene) : System(scene) { acceptsSubset = true; }
+		
+		void setRenderSystem(std::shared_ptr<RenderSystem> renderSys) { this->renderSys = renderSys; }
 
 		virtual void update(float dt);
+
+	private:
+		std::shared_ptr<RenderSystem> renderSys;
 	};
 
 	//class PhysicsSystem : public System
@@ -123,6 +135,4 @@ namespace kuai {
 	//		}
 	//	}
 	//};
-
-
 }

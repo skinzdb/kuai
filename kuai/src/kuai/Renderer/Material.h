@@ -16,11 +16,11 @@ namespace kuai {
 	public:
 		virtual void render() = 0;
 
-		void setShader(IShader* shader) { this->shader = shader; };
-		IShader* getShader() { return shader; }
+		void setShader(Shader* shader) { this->shader = shader; };
+		Shader* getShader() { return shader; }
 
 	protected:
-		IShader* shader = nullptr;
+		Shader* shader = nullptr;
 	};
 
 	class DefaultMaterial : public Material
@@ -34,8 +34,6 @@ namespace kuai {
 
 		virtual void render()
 		{
-			shader->update();
-
 			diffuse->bind(0);
 			specular->bind(1);
 		}
@@ -62,8 +60,6 @@ namespace kuai {
 
 		virtual void render()
 		{
-			shader->update();
-
 			cubemap->bind();
 		}
 

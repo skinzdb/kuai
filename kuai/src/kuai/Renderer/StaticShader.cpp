@@ -3,57 +3,40 @@
 
 #include "kuai/Components/Components.h"
 
-#include "glm/gtc/matrix_inverse.hpp"
-
 namespace kuai {
-	IShader* StaticShader::basic = nullptr;
-	IShader* StaticShader::skybox = nullptr;
-	std::unordered_map<std::string, uint32_t> StaticShader::ubos = std::unordered_map<std::string, uint32_t>();
-
-	IShader::IShader(const std::string& vertSrc, const std::string& fragSrc) : Shader(vertSrc, fragSrc), shaderData(std::make_shared<ShaderData>())
-	{
-	}
-
-	void IShader::updateTransform()
-	{
-		bind();
-
-		setUniform("modelMatrix", shaderData->modelMatrix);
-		setUniform("model3x3InvTransp", glm::inverseTranspose(glm::mat3(shaderData->modelMatrix)));
-	}
-
-	void IShader::updateCamera()
-	{
-		bind();
-
-		setUniform(StaticShader::getUboId("Matrices"), &shaderData->projectionMatrix[0][0], sizeof(glm::mat4));
-		setUniform(StaticShader::getUboId("Matrices"), &shaderData->viewMatrix[0][0], sizeof(glm::mat4), sizeof(glm::mat4));
-	}
-
+	Shader* StaticShader::basic = nullptr;
+	Shader* StaticShader::skybox = nullptr;
+	Shader* StaticShader::depth = nullptr;
+	
 	const char* DEFAULT_VERT = R"(
 		#version 450
 		layout (location = 0) in vec3 pos;
 		layout (location = 1) in vec3 normal;
 		layout (location = 2) in vec2 texCoord;
 
-		layout (std140, binding = 0) uniform Matrices
+		layout (binding = 0) uniform Matrices
 		{
 			mat4 projectionMatrix;
 			mat4 viewMatrix;
 		};		
 
 		uniform mat4 modelMatrix;
-		uniform mat3 model3x3InvTransp; // Used to calculate proper world position of normals		
+		uniform mat3 model3x3InvTransp; // Used to calculate proper world position of normals	
+
+		uniform mat4 lightSpaceMatrix;	
 
 		out vec4 worldPos;
 		out vec3 worldNorm;
 		out vec2 texCoords;
+		out vec4 lightSpace;
 
 		void main()
 		{
 			worldPos = modelMatrix * vec4(pos, 1.0);
 			worldNorm = model3x3InvTransp * normal;
 			texCoords = texCoord;
+			lightSpace = lightSpaceMatrix * worldPos;
+
 			gl_Position = projectionMatrix * viewMatrix * worldPos;
 		}
 	)";
@@ -74,19 +57,22 @@ namespace kuai {
 			float linear;
 			float quadratic;
 			float cutoff;
+
+			int castShadows;
 		};
 
 		uniform Light lights[MAX_LIGHTS];
-		//layout (shared) uniform Lights
-		//{
-		//	Light lights[MAX_LIGHTS];
-		//};
+		// layout (binding = 1) uniform Lights
+		// {
+		// 	Light lights[MAX_LIGHTS];
+		// };
 
 		out vec4 fragCol;
 
 		in vec4 worldPos;
 		in vec3 worldNorm;
 		in vec2 texCoords;
+		in vec4 lightSpace;
 
 		uniform vec3 viewPos;
 
@@ -97,6 +83,39 @@ namespace kuai {
 			float shininess;
 		};
 		uniform Material material;
+
+		uniform sampler2D shadowMap;
+
+		float calcShadow(vec4 lightSpace, vec3 lightDir)
+		{
+			// Perform perspective divide and transform to NDC coords
+  			vec3 projCoords = lightSpace.xyz / lightSpace.w;
+			projCoords = projCoords * 0.5 + 0.5;		
+
+			float closestDepth = texture(shadowMap, projCoords.xy).r;
+			float currentDepth = projCoords.z;
+			
+			// Add bias to remove shadow acne
+			float bias = max(0.05 * (1.0 - dot(worldNorm, lightDir)), 0.005);  
+
+			// Use PCF to sample current texel and 8 surrounding texels to create smoother shadows
+			float shadow = 0.0;
+			vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+			for(int x = -1; x <= 1; x++)
+			{
+				for(int y = -1; y <= 1; y++)
+				{
+					float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
+					shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+				}    
+			}
+			shadow /= 9.0;
+
+			if(projCoords.z > 1.0) // No shadows if fragment is past far plane
+        		shadow = 0.0;
+
+			return shadow;
+		}
 
 		void main()
 		{
@@ -112,6 +131,7 @@ namespace kuai {
 				if (lights[i].type == 0) // Directional Light
 				{
 					lightDir = normalize(-lights[i].dir);
+					//lightDir = normalize(lights[i].pos - worldPos.xyz);
 					factor = lights[i].intensity;
 				} 
 				else
@@ -145,74 +165,71 @@ namespace kuai {
 				float spec = pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
 				vec3 specular = spec * vec3(texture(material.specular, texCoords));
 
-				finalCol += (ambient + diffuse + specular) * factor;
+				float shadow = 0.0;
+				if (lights[i].castShadows)
+				{
+					shadow = calcShadow(lightSpace, lightDir);      
+				}
+				 
+				finalCol += (ambient + (1.0 - shadow) * (diffuse + specular)) * factor;
 			}
 
 			fragCol = vec4(finalCol, 1.0);
 		}
 	)";
 
-	DefaultShader::DefaultShader() : IShader(DEFAULT_VERT, DEFAULT_FRAG)
+	DefaultShader::DefaultShader() : Shader(DEFAULT_VERT, DEFAULT_FRAG)
 	{
 		bind();
+
+		createUniformBlock("Matrices", { "projectionMatrix", "viewMatrix" }, 0);
+		
+		// std::vector<std::string> lightNames;
+		// std::vector<const char*> lightNamesC;
+		// for (size_t i = 0; i < MAX_LIGHTS; i++)	// TODO: HORRIBLE DISGUSTING CODE
+		// {
+		// 	lightNames.push_back("lights[" + std::to_string(i) + "].type");
+		// 	lightNames.push_back("lights[" + std::to_string(i) + "].pos");
+		// 	lightNames.push_back("lights[" + std::to_string(i) + "].dir");
+		// 	lightNames.push_back("lights[" + std::to_string(i) + "].col");
+		// 	lightNames.push_back("lights[" + std::to_string(i) + "].intensity");
+		// 	lightNames.push_back("lights[" + std::to_string(i) + "].linear");
+		// 	lightNames.push_back("lights[" + std::to_string(i) + "].quadratic");
+		// 	lightNames.push_back("lights[" + std::to_string(i) + "].cutoff");
+		// }
+		// for (auto& name : lightNames)
+		// 	lightNamesC.push_back(name.c_str());
+		// createUniformBlock("Lights", lightNamesC, 1);
+
+		for (size_t i = 0; i < MAX_LIGHTS; i++)
+		{
+			createUniform("lights[" + std::to_string(i) + "].type");
+			createUniform("lights[" + std::to_string(i) + "].pos");
+			createUniform("lights[" + std::to_string(i) + "].dir");
+			createUniform("lights[" + std::to_string(i) + "].col");
+			createUniform("lights[" + std::to_string(i) + "].intensity");
+			createUniform("lights[" + std::to_string(i) + "].linear");
+			createUniform("lights[" + std::to_string(i) + "].quadratic");
+			createUniform("lights[" + std::to_string(i) + "].cutoff");
+			createUniform("lights[" + std::to_string(i) + "].castShadows");
+		}
 
 		createUniform("modelMatrix");
 		createUniform("model3x3InvTransp");
 
-		for (int i = 0; i < MAX_LIGHTS; i++)
-		{
-			createUniform("lights[" + std::to_string(i) + "].type");
-
-			createUniform("lights[" + std::to_string(i) + "].pos");
-			createUniform("lights[" + std::to_string(i) + "].dir");
-			createUniform("lights[" + std::to_string(i) + "].col");
-
-			createUniform("lights[" + std::to_string(i) + "].intensity");
-
-			createUniform("lights[" + std::to_string(i) + "].linear");
-			createUniform("lights[" + std::to_string(i) + "].quadratic");
-
-			createUniform("lights[" + std::to_string(i) + "].cutoff");
-		}
-
 		createUniform("material.diffuse");
 		createUniform("material.specular");
-		createUniform("material.shininess");
 		setUniform("material.diffuse", 0);
 		setUniform("material.specular", 1);
 
+		createUniform("material.shininess");
 		setUniform("material.shininess", 35.0f);
 
+		createUniform("lightSpaceMatrix");
+		createUniform("shadowMap");
+		setUniform("shadowMap", 7);
+
 		createUniform("viewPos");
-	}
-
-	void DefaultShader::updateLight()
-	{
-		Light* l = shaderData->light;
-
-		KU_CORE_ASSERT(l->getId() < MAX_LIGHTS, "Exceeded maximum number of lights");
-
-		bind();
-
-		setUniform("lights[" + std::to_string(l->getId()) + "].type", (int)l->getType());
-
-		setUniform("lights[" + std::to_string(l->getId()) + "].pos", l->getTransform().getPos());
-		setUniform("lights[" + std::to_string(l->getId()) + "].dir", l->getTransform().getForward());
-		setUniform("lights[" + std::to_string(l->getId()) + "].col", l->getCol());
-
-		setUniform("lights[" + std::to_string(l->getId()) + "].intensity", l->getIntensity());
-
-		setUniform("lights[" + std::to_string(l->getId()) + "].linear", l->getLinear());
-		setUniform("lights[" + std::to_string(l->getId()) + "].quadratic", l->getQuadratic());
-
-		setUniform("lights[" + std::to_string(l->getId()) + "].cutoff", glm::cos(glm::radians(l->getAngle())));
-	}
-
-	void DefaultShader::updateCamera()
-	{
-		IShader::updateCamera();
-
-		setUniform("viewPos", shaderData->viewPos);
 	}
 
 	const char* SKYBOX_VERT = R"(
@@ -250,7 +267,7 @@ namespace kuai {
 		}
 	)";
 
-	SkyboxShader::SkyboxShader() : IShader(SKYBOX_VERT, SKYBOX_FRAG)
+	SkyboxShader::SkyboxShader() : Shader(SKYBOX_VERT, SKYBOX_FRAG)
 	{
 		bind();
 
@@ -258,26 +275,47 @@ namespace kuai {
 		setUniform("skybox", 0);
 	}
 
+	const char* DEPTH_VERT = R"(
+		#version 450
+		layout (location = 0) in vec3 pos;
+
+		uniform mat4 lightSpaceMatrix;
+		uniform mat4 modelMatrix;
+
+		void main()
+		{
+			gl_Position = lightSpaceMatrix * modelMatrix * vec4(pos, 1.0);
+		}
+	)";
+
+	const char* DEPTH_FRAG = R"(
+		#version 450
+		// out float fragDepth;
+		void main()
+		{
+			// fragDepth = gl_FragCoord.z; (Handled by OpenGL)
+		}
+	)";
+
+	DepthShader::DepthShader() : Shader(DEPTH_VERT, DEPTH_FRAG)
+	{
+		bind();
+
+		createUniform("lightSpaceMatrix");
+		createUniform("modelMatrix");
+	}
+
 	void StaticShader::init()
 	{
 		basic = new DefaultShader();
-		ubos["Matrices"] = basic->createUniformBlock("Matrices", 0);
-
 		skybox = new SkyboxShader();
+		depth = new DepthShader();
 	}
 
 	void StaticShader::cleanup()
 	{
-		basic->bind();
-		basic->deleteBuffer(ubos.at("Matrices"));
-		delete basic;
-
-		delete skybox;
-	}
-
-	uint32_t StaticShader::getUboId(const std::string& name)
-	{
-		return ubos.at(name);
+		//delete basic;
+		//delete skybox;
 	}
 }
 

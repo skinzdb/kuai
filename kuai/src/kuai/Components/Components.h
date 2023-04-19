@@ -1,13 +1,18 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#include <glm/gtx/quaternion.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtx/quaternion.hpp"
 
 #include "kuai/Core/Core.h"
+
 #include "kuai/Renderer/Mesh.h"
 #include "kuai/Renderer/Model.h"
 #include "kuai/Renderer/Material.h"
+#include "kuai/Renderer/Framebuffer.h"
+#include "kuai/Renderer/Camera.h"
+
 #include "kuai/Sound/AudioClip.h"
+
 #include "kuai/Events/Event.h"
 
 namespace kuai {
@@ -48,7 +53,6 @@ namespace kuai {
 	{
 	public:
 		Transform(Entity* entity) : Component(entity) {}
-
 		Transform(Entity* entity, glm::vec3& pos) : Component(entity), pos(pos) {}
 
 		glm::vec3 getPos() { return pos; }
@@ -177,9 +181,7 @@ namespace kuai {
 	{
 	public:
 		MeshRenderer(Entity* entity) : Component(entity) {}
-
 		MeshRenderer(Entity* entity, std::shared_ptr<Model> model) : Component(entity), model(model) {}
-
 		MeshRenderer(Entity* entity, std::shared_ptr<Mesh> mesh) : Component(entity), model(std::make_shared<Model>(mesh)) {}
 
 		void render()
@@ -197,6 +199,36 @@ namespace kuai {
 		bool castShadows = false;
 	};
 
+	/** \class Camera
+	*	\brief
+	*/
+	class CameraComponent : public Component
+	{
+	public:
+		CameraComponent(Entity* entity, float fov, float width, float height, float zNear, float zFar) : Component(entity)
+		{
+			cam.setAspect(width, height);
+			cam.setPerspective(fov, zNear, zFar);
+			changed = true;
+		}
+		
+		CameraComponent(Entity* entity) : Component(entity) { changed = true; }	
+		
+		Camera cam;
+
+		bool isMain = false;
+	};
+
+	struct CameraChangedEvent : public Event
+	{
+		CameraChangedEvent(CameraComponent* cam) : cam(cam) {}
+
+		EVENT_CLASS_TYPE(EventType::CameraChanged);
+		EVENT_CLASS_CATEGORY(0);
+
+		CameraComponent* cam;
+	};
+
 	class LightCounter
 	{
 	public:
@@ -204,7 +236,7 @@ namespace kuai {
 	};
 
 	/** \class Light
-	*	\brief 
+	*	\brief
 	*/
 	class Light : public Component
 	{
@@ -216,30 +248,20 @@ namespace kuai {
 			Spot = 2
 		};
 
-		Light(Entity* entity, LightType type, float intensity, float linear, float quadratic, float angle)
-			: Component(entity), intensity(intensity), linear(linear), quadratic(quadratic), angle(angle), type(type) 
+		Light(Entity* entity) : Component(entity), lightId(LightCounter::lightCount++)
 		{
-			lightId = LightCounter::lightCount++;
+			shadowCam.setAspect(1, 1);
+			shadowCam.setOrtho(20.0f, -10.0f, 10.0f);
+			shadowCam.updateViewMatrix(getTransform().getPos(), getTransform().getRot());
+			calcLightSpaceMatrix();
 			changed = true;
 		}
-
-		Light(Entity* entity, float intensity) 
-			: Light(entity, LightType::Directional, intensity, 0.2f, 0.2f, 30.0f) {}
-
-		Light(Entity* entity, float intensity, float linear, float quadratic)
-			: Light(entity, LightType::Point, intensity, linear, quadratic, 30.0f) {}
-
-		Light(Entity* entity) : Light(entity, LightType::Point, 1.0f, 0.2f, 0.2f, 30.0f) {}
 
 		LightType getType() { return type; }
 		void setType(LightType type) { this->type = type; changed = true; }
 
 		glm::vec3 getCol() { return col; }
-		void setCol(const glm::vec3& col) 
-		{ 
-			this->col = col; 
-			changed = true;
-		}
+		void setCol(const glm::vec3& col) { this->col = col; changed = true; }
 		void setCol(float x, float y, float z) { setCol({ x, y, z }); }
 
 		float getIntensity() { return intensity; }
@@ -252,22 +274,35 @@ namespace kuai {
 		float getAngle() { return angle; }
 		void setAngle(float angle) { this->angle = angle; changed = true; }
 
+		void setShadows(bool enabled) { shadows = enabled; }
+		bool castsShadows() { return shadows; }
+
 		uint32_t getId() { return lightId; }
 
+	public: // TODO: Should not be public, use friend class
+		glm::mat4& getLightSpaceMatrix() { return lightSpaceMatrix; }
+		void calcLightSpaceMatrix() { lightSpaceMatrix = shadowCam.getProjectionMatrix() * shadowCam.getViewMatrix(); }
+
 	private:
+		uint32_t lightId = 0;
+
 		LightType type = LightType::Point;
 
 		glm::vec3 col = { 1.0f, 1.0f, 1.0f };
 		float intensity = 1;
 
 		// Only used for point light and spot light (attenuation values)
-		float linear = 0.2f;	
-		float quadratic = 0.2f;
+		float linear = 0.1f;
+		float quadratic = 0.025f;
 
 		// Only used for spot light
 		float angle = 30;
 
-		uint32_t lightId = 0;
+		bool shadows = false;
+		Camera shadowCam;
+		glm::mat4 lightSpaceMatrix;
+
+		friend class Transform;
 	};
 
 	class LightChangedEvent : public Event
@@ -279,83 +314,6 @@ namespace kuai {
 		EVENT_CLASS_CATEGORY(0);
 
 		Light* light;
-	};
-	
-	/** \class Camera
-	*	\brief
-	*/
-	class Camera : public Component
-	{
-	public:
-		enum class ProjectionType
-		{
-			Perspective,
-			Ortho
-		};
-
-		Camera(Entity* entity) : Component(entity) { changed = true; }
-
-		Camera(Entity* entity, float fov, float width, float height, float zNear, float zFar) 
-			: Component(entity), aspect(width / height) 
-		{ 
-			setPerspective(fov, zNear, zFar); 
-			updateViewMatrix(glm::vec3(0.0f), glm::vec3(0.0f));
-		}
-
-		void setPerspective(float fov, float zNear, float zFar)
-		{
-			projectionType = ProjectionType::Perspective;
-			this->fov = glm::radians(fov);
-			this->zNear = zNear;
-			this->zFar = zFar;
-			updateProjectionMatrix();
-		}
-		void setOrtho(float size, float zNear, float zFar)
-		{
-			projectionType = ProjectionType::Ortho;
-			this->orthoSize = size;
-			this->orthoNear = zNear;
-			this->orthoFar = zFar;
-			updateProjectionMatrix();
-		}
-		void setAspect(float width, float height)
-		{
-			aspect = width / height;
-		}
-
-		inline glm::mat4& getViewMatrix()  { return viewMatrix; }
-		inline glm::mat4& getProjectionMatrix() { return projectionMatrix; }
-
-		void updateViewMatrix(glm::vec3 pos, glm::vec3 rot);
-
-	private:
-		void updateProjectionMatrix();
-
-	private:
-		ProjectionType projectionType = ProjectionType::Perspective;
-
-		glm::mat4 viewMatrix = glm::mat4(1.0f);
-		glm::mat4 projectionMatrix = glm::mat4(1.0f);
-
-		float aspect = 1.0f;
-
-		// Perspective params
-		float fov = glm::radians(60.0f);
-		float zNear = 0.01f, zFar = 100.0f;
-
-		// Ortho params
-		float orthoSize = 10.0f;
-		float orthoNear = -1.0f, orthoFar = 1.0f;
-	};
-
-	struct CameraChangedEvent : public Event
-	{
-		CameraChangedEvent(Camera* cam) : cam(cam) {}
-
-		EVENT_CLASS_TYPE(EventType::CameraChanged);
-		EVENT_CLASS_CATEGORY(0);
-
-		Camera* cam;
 	};
 
 	// Forward declarations

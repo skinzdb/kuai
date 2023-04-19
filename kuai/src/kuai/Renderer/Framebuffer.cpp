@@ -14,12 +14,6 @@ namespace kuai {
 		reset();
 	}
 
-	Framebuffer::Framebuffer() // Default framebuffer, don't do anything
-	{
-		props.width = 1280;
-		props.height = 720;
-	}
-
 	Framebuffer::~Framebuffer()
 	{
 		glDeleteFramebuffers(1, &frameBufId);
@@ -27,10 +21,20 @@ namespace kuai {
 		glDeleteTextures(1, &depthAttachment);
 	}
 
+	const uint32_t Framebuffer::getDepthAttachment()
+	{
+		return depthAttachment;
+	}
+
+	const std::vector<uint32_t>& Framebuffer::getColAttachments()
+	{
+		return colAttachments;
+	}
+
 	void Framebuffer::bind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, frameBufId);
-		glViewport(0, 0, props.width, props.height);
+		// glViewport(0, 0, props.width, props.height);
 	}
 
 	void Framebuffer::unbind()
@@ -86,8 +90,8 @@ namespace kuai {
 		else
 		{
 			// Depth-only framebuffer so specify no drawing (or reading)
-			glReadBuffer(GL_NONE);
 			glDrawBuffer(GL_NONE);
+			// glReadBuffer(GL_NONE);
 		}
 
 		// Add depth attachment
@@ -125,19 +129,22 @@ namespace kuai {
 		bool multisampling = props.samples > 1;
 		if (multisampling)
 		{
-			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, props.samples, GL_DEPTH24_STENCIL8, props.width, props.height, GL_FALSE);
+			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, props.samples, GL_DEPTH_ATTACHMENT, props.width, props.height, GL_FALSE);
 		}
 		else
 		{
-			glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, props.width, props.height);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, props.width, props.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+			// Add border so everything sampled outside of depth map range is set to 1.0
+			float borderCol[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderCol);  
 		}
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, getTextureTarget(multisampling), depthAttachment, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, getTextureTarget(multisampling), depthAttachment, 0);
 	}
 
 	unsigned int Framebuffer::getTextureTarget(bool multisampling)

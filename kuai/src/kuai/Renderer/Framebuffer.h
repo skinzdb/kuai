@@ -14,8 +14,10 @@ namespace kuai {
     {
     public:
         Framebuffer(uint32_t width, uint32_t height, uint32_t samples, uint32_t attachments);
-        Framebuffer();
         ~Framebuffer();
+
+        const uint32_t getDepthAttachment();
+        const std::vector<uint32_t>& getColAttachments();
 
         void bind();
         void unbind();
@@ -30,7 +32,7 @@ namespace kuai {
 
         unsigned int getTextureTarget(bool multisampling);
 
-    private:
+    public: // TODO: set back to private once done
         uint32_t frameBufId = 0;
 
         std::vector<uint32_t> colAttachments;
