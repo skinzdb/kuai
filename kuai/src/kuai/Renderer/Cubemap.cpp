@@ -64,9 +64,9 @@ namespace kuai {
 		return textureId;
 	}
 	
-	void Cubemap::bind()
+	void Cubemap::bind(uint32_t activeTex)
 	{
-		glActiveTexture(GL_TEXTURE0);
+		glActiveTexture(GL_TEXTURE0 + activeTex);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
 	}
 }

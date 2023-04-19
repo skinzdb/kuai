@@ -32,7 +32,7 @@ namespace kuai {
 			const std::vector<uint32_t>& indices);
 
 		virtual ~Mesh();
-		// @private
+		/// @private
 		virtual void render();
 		/**
 		* Manually change the texture coordinates of this mesh.

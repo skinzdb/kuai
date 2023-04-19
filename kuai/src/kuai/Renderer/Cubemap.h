@@ -15,7 +15,7 @@ namespace kuai {
 
 		uint32_t getId();
 
-		void bind();
+		void bind(uint32_t activeTex);
 	private:
 		uint32_t textureId;
 	};

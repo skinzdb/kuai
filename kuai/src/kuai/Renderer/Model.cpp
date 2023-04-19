@@ -93,9 +93,11 @@ namespace kuai {
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
 			// TODO: normal maps and height maps
-
-			std::shared_ptr<Material> mat = std::make_shared<DefaultMaterial>(std::make_shared<Texture>(*textures[0]), std::make_shared<Texture>(*textures[1]), 20.0f);
-			return std::make_shared<Mesh>(vertices, normals, texCoords, indices, mat);
+			if (textures.size() > 1)
+			{
+				std::shared_ptr<Material> mat = std::make_shared<DefaultMaterial>(std::make_shared<Texture>(*textures[0]), std::make_shared<Texture>(*textures[1]), 20.0f);
+				return std::make_shared<Mesh>(vertices, normals, texCoords, indices, mat);
+			}
 		}
 
 		return std::make_shared<Mesh>(vertices, normals, texCoords, indices);

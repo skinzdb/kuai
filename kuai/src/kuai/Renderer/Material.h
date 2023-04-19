@@ -16,38 +16,41 @@ namespace kuai {
 	public:
 		virtual void render() = 0;
 
-		void setShader(IShader* shader) { this->shader = shader; };
-		IShader* getShader() { return shader; }
+		void setShader(Shader* shader) { this->shader = shader; };
+		Shader* getShader() { return shader; }
 
 	protected:
-		IShader* shader = nullptr;
+		Shader* shader = nullptr;
 	};
 
 	class DefaultMaterial : public Material
 	{
 	public:
 		DefaultMaterial(std::shared_ptr<Texture> diffuse, std::shared_ptr<Texture> specular, float specularAmount)
-			: diffuse(diffuse), specular(specular), specularAmount(specularAmount)
+			: diffuse(diffuse), specular(specular), specularAmount(specularAmount), reflections(false)
 		{
 			shader = StaticShader::basic;
 		}
 
 		virtual void render()
 		{
-			shader->update();
-
 			diffuse->bind(0);
 			specular->bind(1);
+			if (reflectionMap)
+				reflectionMap->bind(4);
 		}
 
 		void setDiffuse(std::shared_ptr<Texture> diffuse) { this->diffuse = diffuse; }
 		void setSpecular(std::shared_ptr<Texture> specular) { this->specular = specular; }
+		void setReflection(std::shared_ptr<Cubemap> reflection) { this->reflectionMap = reflection; reflections = true; }
+
+		float specularAmount;
+		bool reflections;
 
 	private:
 		std::shared_ptr<Texture> diffuse;
 		std::shared_ptr<Texture> specular;
-
-		float specularAmount;
+		std::shared_ptr<Cubemap> reflectionMap;
 
 		friend class Model;
 	};
@@ -62,9 +65,7 @@ namespace kuai {
 
 		virtual void render()
 		{
-			shader->update();
-
-			cubemap->bind();
+			cubemap->bind(0);
 		}
 
 	private:

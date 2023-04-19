@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Shader.h"
+#include "glm/glm.hpp"
 
 namespace kuai {
 	// Forward declaration
@@ -8,53 +9,22 @@ namespace kuai {
 
 	const uint32_t MAX_LIGHTS = 10;
 
-	class IShader : public Shader
-	{
-	public:
-		IShader(const std::string& vertSrc, const std::string& fragSrc);
-
-		virtual void update() = 0;
-
-		virtual void updateLight() = 0;
-		virtual void updateTransform();
-		virtual void updateCamera();
-
-	protected:
-		struct ShaderData
-		{
-			glm::mat4 projectionMatrix;
-			glm::mat4 viewMatrix;
-			glm::mat4 modelMatrix;
-
-			glm::vec3 viewPos;
-
-			Light* light;
-		};
-
-		std::shared_ptr<ShaderData> shaderData;
-
-	public:
-		std::shared_ptr<ShaderData> getData() { return shaderData; }
-	};
-
-	class DefaultShader : public IShader
+	class DefaultShader : public Shader
 	{
 	public:
 		DefaultShader();
-
-		virtual void update() {}
-		virtual void updateLight();
-		virtual void updateCamera() override;
 	};
 
-	class SkyboxShader : public IShader
+	class SkyboxShader : public Shader
 	{
 	public:
 		SkyboxShader();
-		
-		virtual void update() {}
-		virtual void updateLight() {}
-		virtual void updateTransform() override {}
+	};
+
+	class DepthShader : public Shader
+	{
+	public:
+		DepthShader();
 	};
 
 	class StaticShader
@@ -63,13 +33,9 @@ namespace kuai {
 		static void init();
 		static void cleanup();
 
-		static IShader* basic;
-		static IShader* skybox;
-
-		static uint32_t getUboId(const std::string& name);
-
-	private:
-		static std::unordered_map<std::string, uint32_t> ubos;
+		static Shader* basic;
+		static Shader* skybox;
+		static Shader* depth;
 	};
 }
 

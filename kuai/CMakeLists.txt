@@ -49,8 +49,11 @@ add_library(${PROJECT_NAME}
     src/kuai/Platform/Windows/WinWindow.h
     src/kuai/Platform/Windows/WinWindow.cpp
 
+    src/kuai/Renderer/Camera.h
     src/kuai/Renderer/Cubemap.h
     src/kuai/Renderer/Cubemap.cpp
+    src/kuai/Renderer/Framebuffer.h
+    src/kuai/Renderer/Framebuffer.cpp
     src/kuai/Renderer/Geometry.h
     src/kuai/Renderer/Material.h
     src/kuai/Renderer/Mesh.h

@@ -80,7 +80,6 @@ namespace kuai {
 		//glDisableVertexAttribArray(2);
 
 		//glBindVertexArray(GL_NONE); // No need to unbind every time
-		//glBindTexture(GL_TEXTURE_2D, GL_NONE);
 	}
 
 	void Mesh::setTexCoords(std::vector<float>& texCoords)

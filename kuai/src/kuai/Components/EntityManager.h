@@ -14,7 +14,7 @@ namespace kuai {
 	/**
 	* Manages creation and deletion of all entities (game objects)
 	* Entities are stored as a unique integer ID
-	* Signatures are bitsets that show what components an entity has
+	* Component masks are bitsets that show what components an entity has
 	*/
 	class EntityManager
 	{
