@@ -208,30 +208,16 @@ namespace kuai {
 				scene->notifySystems(&e);
 				c.changed = false;
 			}
-<<<<<<< Updated upstream
-			if (c.cam.getTarget())
-			{
-				c.cam.getTarget()->bind();
-				renderSys->update(dt);
-				c.cam.getTarget()->unbind();
-=======
-<<<<<<< Updated upstream
-=======
 			if (c.getTarget())
 			{
 				c.getTarget()->bind();
 				renderSys->update(dt);
 				c.getTarget()->unbind();
->>>>>>> Stashed changes
 			}
 			else if (c.isMain)
 			{
 				renderSys->update(dt);
 			}
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 		}
 	}
 

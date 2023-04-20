@@ -50,13 +50,6 @@ public:
 
 		auto skyboxEntity = scene->createEntity();
 		skyboxEntity->addComponent<kuai::MeshRenderer>(skybox);
-
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-		auto audio = std::make_shared<kuai::AudioClip>("C:/Users/David/Music/jigsaw.wav");
-=======
->>>>>>> Stashed changes
 		
 		auto grassTex = std::make_shared<kuai::Texture>("C:/Users/David/Pictures/grass.png");
 		auto grassMat = std::make_shared<kuai::DefaultMaterial>(grassTex, grassTex, 10.0f);
@@ -64,20 +57,12 @@ public:
 		auto plane = std::make_shared<kuai::Model>("C:/Users/David/Documents/plane.obj");
 
 		plane->getMeshes()[0]->setMaterial(grassMat);
-<<<<<<< Updated upstream
-		std::vector<float> texCoords = { 0, 0, 5, 0, 5, 5, 0, 5 };
-		plane->getMeshes()[0]->setTexCoords(texCoords);
-=======
->>>>>>> Stashed changes
 
 		auto planeEntity = scene->createEntity();
 		planeEntity->addComponent<kuai::MeshRenderer>(plane);
 		planeEntity->getTransform().setPos(0, -1, -2);
-<<<<<<< Updated upstream
-		planeEntity->getTransform().setScale(5, 0.5f, 5);
-=======
 		planeEntity->getTransform().setScale(1, 0.5f, 1);
->>>>>>> Stashed changes
+
 
 		//auto model = std::make_shared<kuai::Model>("C:/Users/David/Documents/cs310/backpack/backpack.obj");
 		auto model = std::make_shared<kuai::Model>("C:/Users/David/Documents/bunny.obj");
@@ -92,10 +77,6 @@ public:
 		pointLight = scene->createEntity();
 		pointLight->addComponent<kuai::Light>().setIntensity(0.5f);
 		pointLight->getTransform().setPos(-1, 4, -2);
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
 		//auto audio = std::make_shared<kuai::AudioClip>("C:/Users/David/Music/baka.wav");
 
