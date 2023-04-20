@@ -1,10 +1,10 @@
-#include <pybind11/pybind11.h>
-#include <pybind11/operators.h>
-#include <pybind11/stl.h>
+#include "pybind11/pybind11.h"
+#include "pybind11/operators.h"
+#include "pybind11/stl.h"
 
-#include <kuai.h>
+#include "kuai.h"
 
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 
 using namespace kuai;
 namespace py = pybind11;
@@ -57,12 +57,12 @@ PYBIND11_MODULE(pykuai, m)
 {
     Log::Init();
 
-    m.doc() = "Game Engine";
+    m.doc() = "3D Game Engine";
 
     py::class_<App>(m, "App")
         .def(py::init<>())
-        .def("pushLayer", &App::pushLayer)
-        .def("run", &App::run)
+        .def("pushLayer", &App::pushLayer, "Pushes a layer on to the app's layer stack.")
+        .def("run", &App::run, "Starts the application main loop. Layers on the layer stack get updated every iteration of the loop.")
         .def_static("get", &App::get, py::return_value_policy::reference)
         .def("getWindow", &App::getWindow, py::return_value_policy::reference);
 
@@ -127,11 +127,52 @@ PYBIND11_MODULE(pykuai, m)
         .export_values();
 
     py::enum_<Key::Key>(m, "Key")
-        .value("W", Key::W)
-        .value("A", Key::A)
-        .value("S", Key::S)
-        .value("D", Key::D)
         .value("SPACE", Key::Space)
+        .value("A", Key::A)
+        .value("B", Key::B)
+        .value("C", Key::C)
+        .value("D", Key::D)
+        .value("E", Key::E)
+        .value("F", Key::F)
+        .value("G", Key::G)
+        .value("H", Key::H)
+        .value("I", Key::I)
+        .value("J", Key::J)
+        .value("K", Key::K)
+        .value("L", Key::L)
+        .value("M", Key::M)
+        .value("N", Key::N)
+        .value("O", Key::O)
+        .value("P", Key::P)
+        .value("Q", Key::Q)
+        .value("R", Key::R)
+        .value("S", Key::S)
+        .value("T", Key::T)
+        .value("U", Key::U)
+        .value("V", Key::V)
+        .value("W", Key::W)
+        .value("X", Key::X)
+        .value("Y", Key::Y)
+        .value("Z", Key::Z)
+        .value("ESC", Key::Escape)
+        .value("ENTER", Key::Enter)
+        .value("TAB", Key::Tab)
+        .value("RIGHT", Key::Right)
+        .value("LEFT", Key::Left)
+        .value("DOWN", Key::Down)
+        .value("UP", Key::Up)
+        .value("F1", Key::F1)
+        .value("F2", Key::F2)
+        .value("F3", Key::F3)
+        .value("F4", Key::F4)
+        .value("F5", Key::F5)
+        .value("F6", Key::F6)
+        .value("F7", Key::F7)
+        .value("F8", Key::F8)
+        .value("F9", Key::F9)
+        .value("F10", Key::F10)
+        .value("F11", Key::F11)
+        .value("F12", Key::F12)
         .value("L_SHIFT", Key::LeftShift)
         .value("L_CTRL", Key::LeftControl)
         .export_values();
@@ -193,13 +234,13 @@ PYBIND11_MODULE(pykuai, m)
         .def("setIntensity", &Light::setIntensity)
         .def("setAttenuation", &Light::setAttenuation);
 
-    py::class_<Camera>(m, "Camera")
+    py::class_<CameraComponent>(m, "Camera")
         //.def(py::init<Entity*>())
         //.def(py::init<float, float, float, float, float>())
-        .def("setPersp", &Camera::setPerspective)
-        .def("setOrtho", &Camera::setOrtho)
-        .def("setAspect", &Camera::setAspect)
-        .def("getTransform", &Camera::getTransform, py::return_value_policy::reference);
+        .def("setPersp", &CameraComponent::setPerspective)
+        .def("setOrtho", &CameraComponent::setOrtho)
+        .def("setAspect", &CameraComponent::setAspect)
+        .def("getTransform", &CameraComponent::getTransform, py::return_value_policy::reference);
 
     py::class_<AudioClip, std::shared_ptr<AudioClip>>(m, "AudioClip")
         .def(py::init<const std::string&>());
@@ -208,7 +249,10 @@ PYBIND11_MODULE(pykuai, m)
         .def("getGain", &AudioListener::getGain, py::return_value_policy::copy)
         .def("setGain", &AudioListener::setGain);
 
-    py::class_<AudioSource>(m, "AudioSource")
+    py::class_<AudioSourceComponent>(m, "AudioSource")
+        .def_readonly("source", &AudioSourceComponent::source, py::return_value_policy::reference);
+
+    py::class_<AudioSource>(m, "sauce")
         .def("getPitch", &AudioSource::getPitch, py::return_value_policy::copy)
         .def("setPitch", &AudioSource::setPitch)
         .def("getGain", &AudioSource::getGain, py::return_value_policy::copy)
@@ -231,7 +275,7 @@ PYBIND11_MODULE(pykuai, m)
         .def(py::init<const char*>());
 
     py::class_<MeshRenderer>(m, "Renderer")
-        //.def(py::init<Entity*, std::shared_ptr<Model>>())
+        //.def(py::init<std::shared_ptr<Model>>())
         .def("setModel", &MeshRenderer::setModel);
 
     py::class_<Mesh, std::shared_ptr<Mesh>>(m, "Mesh")
@@ -248,7 +292,9 @@ PYBIND11_MODULE(pykuai, m)
     py::class_<DefaultMaterial, std::shared_ptr<DefaultMaterial>, Material>(m, "DefaultMaterial")
         .def(py::init<std::shared_ptr<Texture>, std::shared_ptr<Texture>, float>())
         .def("setDiffuse", &DefaultMaterial::setDiffuse)
-        .def("setSpecular", &DefaultMaterial::setSpecular);
+        .def("setSpecular", &DefaultMaterial::setSpecular)
+        .def("setReflection", &DefaultMaterial::setReflection)
+        .def_readwrite("shininess", &DefaultMaterial::specularAmount);
 
     py::class_<Model, std::shared_ptr<Model>>(m, "Model")
         .def(py::init<const std::string&>())
@@ -257,13 +303,13 @@ PYBIND11_MODULE(pykuai, m)
 
     py::class_<Entity, std::shared_ptr<Entity>>(m, "Entity")
         .def("getTransform", &Entity::getTransform, py::return_value_policy::reference)
-        .def("getCam", &Entity::getComponent<Camera>, py::return_value_policy::reference)
+        .def("getCam", &Entity::getComponent<CameraComponent>, py::return_value_policy::reference)
         .def("getLight", &Entity::getComponent<Light>, py::return_value_policy::reference)
         .def("getRenderer", &Entity::getComponent<MeshRenderer>, py::return_value_policy::reference)
         .def("getListener", &Entity::getComponent<AudioListener>, py::return_value_policy::reference)
-        .def("getAudioSource", &Entity::getComponent<AudioSource>, py::return_value_policy::reference)
-        .def("addCam", &Entity::addComponent<Camera>, py::return_value_policy::reference)
+        .def("getAudioSource", &Entity::getComponent<AudioSourceComponent>, py::return_value_policy::reference)
+        .def("addCam", &Entity::addComponent<CameraComponent>, py::return_value_policy::reference)
         .def("addLight", &Entity::addComponent<Light>, py::return_value_policy::reference)
         .def("addRenderer", &Entity::addComponent<MeshRenderer>, py::return_value_policy::reference)
-        .def("addAudioSource", &Entity::addComponent<AudioSource>, py::return_value_policy::reference);
+        .def("addAudioSource", &Entity::addComponent<AudioSourceComponent>, py::return_value_policy::reference);
 }

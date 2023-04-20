@@ -16,6 +16,7 @@
 #include "kuai/Components/Scene.h"
 #include "kuai/Components/Entity.h"
 
+#include "kuai/Renderer/Camera.h"
 #include "kuai/Renderer/Shader.h"
 #include "kuai/Renderer/Texture.h"
 #include "kuai/Renderer/Cubemap.h"

@@ -123,6 +123,8 @@ namespace kuai {
 		for (auto& entity : entities)
 		{
 			MeshRenderer m = entity->getComponent<MeshRenderer>();
+			if (!m.getModel())
+				continue;
 			for (auto& mesh : m.getModel()->getMeshes())
 			{
 				Shader* shader = mesh->getMaterial()->getShader();
@@ -168,6 +170,8 @@ namespace kuai {
 		for (auto& entity : entities)
 		{
 			MeshRenderer m = entity->getComponent<MeshRenderer>();
+			if (!m.getModel())
+				continue;
 			for (auto& mesh : m.getModel()->getMeshes())
 			{
 				Shader* shader = mesh->getMaterial()->getShader();
@@ -175,8 +179,8 @@ namespace kuai {
 
 				shader->bind();
 
-				shader->setUniform("Matrices", "projectionMatrix", &c->cam.getProjectionMatrix()[0][0], sizeof(glm::mat4));
-				shader->setUniform("Matrices", "viewMatrix", &c->cam.getViewMatrix()[0][0], sizeof(glm::mat4));
+				shader->setUniform("Matrices", "projectionMatrix", &c->getProjectionMatrix()[0][0], sizeof(glm::mat4));
+				shader->setUniform("Matrices", "viewMatrix", &c->getViewMatrix()[0][0], sizeof(glm::mat4));
 
 				if (shader == StaticShader::basic)
 					shader->setUniform("viewPos", c->getTransform().getPos());
@@ -204,16 +208,30 @@ namespace kuai {
 				scene->notifySystems(&e);
 				c.changed = false;
 			}
+<<<<<<< Updated upstream
 			if (c.cam.getTarget())
 			{
 				c.cam.getTarget()->bind();
 				renderSys->update(dt);
 				c.cam.getTarget()->unbind();
+=======
+<<<<<<< Updated upstream
+=======
+			if (c.getTarget())
+			{
+				c.getTarget()->bind();
+				renderSys->update(dt);
+				c.getTarget()->unbind();
+>>>>>>> Stashed changes
 			}
 			else if (c.isMain)
 			{
 				renderSys->update(dt);
 			}
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 		}
 	}
 

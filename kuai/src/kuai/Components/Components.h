@@ -205,19 +205,14 @@ namespace kuai {
 	/** \class Camera
 	*	\brief
 	*/
-	class CameraComponent : public Component
+	class CameraComponent : public Component, public Camera
 	{
 	public:
-		CameraComponent(Entity* entity, float fov, float width, float height, float zNear, float zFar) : Component(entity)
+		CameraComponent(Entity* entity, float fov, float width, float height, float zNear, float zFar) : Component(entity), 
+			Camera(fov, width, height, zNear, zFar)
 		{
-			cam.setAspect(width, height);
-			cam.setPerspective(fov, zNear, zFar);
 			changed = true;
 		}
-		
-		CameraComponent(Entity* entity) : Component(entity) { changed = true; }	
-		
-		Camera cam;
 
 		bool isMain = false;
 	};
@@ -330,6 +325,9 @@ namespace kuai {
 	{
 	public:
 		AudioListener(Entity* entity);
+
+		float getGain();
+		void setGain(float gain);
 
 	private:
 		void update();

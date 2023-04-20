@@ -21,7 +21,7 @@ namespace kuai {
 	{	
 		if (hasComponent<CameraComponent>())
 		{
-			getComponent<CameraComponent>().cam.updateViewMatrix(pos, rot);
+			getComponent<CameraComponent>().updateViewMatrix(pos, rot);
 			getComponent<CameraComponent>().changed = true;
 		}
 
@@ -47,6 +47,9 @@ namespace kuai {
 	AudioListener::AudioListener(Entity* entity) : Component(entity)
 	{
 	}
+
+	float AudioListener::getGain() { return AudioManager::getGlobalGain(); }
+	void AudioListener::setGain(float gain) { AudioManager::setGlobalGain(gain); }
 
 	void AudioListener::update()
 	{

@@ -93,8 +93,19 @@ namespace kuai {
     {
         KU_PROFILE_FUNCTION();
 
+<<<<<<< Updated upstream
         for (auto& renderEntity : renderData->renderEntities)
         {
+=======
+<<<<<<< Updated upstream
+        mesh.getMaterial()->getShader()->bind();
+        mesh.render();
+=======
+        for (auto& renderEntity : renderData->renderEntities)
+        {
+            if (!renderEntity->getComponent<MeshRenderer>().getModel())
+				continue;
+>>>>>>> Stashed changes
             for (auto& mesh : renderEntity->getComponent<MeshRenderer>().getModel()->getMeshes())
             {
                 Shader* shader = mesh->getMaterial()->getShader();
@@ -119,7 +130,11 @@ namespace kuai {
         for (auto& renderEntity : renderData->renderEntities)
         {
             MeshRenderer renderer = renderEntity->getComponent<MeshRenderer>();
+<<<<<<< Updated upstream
             if (!renderer.castsShadows())
+=======
+            if (!renderer.getModel() || !renderer.castsShadows())
+>>>>>>> Stashed changes
                 continue;
             
             for (auto& mesh : renderEntity->getComponent<MeshRenderer>().getModel()->getMeshes())
@@ -131,6 +146,10 @@ namespace kuai {
             }
             
         } 
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
     }
 }
 
