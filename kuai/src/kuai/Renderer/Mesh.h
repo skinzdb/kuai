@@ -1,11 +1,19 @@
 #pragma once
 
 #include "Material.h"
+#include "Buffer.h"
 
 namespace kuai {
+	struct Vertex
+	{
+		float pos[3];
+		float normal[3];
+		float texCoords[2];
+		u32 texId;
+	};
 
 	/** \class Mesh
-	*	\brief A collection of vertices, normals and texture coordinates that define a polyhedral object. Each mesh has a material.
+	*	\brief A collection of vertices, normals and texture coordinates that define a polyhedral object. Each mesh has a Material.
 	*/
 	class Mesh
 	{
@@ -20,34 +28,26 @@ namespace kuai {
 		Mesh(const std::vector<float>& positions, 
 			const std::vector<float>& normals, 
 			const std::vector<float>& texCoords, 
-			const std::vector<uint32_t>& indices,
-			std::shared_ptr<Material> material);
+			const std::vector<u32>& indices
+		);
 
-		/**
-		* Construct a mesh that uses the default material.
-		*/
-		Mesh(const std::vector<float>& positions, 
-			const std::vector<float>& normals, 
-			const std::vector<float>& texCoords, 
-			const std::vector<uint32_t>& indices);
+		Mesh(const std::vector<Vertex>& vertexData, const std::vector<u32> indices);
 
 		virtual ~Mesh();
-		/// @private
-		virtual void render();
-		/**
-		* Manually change the texture coordinates of this mesh.
-		*/
-		void setTexCoords(std::vector<float>& texCoords);
 
-		std::shared_ptr<Material> getMaterial() { return material; }
-		void setMaterial(std::shared_ptr<Material> material) { this->material = material; }
+	private:
+		u32 getId() const { return meshId; }
 
-	protected:
-		uint32_t vaoId;
-		uint32_t vboIds[4] = { 0, 0, 0, 0 };
-		uint32_t vertCount;
+		friend class RenderSystem;
 
-		std::shared_ptr<Material> material;
+	private:
+		u32 meshId;
+
+		std::vector<Vertex> vertexData;
+		std::vector<u32> indices;
+
+	private:
+		static u32 meshCounter;
 	};
 }
 

@@ -1,8 +1,8 @@
 #include "kpch.h"
 #include "Texture.h"
 
-#include <glad/glad.h>
-#include <stb_image.h>
+#include "glad/glad.h"
+#include "stb_image.h"
 
 namespace kuai {
 	Texture::Texture()

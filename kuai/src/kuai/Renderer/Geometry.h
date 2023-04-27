@@ -6,10 +6,10 @@ namespace kuai {
 	class Geometry
 	{
 	public:
-		static std::shared_ptr<Model> plane() { return std::make_shared<Model>("plane.obj"); }
+		static Rc<Model> plane;
 
-        static std::shared_ptr<Model> cube() { return std::make_shared<Model>("cube.obj"); }
+		static Rc<Model> cube;
 
-        static std::shared_ptr<Model> sphere() { return std::make_shared<Model>("sphere.obj"); }
+		static Rc<Model> sphere;
 	};
 }

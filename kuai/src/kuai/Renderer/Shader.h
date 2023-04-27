@@ -2,6 +2,8 @@
 
 #include <glm/glm.hpp>
 
+#include "Buffer.h"
+
 namespace kuai {
 
 	class Shader
@@ -19,11 +21,16 @@ namespace kuai {
 		void setUniform(const std::string& name, const glm::mat3& val) const;
 		void setUniform(const std::string& name, const glm::mat4& val) const;
 
-		void createUniformBlock(const std::string& name, const std::vector<const char*>& members, uint32_t binding);
-		void setUniform(const std::string& name, const std::string& member, const void* data, uint32_t size) const;
+		void createUniformBlock(const std::string& name, const std::vector<const char*>& members, u32 binding);
+		void setUniform(const std::string& name, const std::string& member, const void* data, u32 size) const;
 
-		void bind();
-		void unbind();
+		Rc<VertexArray> getVertexArray();
+
+		u32 getCommandCount() const;
+		void setIndirectBufData(std::vector<IndirectCommand> commands);
+
+		void bind() const;
+		void unbind() const;
 
 	protected:
 		int createShader(const char* src, int type);
@@ -33,10 +40,16 @@ namespace kuai {
 		int vertShaderId;
 		int fragShaderId;
 
-		std::unordered_map<std::string, uint32_t> uniforms;
-		// Static maps of UBOs and member offsets as they are shared between all shaders
-		static std::unordered_map<std::string, uint32_t> ubos;
-		static std::unordered_map<std::string, uint32_t> uboOffsets;
+		std::unordered_map<std::string, u32> uniforms;
+
+		Rc<VertexArray> vao;				// Vertex array object
+		Rc<IndexBuffer>	ebo;				// List of indices that point to which vertices to draw
+		Rc<IndirectBuffer> ibo;				// Buffer containing mesh instance information
+
+	private:
+		// UBOs and member offsets are static as they are shared between all shaders
+		static std::unordered_map<std::string, u32> ubos;
+		static std::unordered_map<std::string, u32> uboOffsets;
 
 		friend class StaticShader;
 	};

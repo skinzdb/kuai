@@ -13,6 +13,9 @@ namespace kuai {
 		vertShaderId = createShader(vertSrc.c_str(), GL_VERTEX_SHADER);
 		fragShaderId = createShader(fragSrc.c_str(), GL_FRAGMENT_SHADER);
 		link();
+
+		vao = MakeBox<VertexArray>();
+		ibo = MakeRc<IndirectBuffer>(std::vector<IndirectCommand>());
 	}
 
 	Shader::~Shader()
@@ -103,14 +106,32 @@ namespace kuai {
 		glNamedBufferSubData(ubos.at(name), uboOffsets.at(member), size, data);
 	}
 
-	void Shader::bind()
+	Rc<VertexArray> Shader::getVertexArray()
 	{
-		glUseProgram(programId);
+		return vao;
 	}
 
-	void Shader::unbind()
+	u32 Shader::getCommandCount() const
 	{
-		glUseProgram(GL_NONE);
+		return ibo->getCount();
+	}
+
+	void Shader::setIndirectBufData(std::vector<IndirectCommand> commands)
+	{
+		ibo = MakeBox<IndirectBuffer>(commands);
+		ibo->bind();
+	}
+
+	void Shader::bind() const
+	{
+		glUseProgram(programId);
+		vao->bind();
+		ibo->bind();
+	}
+
+	void Shader::unbind() const
+	{
+		glUseProgram(0);
 	}
 
 	int Shader::createShader(const char* src, int type)

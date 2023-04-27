@@ -55,8 +55,8 @@ namespace kuai {
 		    viewMatrix = glm::inverse(viewMatrix); // Calculate inverse to get correct operation, aka (TR)^-1 = R^-1T^-1
         }
 
-		void setTarget(std::shared_ptr<Framebuffer> target) { this->target = target; }
-		std::shared_ptr<Framebuffer> getTarget() { return target; }
+		void setTarget(Rc<Framebuffer> target) { this->target = target; }
+		Rc<Framebuffer> getTarget() { return target; }
 
 	private:
 		void updateProjectionMatrix()
@@ -92,7 +92,7 @@ namespace kuai {
 		float orthoNear, orthoFar;
 
 		// Framebuffer this camera will render to; none is default framebuffer
-		std::shared_ptr<Framebuffer> target = nullptr;
+		Rc<Framebuffer> target = nullptr;
 
 		friend class CameraSystem;
     };

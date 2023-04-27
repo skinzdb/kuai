@@ -8,9 +8,9 @@
 #include "glm/gtc/matrix_inverse.hpp"
 
 namespace kuai {
-    std::unique_ptr<Renderer::RenderData> Renderer::renderData = std::make_unique<Renderer::RenderData>();
-    std::shared_ptr<Framebuffer> Renderer::framebuffer = nullptr;
-    std::unique_ptr<Framebuffer> Renderer::shadowMap = nullptr;
+    Box<Renderer::RenderData> Renderer::renderData = std::make_unique<Renderer::RenderData>();
+    Rc<Framebuffer> Renderer::framebuffer = nullptr;
+    Box<Framebuffer> Renderer::shadowMap =  nullptr;
 
     void Renderer::init()
     {
@@ -22,6 +22,10 @@ namespace kuai {
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        i32 textureUnits;
+        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &textureUnits);
+        KU_CORE_WARN("Max texture units: {0}", textureUnits);
 
         glEnable(GL_FRAMEBUFFER_SRGB); // TODO: IMPLEMENT THIS MANUALLY IN SHADER AND TEXTURES
 
@@ -37,19 +41,18 @@ namespace kuai {
         StaticShader::cleanup();
     }
 
-    void Renderer::setCamera(CameraComponent& camera)
+    void Renderer::setCamera(Camera& camera)
     {
+        StaticShader::basic->setUniform("Matrices", "projectionMatrix", &camera.getProjectionMatrix()[0][0], sizeof(glm::mat4));
+        StaticShader::basic->setUniform("Matrices", "viewMatrix", &camera.getViewMatrix()[0][0], sizeof(glm::mat4));
         // framebuffer = camera.cam.getTarget();
     }
 
-    void Renderer::updateShadowMap(Light light)
+    void Renderer::updateShadowMap(Light& light)
     {
         if (!light.castsShadows())
             return;
-        
-        StaticShader::depth->bind();
-        StaticShader::depth->setUniform("lightSpaceMatrix", light.getLightSpaceMatrix());
-		
+       
 		shadowMap->bind();
         glViewport(
             (light.getId() % LIGHTS_PER_ROW) * LIGHT_SHADOW_SIZE, 
@@ -59,22 +62,19 @@ namespace kuai {
         );
         glClear(GL_DEPTH_BUFFER_BIT);
         // glCullFace(GL_FRONT); // Helps avoid peter-panning; however completely removes objects with no back faces :(
-        renderDepth();
+        render(*StaticShader::depth);
         // glCullFace(GL_BACK);
         shadowMap->unbind();
     }
 
-    void Renderer::setLights(const std::vector<std::shared_ptr<Entity>>& lightEntities)
+    void Renderer::render(Shader& shader)
     {
-        renderData->lightEntities = lightEntities;
+        shader.bind();
+
+        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)0, shader.getCommandCount(), sizeof(IndirectCommand));
     }
 
-    void Renderer::setMeshes(const std::vector<std::shared_ptr<Entity>>& renderEntities)
-    {
-        renderData->renderEntities = renderEntities;
-    }
-
-    void Renderer::setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+    void Renderer::setViewport(u32 x, u32 y, u32 width, u32 height)
     {
         glViewport(x, y, width, height);
     }
@@ -89,51 +89,52 @@ namespace kuai {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    void Renderer::render()
-    {
-        KU_PROFILE_FUNCTION();
+    //void Renderer::render()
+    //{
+    //    KU_PROFILE_FUNCTION();
+    //
+    //    for (auto& renderEntity : renderData->renderEntities)
+    //    {
+    //        if (!renderEntity->getComponent<MeshRenderer>().getModel())
+	//			continue;
+    //        for (auto& mesh : renderEntity->getComponent<MeshRenderer>().getModel()->getMeshes())
+    //        {
+    //            Shader* shader = mesh->getMaterial()->getShader();
+    //            shader->bind();
+    //
+	//			if (shader == StaticShader::basic)
+	//			{
+    //              DefaultMaterial* mat = (DefaultMaterial*)mesh->getMaterial().get();
+	//			    shader->setUniform("modelMatrix", renderEntity->getTransform().getModelMatrix());
+	//				shader->setUniform("model3x3InvTransp", glm::inverseTranspose(glm::mat3(renderEntity->getTransform().getModelMatrix())));
+    //              shader->setUniform("material.reflections", mat->reflections);
+    //              shader->setUniform("material.shininess", mat->specularAmount);
+	//			}
+    //            mesh->render();
+    //        }
+    //    }
+    //}
 
-        for (auto& renderEntity : renderData->renderEntities)
-        {
-            if (!renderEntity->getComponent<MeshRenderer>().getModel())
-				continue;
-            for (auto& mesh : renderEntity->getComponent<MeshRenderer>().getModel()->getMeshes())
-            {
-                Shader* shader = mesh->getMaterial()->getShader();
-                shader->bind();
+    //void Renderer::renderDepth()
+    //{
+    //    StaticShader::depth->bind();
 
-				if (shader == StaticShader::basic)
-				{
-                    DefaultMaterial* mat = (DefaultMaterial*)mesh->getMaterial().get();
-					shader->setUniform("modelMatrix", renderEntity->getTransform().getModelMatrix());
-					shader->setUniform("model3x3InvTransp", glm::inverseTranspose(glm::mat3(renderEntity->getTransform().getModelMatrix())));
-                    shader->setUniform("material.reflections", mat->reflections);
-                    shader->setUniform("material.shininess", mat->specularAmount);
-				}
-                mesh->render();
-            }
-        }
-    }
-
-    void Renderer::renderDepth()
-    {
-        StaticShader::depth->bind();
-        for (auto& renderEntity : renderData->renderEntities)
-        {
-            MeshRenderer renderer = renderEntity->getComponent<MeshRenderer>();
-            if (!renderer.getModel() || !renderer.castsShadows())
-                continue;
-            
-            for (auto& mesh : renderEntity->getComponent<MeshRenderer>().getModel()->getMeshes())
-            {
-                    if (mesh->getMaterial()->getShader() == StaticShader::skybox)
-                        continue;
-                    StaticShader::depth->setUniform("modelMatrix", renderEntity->getTransform().getModelMatrix());
-                    mesh->render();
-            }
-            
-        } 
-    }
+    //    for (auto& renderEntity : renderData->renderEntities)
+    //    {
+    //        MeshRenderer renderer = renderEntity->getComponent<MeshRenderer>();
+    //        if (!renderer.getModel() || !renderer.castsShadows())
+    //            continue;
+    //        
+    //        for (auto& mesh : renderEntity->getComponent<MeshRenderer>().getModel()->getMeshes())
+    //        {
+    //                if (mesh->getMaterial()->getShader() == StaticShader::skybox)
+    //                    continue;
+    //                StaticShader::depth->setUniform("modelMatrix", renderEntity->getTransform().getModelMatrix());
+    //                mesh->render();
+    //        }
+    //        
+    //    } 
+    //}
 }
 
 

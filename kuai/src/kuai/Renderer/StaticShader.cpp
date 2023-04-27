@@ -10,32 +10,40 @@ namespace kuai {
 	
 	const char* DEFAULT_VERT = R"(
 		#version 450
-		layout (location = 0) in vec3 pos;
-		layout (location = 1) in vec3 normal;
-		layout (location = 2) in vec2 texCoord;
+		#define MAX_LIGHTS 10
 
-		layout (binding = 0) uniform Matrices
+		layout (location = 0)	in vec3 aPos;
+		layout (location = 1)	in vec3 aNormal;
+		layout (location = 2)	in vec2 aTexCoord;
+		layout (location = 3)   in int  aMatId;
+		layout (location = 4)	in mat4 aModelMatrix;
+		// layout (location = 8) in mat3 aModel3x3InvTransp;
+
+		layout (binding = 0) uniform CamData
 		{
 			mat4 projectionMatrix;
 			mat4 viewMatrix;
-		};		
+			vec3 viewPos;
+		};	
 
-		uniform mat4 modelMatrix;
-		uniform mat3 model3x3InvTransp; // Used to calculate proper world position of normals	
-
-		uniform mat4 lightSpaceMatrix;	
+		uniform mat4 lightSpaceMatrix; // TODO: change to layout, have an array of matrices to handle shadows from multiple lights
 
 		out vec4 worldPos;
 		out vec3 worldNorm;
 		out vec2 texCoords;
-		out vec4 lightSpace;
+		out vec4 lightSpace;		   // TODO: change to array
+		out vec3 viewingPos;
+		out flat int matId;
 
 		void main()
 		{
-			worldPos = modelMatrix * vec4(pos, 1.0);
-			worldNorm = model3x3InvTransp * normal;
-			texCoords = texCoord;
+			worldPos = aModelMatrix * vec4(aPos, 1.0);
+			mat3 model3x3InvTransp = mat3(transpose(inverse(aModelMatrix))); // TODO: remove in favour of vertex attribute
+			worldNorm = model3x3InvTransp * aNormal;
+			texCoords = aTexCoord;
+			matId = aMatId;
 			lightSpace = lightSpaceMatrix * worldPos;
+			viewingPos = viewPos;
 
 			gl_Position = projectionMatrix * viewMatrix * worldPos;
 		}
@@ -58,23 +66,22 @@ namespace kuai {
 			float quadratic;
 			float cutoff;
 
-			int castShadows;
+			int castsShadows;
 		};
 
-		uniform Light lights[MAX_LIGHTS];
-		// layout (binding = 1) uniform Lights
-		// {
-		// 	Light lights[MAX_LIGHTS];
-		// };
+		layout (binding = 1) uniform Lights
+		{
+			Light lights[MAX_LIGHTS];
+		};
 
 		out vec4 fragCol;
 
 		in vec4 worldPos;
 		in vec3 worldNorm;
 		in vec2 texCoords;
-		in vec4 lightSpace;
-
-		uniform vec3 viewPos;
+		in vec4 lightSpace;		// TODO: change to array
+		in vec3 viewingPos;
+		in flat int matId;
 
 		struct Material
 		{
@@ -84,7 +91,7 @@ namespace kuai {
 			int reflections;
 			float shininess;
 		};
-		uniform Material material;
+		uniform	Material materials[10];
 
 		uniform sampler2D shadowMap;
 
@@ -122,14 +129,14 @@ namespace kuai {
 		void main()
 		{
 			vec3 norm = normalize(worldNorm);
-			vec3 viewDir = normalize(viewPos - worldPos.xyz);
+			vec3 viewDir = normalize(viewingPos - worldPos.xyz);
 			vec3 viewReflectDir = reflect(-viewDir, norm);
 			vec3 lightDir = vec3(0.0, 0.0, 0.0);
 			float factor = 1.0;
 
 			vec3 finalCol = vec3(0.0, 0.0, 0.0);
 
-			for (int i = 0; i < MAX_LIGHTS; i++)
+			for (int i = 0; i < 1; i++)
 			{
 				if (lights[i].type == 0) // Directional Light
 				{
@@ -156,27 +163,27 @@ namespace kuai {
 				}
 
 				// Ambient
-				vec3 ambient = 0.1 * lights[i].col * vec3(texture(material.diffuse, texCoords));
+				vec3 ambient = 0.1 * lights[i].col;// vec3(texture(materials[matId].diffuse, texCoords));
 
 				// Diffuse
 				float diff = max(dot(norm, lightDir), 0.0);
-				vec3 diffuse = lights[i].col * diff * vec3(texture(material.diffuse, texCoords));
+				vec3 diffuse = lights[i].col * diff;//vec3(texture(materials[matId].diffuse, texCoords));
 
 				// Specular
 				vec3 reflectDir = reflect(-lightDir, norm);
 				vec3 halfwayDir = normalize(lightDir + viewDir);
-				float spec = pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
-				vec3 specular = spec * vec3(texture(material.specular, texCoords));
+				float spec = pow(max(dot(norm, halfwayDir), 0.0), materials[matId].shininess);
+				vec3 specular = spec * vec3(1.0,1.0,1.0);//vec3(texture(materials[matId].specular, texCoords));
 
 				// Reflection Map
 				vec3 reflection = vec3(0.0);
-				if (material.reflections)
+				if (materials[matId].reflections)
 				{
-					reflection = vec3(texture(material.reflectionMap, viewReflectDir));
+					reflection = vec3(texture(materials[matId].reflectionMap, viewReflectDir));
 				}
 				
 				float shadow = 0.0;
-				if (lights[i].castShadows)
+				if (lights[i].castsShadows)
 				{
 					shadow = calcShadow(lightSpace, lightDir);      
 				}
@@ -188,71 +195,77 @@ namespace kuai {
 		}
 	)";
 
-	DefaultShader::DefaultShader() : Shader(DEFAULT_VERT, DEFAULT_FRAG)
+	DefaultShader::DefaultShader() : Shader(DEFAULT_VERT, DEFAULT_FRAG) 
 	{
+		Rc<VertexBuffer> vbo1 = MakeRc<VertexBuffer>(0);
+		Rc<VertexBuffer> vbo2 = MakeRc<VertexBuffer>(0);
+
+		vbo1->setLayout(
+		{ 
+			{ ShaderDataType::VEC3, "pos" },
+			{ ShaderDataType::VEC3, "normal" },
+			{ ShaderDataType::VEC2, "texCoord" },
+			{ ShaderDataType::INT,  "texId" }
+		});
+		vbo2->setLayout(
+		{
+			{ ShaderDataType::MAT4,  "modelMatrix" }, // TODO: change to 3 Vec4s and use fact that bottom row of model matrix is always (0, 0, 0, 1)
+			// { ShaderDataType::MAT3,  "model3x3InvTransp" }
+		});
+		vao->addVertexBuffer(vbo1);
+		vao->addVertexBuffer(vbo2);
+
 		bind();
 
-		createUniformBlock("Matrices", { "projectionMatrix", "viewMatrix" }, 0);
+		createUniformBlock("CamData", { "projectionMatrix", "viewMatrix", "viewPos"}, 0);
 		
-		// std::vector<std::string> lightNames;
-		// std::vector<const char*> lightNamesC;
-		// for (size_t i = 0; i < MAX_LIGHTS; i++)	// TODO: HORRIBLE DISGUSTING CODE
-		// {
-		// 	lightNames.push_back("lights[" + std::to_string(i) + "].type");
-		// 	lightNames.push_back("lights[" + std::to_string(i) + "].pos");
-		// 	lightNames.push_back("lights[" + std::to_string(i) + "].dir");
-		// 	lightNames.push_back("lights[" + std::to_string(i) + "].col");
-		// 	lightNames.push_back("lights[" + std::to_string(i) + "].intensity");
-		// 	lightNames.push_back("lights[" + std::to_string(i) + "].linear");
-		// 	lightNames.push_back("lights[" + std::to_string(i) + "].quadratic");
-		// 	lightNames.push_back("lights[" + std::to_string(i) + "].cutoff");
-		// }
-		// for (auto& name : lightNames)
-		// 	lightNamesC.push_back(name.c_str());
-		// createUniformBlock("Lights", lightNamesC, 1);
-
-		for (size_t i = 0; i < MAX_LIGHTS; i++)
+		std::vector<std::string> lightNames;
+		std::vector<const char*> lightNamesCStr;
+		for (u8 i = 0; i < MAX_LIGHTS; i++)	// TODO: HORRIBLE DISGUSTING CODE
 		{
-			createUniform("lights[" + std::to_string(i) + "].type");
-			createUniform("lights[" + std::to_string(i) + "].pos");
-			createUniform("lights[" + std::to_string(i) + "].dir");
-			createUniform("lights[" + std::to_string(i) + "].col");
-			createUniform("lights[" + std::to_string(i) + "].intensity");
-			createUniform("lights[" + std::to_string(i) + "].linear");
-			createUniform("lights[" + std::to_string(i) + "].quadratic");
-			createUniform("lights[" + std::to_string(i) + "].cutoff");
-			createUniform("lights[" + std::to_string(i) + "].castShadows");
+			lightNames.push_back("lights[" + std::to_string(i) + "].type");
+		 	lightNames.push_back("lights[" + std::to_string(i) + "].pos");
+		 	lightNames.push_back("lights[" + std::to_string(i) + "].dir");
+		 	lightNames.push_back("lights[" + std::to_string(i) + "].col");
+		 	lightNames.push_back("lights[" + std::to_string(i) + "].intensity");
+		 	lightNames.push_back("lights[" + std::to_string(i) + "].linear");
+		 	lightNames.push_back("lights[" + std::to_string(i) + "].quadratic");
+		 	lightNames.push_back("lights[" + std::to_string(i) + "].cutoff");
+			lightNames.push_back("lights[" + std::to_string(i) + "].castsShadows");
+		}
+		for (auto& name : lightNames)
+			lightNamesCStr.push_back(name.c_str());
+		createUniformBlock("Lights", lightNamesCStr, 1);
+
+		for (u8 i = 0; i < 10; i++)	
+		{
+			createUniform("materials[" + std::to_string(i) + "].diffuse");
+			createUniform("materials[" + std::to_string(i) + "].specular");
+			createUniform("materials[" + std::to_string(i) + "].reflectionMap");
+
+			setUniform("materials[" + std::to_string(i) + "].diffuse", i * 3);
+			setUniform("materials[" + std::to_string(i) + "].specular", i * 3 + 1);
+			setUniform("materials[" + std::to_string(i) + "].reflectionMap", i * 3 + 2);
+
+			createUniform("materials[" + std::to_string(i) + "].shininess");
+			createUniform("materials[" + std::to_string(i) + "].reflections");
+			setUniform("materials[" + std::to_string(i) + "].shininess", 20.0f);
+			setUniform("materials[" + std::to_string(i) + "].reflections", 0);
 		}
 
-		createUniform("modelMatrix");
-		createUniform("model3x3InvTransp");
-
-		createUniform("material.diffuse");
-		createUniform("material.specular");
-		createUniform("material.reflectionMap");
-		setUniform("material.diffuse", 0);
-		setUniform("material.specular", 1);
-		setUniform("material.reflectionMap", 4);
-
-		createUniform("material.shininess");
-		setUniform("material.shininess", 35.0f);
-		createUniform("material.reflections");
-
-		createUniform("lightSpaceMatrix");
 		createUniform("shadowMap");
-		setUniform("shadowMap", 7);
-
-		createUniform("viewPos");
+		setUniform("shadowMap", 30);
 	}
 
 	const char* SKYBOX_VERT = R"(
 		#version 450
 		layout (location = 0) in vec3 pos;
 
-		layout (std140, binding = 0) uniform Matrices
+		layout (binding = 0) uniform CamData
 		{
 			mat4 projectionMatrix;
 			mat4 viewMatrix;
+			vec3 viewPos;
 		};	
 
 		out vec3 texCoords;
@@ -272,6 +285,8 @@ namespace kuai {
 
 		out vec4 fragCol;
 
+		layout (binding = 2) uniform sampler2D textures[32];
+
 		uniform samplerCube skybox;
 
 		void main()
@@ -282,6 +297,15 @@ namespace kuai {
 
 	SkyboxShader::SkyboxShader() : Shader(SKYBOX_VERT, SKYBOX_FRAG)
 	{
+		Rc<VertexBuffer> vbo1 = MakeRc<VertexBuffer>(0);
+		Rc<VertexBuffer> vbo2 = MakeRc<VertexBuffer>(0);
+
+		vbo1->setLayout({ { ShaderDataType::VEC3, "pos" } });
+		vbo2->setLayout({ { ShaderDataType::MAT4, "modelMatrix" } });
+
+		vao->addVertexBuffer(vbo1);
+		vao->addVertexBuffer(vbo2);
+
 		bind();
 
 		createUniform("skybox");
@@ -291,9 +315,8 @@ namespace kuai {
 	const char* DEPTH_VERT = R"(
 		#version 450
 		layout (location = 0) in vec3 pos;
-
-		uniform mat4 lightSpaceMatrix;
-		uniform mat4 modelMatrix;
+		layout (location = 1) in mat4 modelMatrix;
+		layout (location = 5) in mat4 lightSpaceMatrix;
 
 		void main()
 		{
@@ -312,10 +335,20 @@ namespace kuai {
 
 	DepthShader::DepthShader() : Shader(DEPTH_VERT, DEPTH_FRAG)
 	{
-		bind();
+		Rc<VertexBuffer> vbo1 = MakeRc<VertexBuffer>(0);
+		Rc<VertexBuffer> vbo2 = MakeRc<VertexBuffer>(0);
 
-		createUniform("lightSpaceMatrix");
-		createUniform("modelMatrix");
+		vbo1->setLayout({ { ShaderDataType::VEC3, "pos" } });
+		vbo2->setLayout(
+		{ 
+			{ ShaderDataType::MAT4, "modelMatrix" },
+			{ ShaderDataType::MAT4, "lightSpaceMatrix" }
+		});
+
+		vao->addVertexBuffer(vbo1);
+		vao->addVertexBuffer(vbo2);
+
+		bind();
 	}
 
 	void StaticShader::init()

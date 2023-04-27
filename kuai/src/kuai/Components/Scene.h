@@ -4,6 +4,8 @@
 #include "Entity.h"
 #include "Components.h"
 
+#include <map>
+
 namespace kuai {
 	// Forward declarations
 	class RenderSystem;
@@ -24,13 +26,13 @@ namespace kuai {
 		/** 
 		* Adds new entity to scene.
 		*/
-		std::shared_ptr<Entity> createEntity();
+		Rc<Entity> createEntity();
 
 		/**
 		* Finds an entity by its ID and returns a reference if it exists.
 		*/
-		std::shared_ptr<Entity> getEntityById(EntityID entity);
-		std::shared_ptr<Entity> getEntityByName(const std::string& name) { KU_CORE_ASSERT(0, "Not yet implemented"); } // TODO: implement
+		Rc<Entity> getEntityById(EntityID entity);
+		Rc<Entity> getEntityByName(const std::string& name) { KU_CORE_ASSERT(0, "Not yet implemented"); } // TODO: implement
 		/**
 		* Removes entity from the scene.
 		*/
@@ -63,31 +65,47 @@ namespace kuai {
 		Light& getMainLight();
 		void setMainLight(Light& light);
 
-		std::vector<std::shared_ptr<Entity>>::iterator begin() { return entities.begin(); }
-		std::vector<std::shared_ptr<Entity>>::iterator end() { return entities.end(); }
+		std::vector<Rc<Entity>>::iterator begin() { return entities.begin(); }
+		std::vector<Rc<Entity>>::iterator end() { return entities.end(); }
 
 		void update(float dt);
 	private:
-		std::shared_ptr<Entity> mainCam;
-		std::shared_ptr<Entity> mainLight;
+		Rc<Entity> mainCam;
+		Rc<Entity> mainLight;
 
 		EntityComponentSystem* ECS;
-		std::vector<std::shared_ptr<Entity>> entities;
+		std::vector<Rc<Entity>> entities;
 
-		std::shared_ptr<RenderSystem> renderSys;
-		std::shared_ptr<CameraSystem> cameraSys;
-		std::shared_ptr<LightSystem> lightSys;
+		Rc<RenderSystem> renderSys;
+		Rc<CameraSystem> cameraSys;
+		Rc<LightSystem> lightSys;
 	};
 
 	class RenderSystem : public System
 	{
 	public:
-		RenderSystem(Scene* scene);
+		RenderSystem(Scene* scene) : System(scene) { acceptsSubset = true; }
 
-		void onLightChanged(LightChangedEvent* event);
-		void onCameraChanged(CameraChangedEvent* event);
+		virtual void insertEntity(EntityID entity) override;
+		virtual void removeEntity(EntityID entity) override;
+		virtual void update(float dt) override;
 
-		virtual void update(float dt);
+		void render();
+
+	private:
+		bool dataChanged = false;
+		u32 totalInstances = 0;
+
+		std::unordered_map<u32, u32> meshToInstancesMap;
+
+		std::unordered_map<Shader*, std::vector<Vertex>> shaderToVertexDataMap;
+		std::unordered_map<Shader*, std::vector<glm::mat4>> shaderToModelMatrixMap;
+		std::unordered_map<Shader*, std::unordered_map<u32, u32>> shaderToVertexDataSizesMap;
+		std::unordered_map<Shader*, std::unordered_map<u32, u32>> shaderToIndicesSizesMap;
+
+		std::unordered_map<Shader*, std::vector<u32>> shaderToIndicesMap;
+
+		std::unordered_map < Shader*, std::unordered_map<u32, IndirectCommand>> shaderToCommandMap;
 	};
 
 	class CameraSystem : public System
@@ -95,14 +113,13 @@ namespace kuai {
 	public:
 		CameraSystem(Scene* scene) : System(scene) { acceptsSubset = true; }
 
-		void setRenderSystem(std::shared_ptr<RenderSystem> renderSys) { this->renderSys = renderSys; }
-
+		void setRenderSystem(Rc<RenderSystem> renderSys) { this->renderSys = renderSys; }
 		void setMainCam(CameraComponent& cam);
 
-		virtual void update(float dt);
+		virtual void update(float dt) override;
 
 	private:
-		std::shared_ptr<RenderSystem> renderSys;
+		Rc<RenderSystem> renderSys;
 	};
 
 	class LightSystem : public System
@@ -110,12 +127,12 @@ namespace kuai {
 	public:
 		LightSystem(Scene* scene) : System(scene) { acceptsSubset = true; }
 		
-		void setRenderSystem(std::shared_ptr<RenderSystem> renderSys) { this->renderSys = renderSys; }
+		void setRenderSystem(Rc<RenderSystem> renderSys) { this->renderSys = renderSys; }
 
-		virtual void update(float dt);
+		virtual void update(float dt) override;
 
 	private:
-		std::shared_ptr<RenderSystem> renderSys;
+		Rc<RenderSystem> renderSys;
 	};
 
 	//class PhysicsSystem : public System

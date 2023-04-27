@@ -22,15 +22,17 @@ namespace kuai {
 		processNode(scene->mRootNode, scene);
 	}
 
-	Model::Model(std::shared_ptr<Mesh> mesh)
+	Model::Model(const Rc<Mesh>& mesh, const Rc<Material>& material)
 	{
 		meshes.push_back(mesh);
-	}
-
-	void Model::render()
-	{
-		for (auto& mesh : meshes)
-			mesh->render();
+		if (!material)
+		{
+			// Default material
+			Rc<Texture> tex = MakeRc<Texture>();
+			materials.push_back(MakeRc<DefaultMaterial>(tex, tex, 10.0f));
+		}
+		else
+			materials.push_back(material);
 	}
 
 	void Model::processNode(aiNode* node, const aiScene* scene)
@@ -47,31 +49,30 @@ namespace kuai {
 		}
 	}
 
-	std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene)
+	Rc<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene)
 	{
-		std::vector<float> vertices((size_t)mesh->mNumVertices * 3);
-		std::vector<float> normals((size_t)mesh->mNumVertices * 3);
-		std::vector<float> texCoords;
-		std::vector<uint32_t> indices;
+		std::vector<Vertex> vertexData(mesh->mNumVertices);
+		std::vector<u32> indices;
 		std::vector<Texture*> textures;
 
-		// Vertices and Normals
-		memcpy(vertices.data(), &mesh->mVertices[0], mesh->mNumVertices * sizeof(float) * 3);
-		memcpy(normals.data(), &mesh->mNormals[0], mesh->mNumVertices * sizeof(float) * 3);
-
-		// Texture Coords
-		if (mesh->mTextureCoords[0])
+		for (int i = 0; i < mesh->mNumVertices; i++)
 		{
-			for (int i = 0; i < mesh->mNumVertices; i++)
-			{
-				texCoords.push_back(mesh->mTextureCoords[0][i].x);
-				texCoords.push_back(mesh->mTextureCoords[0][i].y);
+			vertexData[i].pos[0] = mesh->mVertices[i].x;
+			vertexData[i].pos[1] = mesh->mVertices[i].y;
+			vertexData[i].pos[2] = mesh->mVertices[i].z;
 
-				// TODO: load tangents and bitangents
+			vertexData[i].normal[0] = mesh->mNormals[i].x;
+			vertexData[i].normal[1] = mesh->mNormals[i].x;
+			vertexData[i].normal[2] = mesh->mNormals[i].x;
+
+			if (mesh->mTextureCoords[0])
+			{
+				vertexData[i].texCoords[0] = mesh->mTextureCoords[0][i].x;
+				vertexData[i].texCoords[1] = mesh->mTextureCoords[0][i].y;
 			}
+
+			vertexData[i].texId = 0;
 		}
-		else
-			texCoords.resize((size_t)mesh->mNumVertices * 2);
 
 		// Indices
 		for (size_t i = 0; i < mesh->mNumFaces; i++)
@@ -95,12 +96,13 @@ namespace kuai {
 			// TODO: normal maps and height maps
 			if (textures.size() > 1)
 			{
-				std::shared_ptr<Material> mat = std::make_shared<DefaultMaterial>(std::make_shared<Texture>(*textures[0]), std::make_shared<Texture>(*textures[1]), 20.0f);
-				return std::make_shared<Mesh>(vertices, normals, texCoords, indices, mat);
+				materials.push_back(MakeRc<DefaultMaterial>(MakeRc<Texture>(*textures[0]), MakeRc<Texture>(*textures[1]), 20.0f));
+				return MakeRc<Mesh>(vertexData, indices);
 			}
 		}
 
-		return std::make_shared<Mesh>(vertices, normals, texCoords, indices);
+		materials.push_back(MakeRc<DefaultMaterial>(MakeRc<Texture>(), MakeRc<Texture>(), 20.0f));
+		return MakeRc<Mesh>(vertexData, indices);
 	}
 
 	std::vector<Texture*> Model::loadMaterialTextures(aiMaterial* mat, uint64_t type)

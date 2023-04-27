@@ -10,7 +10,7 @@
 #include "kuai/Sound/MusicSource.h"
 
 namespace kuai {
-	uint32_t LightCounter::lightCount = 0;
+	u32 Light::lightCount = 0;
 
 	Transform& Component::getTransform()
 	{
@@ -30,7 +30,7 @@ namespace kuai {
 			getComponent<Light>().shadowCam.updateViewMatrix(pos, rot);
 			getComponent<Light>().calcLightSpaceMatrix();
 			getComponent<Light>().changed = true;
-			Renderer::updateShadowMap(getComponent<Light>());
+			// Renderer::updateShadowMap(getComponent<Light>());
 		}
 
 		if (hasComponent<AudioListener>())

@@ -1,92 +1,50 @@
 #include "kpch.h"
 #include "Mesh.h"
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 
 namespace kuai {
-	Mesh::Mesh(const std::vector<float>& positions, const std::vector<float>& normals, const std::vector<float>& texCoords, const std::vector<uint32_t>& indices, std::shared_ptr<Material> material) :
-		Mesh(positions, normals, texCoords, indices)
+	u32 Mesh::meshCounter = 0;
+
+	Mesh::Mesh(const std::vector<Vertex>& vertexData, const std::vector<u32> indices) :
+		vertexData(vertexData), indices(indices)
 	{
-		this->material = material;
+		meshId = meshCounter++;
 	}
 
-	Mesh::Mesh(const std::vector<float>& positions, const std::vector<float>& normals, const std::vector<float>& texCoords, const std::vector<uint32_t>& indices)
+	Mesh::Mesh(const std::vector<float>& positions, const std::vector<float>& normals, const std::vector<float>& texCoords, const std::vector<u32>& indices)
 	{
-		KU_PROFILE_FUNCTION();
+		u32 vertCount = positions.size() / 3;
+		vertexData.resize(vertCount);
 
-		vertCount = indices.size();
+		bool useNormals = positions.size() == normals.size();
+		
+		this->indices = indices;
 
-		glGenVertexArrays(1, &vaoId);
-		glBindVertexArray(vaoId);
+		for (size_t i = 0; i < vertCount; i++)
+		{
+			vertexData[i].pos[0] = positions[i * 3];
+			vertexData[i].pos[1] = positions[i * 3 + 1];
+			vertexData[i].pos[2] = positions[i * 3 + 2];
 
-		glGenBuffers(4, vboIds);
+			if (useNormals)
+			{
+				vertexData[i].normal[0] = normals[i * 3];
+				vertexData[i].normal[1] = normals[i * 3 + 1];
+				vertexData[i].normal[2] = normals[i * 3 + 2];
+			}
 
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
+			if (i < texCoords.size())
+			{
+				vertexData[i].texCoords[0] = texCoords[i * 2];
+				vertexData[i].texCoords[1] = texCoords[i * 2 + 1];
+			}
+		}
 
-		// Positions
-		glBindBuffer(GL_ARRAY_BUFFER, vboIds[0]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * positions.size(), positions.data(), GL_DYNAMIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-
-		// Normals
-		glBindBuffer(GL_ARRAY_BUFFER, vboIds[1]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * normals.size(), normals.data(), GL_STATIC_DRAW);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-
-		// Texture coords
-		glBindBuffer(GL_ARRAY_BUFFER, vboIds[2]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * texCoords.size(), texCoords.data(), GL_STATIC_DRAW);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
-
-		// Indices
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIds[3]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * vertCount, indices.data(), GL_STATIC_DRAW);
-
-		glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-		glBindVertexArray(GL_NONE);
-
-		// Default material
-		auto tex = std::make_shared<Texture>();
-		material = std::make_shared<DefaultMaterial>(tex, tex, 10.0f);
+		meshId = meshCounter++;
 	}
 
 	Mesh::~Mesh()
 	{
-		// Delete VBOs
-		glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-		glDeleteBuffers(4, vboIds);
-
-		// Delete VAO
-		glBindVertexArray(GL_NONE);
-		glDeleteVertexArrays(1, &vaoId);
 	}
-
-	void Mesh::render()
-	{
-		material->render();
-
-		glBindVertexArray(vaoId);
-		//glEnableVertexAttribArray(0);
-		//glEnableVertexAttribArray(1);
-		//glEnableVertexAttribArray(2);
-
-		glDrawElements(GL_TRIANGLES, vertCount, GL_UNSIGNED_INT, 0);
-
-		// Restore state
-		//glDisableVertexAttribArray(0);
-		//glDisableVertexAttribArray(1);
-		//glDisableVertexAttribArray(2);
-
-		//glBindVertexArray(GL_NONE); // No need to unbind every time
-	}
-
-	void Mesh::setTexCoords(std::vector<float>& texCoords)
-	{
-		glBindVertexArray(vaoId);
-		glBindBuffer(GL_ARRAY_BUFFER, vboIds[2]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * texCoords.size(), texCoords.data(), GL_STATIC_DRAW);
-	}
-
 }

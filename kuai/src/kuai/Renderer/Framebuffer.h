@@ -10,7 +10,10 @@ namespace kuai {
         uint32_t attachments = 0;
     };
 
-    class Framebuffer
+    /** \class Framebuffer
+	*	\brief Holds a texture that gets rendered to.
+	*/
+    class Framebuffer // TODO: rename as render texture?
     {
     public:
         Framebuffer(uint32_t width, uint32_t height, uint32_t samples, uint32_t attachments);
@@ -32,7 +35,7 @@ namespace kuai {
 
         unsigned int getTextureTarget(bool multisampling);
 
-    public: // TODO: set back to private once done
+    private:
         uint32_t frameBufId = 0;
 
         std::vector<uint32_t> colAttachments;

@@ -2,7 +2,7 @@
 
 namespace kuai {
 	/** \class Cubemap
-	*	\brief A collection of six textures that form a cube. Used in environment mapping and to create @see Skybox objects.
+	*	\brief A collection of six textures that form a cube. Used in environment mapping and to create Skybox objects.
 	*/
 	class Cubemap
 	{
@@ -14,7 +14,7 @@ namespace kuai {
 		~Cubemap();
 
 		uint32_t getId();
-
+		/// @private
 		void bind(uint32_t activeTex);
 	private:
 		uint32_t textureId;

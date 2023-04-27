@@ -4,7 +4,7 @@
 #include "Texture.h"
 #include "Cubemap.h"
 
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 #include <memory>
 
 namespace kuai {
@@ -26,7 +26,7 @@ namespace kuai {
 	class DefaultMaterial : public Material
 	{
 	public:
-		DefaultMaterial(std::shared_ptr<Texture> diffuse, std::shared_ptr<Texture> specular, float specularAmount)
+		DefaultMaterial(Rc<Texture> diffuse, Rc<Texture> specular, float specularAmount)
 			: diffuse(diffuse), specular(specular), specularAmount(specularAmount), reflections(false)
 		{
 			shader = StaticShader::basic;
@@ -40,17 +40,21 @@ namespace kuai {
 				reflectionMap->bind(4);
 		}
 
-		void setDiffuse(std::shared_ptr<Texture> diffuse) { this->diffuse = diffuse; }
-		void setSpecular(std::shared_ptr<Texture> specular) { this->specular = specular; }
-		void setReflection(std::shared_ptr<Cubemap> reflection) { this->reflectionMap = reflection; reflections = true; }
+		void setDiffuse(Rc<Texture> diffuse) { this->diffuse = diffuse; }
+		void setSpecular(Rc<Texture> specular) { this->specular = specular; }
+		void setReflection(Rc<Cubemap> reflection) { this->reflectionMap = reflection; reflections = true; }
+
+		void setTiling(float x, float y) { tilingFactor = glm::vec2(x, y); }
 
 		float specularAmount;
 		bool reflections;
 
 	private:
-		std::shared_ptr<Texture> diffuse;
-		std::shared_ptr<Texture> specular;
-		std::shared_ptr<Cubemap> reflectionMap;
+		Rc<Texture> diffuse;
+		Rc<Texture> specular;
+		Rc<Cubemap> reflectionMap;
+
+		glm::vec2 tilingFactor = { 1.0f, 1.0f };
 
 		friend class Model;
 	};
@@ -58,7 +62,7 @@ namespace kuai {
 	class SkyboxMaterial : public Material
 	{
 	public:
-		SkyboxMaterial(std::shared_ptr<Cubemap> cubemap) : cubemap(cubemap)
+		SkyboxMaterial(Rc<Cubemap> cubemap) : cubemap(cubemap)
 		{
 			shader = StaticShader::skybox;
 		}
@@ -69,6 +73,6 @@ namespace kuai {
 		}
 
 	private:
-		std::shared_ptr<Cubemap> cubemap;
+		Rc<Cubemap> cubemap;
 	};
 }

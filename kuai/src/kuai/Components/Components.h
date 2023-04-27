@@ -181,29 +181,28 @@ namespace kuai {
 	{
 	public:
 		MeshRenderer(Entity* entity) : Component(entity) {}
-		MeshRenderer(Entity* entity, std::shared_ptr<Model> model) : Component(entity), model(model) {}
-		MeshRenderer(Entity* entity, std::shared_ptr<Mesh> mesh) : Component(entity), model(std::make_shared<Model>(mesh)) {}
+		MeshRenderer(Entity* entity, Rc<Model> model) : Component(entity), model(model) {}
+		MeshRenderer(Entity* entity, Rc<Mesh> mesh) : Component(entity), model(MakeRc<Model>(mesh)) {}
 
 		void render()
 		{
-			if (model)
-				model->render();
+			
 		}
 
-		std::shared_ptr<Model> getModel() { return model; }
-		void setModel(std::shared_ptr<Model> model) { this->model = model; }
+		Rc<Model> getModel() { return model; }
+		void setModel(Rc<Model> model) { this->model = model; }
 
 		bool castsShadows() { return shadows; }
 		void setShadows(bool shadows) { this->shadows = shadows; }
 
 	private:
-		std::shared_ptr<Model> model;
+		Rc<Model> model;
 		
 		bool shadows = true;
 	};
 
 	/** \class Camera
-	*	\brief
+	*	\brief Device through which the user views the world.
 	*/
 	class CameraComponent : public Component, public Camera
 	{
@@ -214,7 +213,9 @@ namespace kuai {
 			changed = true;
 		}
 
-		bool isMain = false;
+		CameraComponent(Entity* entity) : Component(entity), Camera() { changed = true; }
+
+		bool isMain = false; // Indicates whether this is the main camera (i.e. the camera that renders to the window)
 	};
 
 	struct CameraChangedEvent : public Event
@@ -227,14 +228,11 @@ namespace kuai {
 		CameraComponent* cam;
 	};
 
-	class LightCounter
-	{
-	public:
-		static uint32_t lightCount;
-	};
-
 	/** \class Light
-	*	\brief
+	*	\brief Illuminates a scene. There are three types of light: directional, point and spot.
+			   Directional lights only shine in one direction; they are used to model far away light sources such as the sun.
+			   Point lights create an area of lighting.
+			   Spotlights shine a concentrated beam of light with a provided angle and direction.
 	*/
 	class Light : public Component
 	{
@@ -246,7 +244,7 @@ namespace kuai {
 			Spot = 2
 		};
 
-		Light(Entity* entity) : Component(entity), lightId(LightCounter::lightCount++)
+		Light(Entity* entity) : Component(entity), lightId(lightCount++)
 		{
 			shadowCam.setAspect(1, 1);
 			shadowCam.setOrtho(20.0f, -10.0f, 10.0f);
@@ -300,6 +298,9 @@ namespace kuai {
 		Camera shadowCam;
 		glm::mat4 lightSpaceMatrix;
 
+	private:
+		static uint32_t lightCount;
+
 		friend class Transform;
 	};
 
@@ -319,7 +320,7 @@ namespace kuai {
 	class AudioSource;
 
 	/** \class AudioListener
-	*	\brief
+	*	\brief Acts like a microphone; plays back sounds in a scene. Only one AudioListener is permitted per scene.
 	*/
 	class AudioListener : public Component
 	{
@@ -336,7 +337,7 @@ namespace kuai {
 	};
 
 	/** \class AudioSourceComponent
-	*	\brief
+	*	\brief Acts like a speaker; generates sounds in a scene. Must be provided with an AudioClip to play.
 	*/
 	class AudioSourceComponent : public Component
 	{
