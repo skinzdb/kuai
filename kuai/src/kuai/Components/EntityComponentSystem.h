@@ -99,9 +99,9 @@ namespace kuai {
 
 		void destroyEntity(EntityID entity)
 		{
-			entityManager->destroyEntity(entity);
-			componentManager->onEntityDestroyed(entity);
 			systemManager->onEntityDestroyed(entity);
+			componentManager->onEntityDestroyed(entity);
+			entityManager->destroyEntity(entity);
 		}
 
 		// *** Component Management *******************************************
@@ -164,7 +164,7 @@ namespace kuai {
 		// *** System Management **********************************************
 
 		template<typename T>
-		std::shared_ptr<T> registerSystem(Scene* scene)
+		Rc<T> registerSystem(Scene* scene)
 		{
 			KU_CORE_INFO("Registered new system: {0}", typeid(T).name());
 
@@ -192,12 +192,12 @@ namespace kuai {
 		}
 
 	private:
-		std::unique_ptr<EntityManager> entityManager;
-		std::unique_ptr<ComponentManager> componentManager;
-		std::unique_ptr<SystemManager> systemManager;
+		Box<EntityManager> entityManager;
+		Box<ComponentManager> componentManager;
+		Box<SystemManager> systemManager;
 
 		// *** Event bus - for communication between systems ***
-		std::unique_ptr<EventBus> eventBus;
+		Box<EventBus> eventBus;
 	};
 }
 //@endcond

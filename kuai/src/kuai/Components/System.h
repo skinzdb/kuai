@@ -1,7 +1,5 @@
 #pragma once
 
-#include "kuai/Events/Event.h"
-
 namespace kuai {
 	class Scene; // Forward declarations
 	class Entity;
@@ -29,6 +27,10 @@ namespace kuai {
 		Scene* scene;
 
 		bool acceptsSubset = false;	// Add entities that have components which are a subset of the system's component mask
+
+	private:
+
+		bool hasEntity(EntityID entity);
 
 		friend class SystemManager;
 	};

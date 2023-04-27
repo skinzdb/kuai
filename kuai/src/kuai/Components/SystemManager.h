@@ -57,7 +57,10 @@ namespace kuai {
 				if (entityComponentMask == systemComponentMask || (system->acceptsSubset && (entityComponentMask & systemComponentMask)))
 					system->insertEntity(entity);
 				else
-					system->removeEntity(entity);
+				{
+					if (system->hasEntity(entity))
+						system->removeEntity(entity);
+				}
 			}
 		}
 

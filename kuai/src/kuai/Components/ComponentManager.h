@@ -11,7 +11,7 @@ namespace kuai {
 	class IComponentContainer
 	{
 	public:
-		virtual ~IComponentContainer() {}
+		virtual ~IComponentContainer() = default;
 
 		virtual void onEntityDestroyed(EntityID entity) = 0;
 	};
@@ -20,8 +20,6 @@ namespace kuai {
 	class ComponentContainer : public IComponentContainer
 	{
 	public:
-		ComponentContainer() : currentComponents(0) {}
-
 		template <typename ...Args>
 		void insert(EntityID entity, Args&&... args)
 		{
@@ -79,7 +77,7 @@ namespace kuai {
 		std::unordered_map<EntityID, size_t> entityToIndex;
 		std::unordered_map<size_t, EntityID> indexToEntity;
 
-		size_t currentComponents;
+		size_t currentComponents = 0;
 	};
 
 	class ComponentManager
@@ -93,7 +91,7 @@ namespace kuai {
 			KU_CORE_ASSERT(componentTypes.find(typeName) == componentTypes.end(), "Registering a component type more than once")
 
 			componentTypes.insert({ typeName, nextComponentType++ });	// Increment for next component
-			componentContainers.insert({ typeName, std::make_shared<ComponentContainer<T>>() });
+			componentContainers.insert({ typeName, MakeRc<ComponentContainer<T>>() });
 		}
 
 		template<typename T, typename... Args>
@@ -149,13 +147,13 @@ namespace kuai {
 		// Map of component names to their types (uint_8)
 		std::unordered_map<const char*, ComponentType> componentTypes;
 		// Map of component names to their containers
-		std::unordered_map<const char*, std::shared_ptr<IComponentContainer>> componentContainers;
+		std::unordered_map<const char*, Rc<IComponentContainer>> componentContainers;
 
 		// Component type to be assigned to next registered component
 		ComponentType nextComponentType = 0;
 
 		template<typename T>
-		std::shared_ptr<ComponentContainer<T>> getComponentContainer()
+		Rc<ComponentContainer<T>> getComponentContainer()
 		{
 			const char* typeName = typeid(T).name();
 

@@ -2,7 +2,6 @@
 #include "System.h"
 
 #include "Scene.h"
-#include "Entity.h"
 
 namespace kuai {
 
@@ -21,4 +20,8 @@ namespace kuai {
 		return entities;
 	}
 
+	bool System::hasEntity(EntityID entity)
+	{
+		return std::find(entities.begin(), entities.end(), scene->getEntityById(entity)) != entities.end();
+	}
 }
