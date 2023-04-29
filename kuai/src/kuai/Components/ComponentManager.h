@@ -27,7 +27,8 @@ namespace kuai {
 
 			entityToIndex[entity] = currentComponents;
 			indexToEntity[currentComponents] = entity;
-			components.emplace_back(args...);
+
+			components[currentComponents] = MakeBox<T>(args...);
 			currentComponents++;
 		}
 
@@ -37,22 +38,28 @@ namespace kuai {
 
 			// Update mappings s.t. entity of last component in array points to removed index and vice-versa
 			size_t removeIndex = entityToIndex[entity];
+			size_t lastElementIndex = currentComponents - 1;
 
-			EntityID lastElementEntity = indexToEntity[currentComponents - 1];
+			EntityID lastElementEntity = indexToEntity[lastElementIndex];
 			entityToIndex[lastElementEntity] = removeIndex;
 			indexToEntity[removeIndex] = lastElementEntity;
 
+			// Move last element of array to removed index so components are properly indexed
+			components[removeIndex] = std::move(components[lastElementIndex]);
+
 			// Erase mappings of removed component and index of last component in the array
-			entityToIndex.erase(entity);
-			indexToEntity.erase(--currentComponents);
 			// The components array will remain tightly packed
+			entityToIndex.erase(entity);
+			indexToEntity.erase(lastElementIndex);
+
+			lastElementIndex--;
 		}
 
 		T& get(EntityID entity)
 		{
 			KU_CORE_ASSERT(entityToIndex.find(entity) != entityToIndex.end(), "Retrieving component that does not exist");
 
-			return components[entityToIndex[entity]]; // Return reference to entity's component
+			return *(components[entityToIndex[entity]].get()); // Return reference to entity's component
 		}
 
 		bool has(EntityID entity)
@@ -71,7 +78,7 @@ namespace kuai {
 		typename std::vector<T>::iterator end() { return components.end(); }
 
 	private:
-		std::vector<T> components;
+		Box<T> components[MAX_ENTITIES];
 
 		// Mappings from entities to their respective index in components array and vice-versa
 		std::unordered_map<EntityID, size_t> entityToIndex;

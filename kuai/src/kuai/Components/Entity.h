@@ -76,12 +76,6 @@ namespace kuai {
 			return id;
 		}
 
-		/// @private
-		void destroy()
-		{
-			ECS->destroyEntity(id);
-		}
-
 	private:
 		EntityID id;
 		EntityComponentSystem* ECS;

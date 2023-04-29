@@ -100,8 +100,8 @@ namespace kuai {
 		void destroyEntity(EntityID entity)
 		{
 			systemManager->onEntityDestroyed(entity);
-			componentManager->onEntityDestroyed(entity);
 			entityManager->destroyEntity(entity);
+			componentManager->onEntityDestroyed(entity);
 		}
 
 		// *** Component Management *******************************************
