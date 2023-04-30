@@ -4,8 +4,6 @@
 #include "Entity.h"
 #include "Components.h"
 
-#include <map>
-
 namespace kuai {
 	// Forward declarations
 	class RenderSystem;
@@ -65,8 +63,8 @@ namespace kuai {
 		Light& getMainLight();
 		void setMainLight(Light& light);
 
-		std::vector<Rc<Entity>>::iterator begin() { return entities.begin(); }
-		std::vector<Rc<Entity>>::iterator end() { return entities.end(); }
+		std::unordered_map<u32, Rc<Entity>>::iterator begin() { return entityMap.begin(); }
+		std::unordered_map<u32, Rc<Entity>>::iterator end() { return entityMap.end(); }
 
 		void update(float dt);
 	private:
@@ -74,7 +72,7 @@ namespace kuai {
 		Rc<Entity> mainLight;
 
 		EntityComponentSystem* ECS;
-		std::vector<Rc<Entity>> entities;
+		std::unordered_map<u32, Rc<Entity>> entityMap;
 
 		Rc<RenderSystem> renderSys;
 		Rc<CameraSystem> cameraSys;
@@ -93,19 +91,28 @@ namespace kuai {
 		void render();
 
 	private:
+		void setCommands();
+
+	private:
+		// Total number of instances shader owns
+		std::unordered_map<Shader*, size_t> shaderToInstances;
+
+		// Maps meshes to the number of instances they have.
+		std::unordered_map<u32, size_t> meshToNumInstances;
+
+		// Map each shader to a list of vertices, indices and model matrices.
+		std::unordered_map<Shader*, std::vector<Vertex>> shaderToVertexData;
+		std::unordered_map<Shader*, std::vector<u32>> shaderToIndices;
+		std::unordered_map<Shader*, std::vector<glm::mat4>> shaderToModelMatrices;
+
+		// For each shader and for each mesh, store the sizes of their vertex and index lists.
+		std::unordered_map<Shader*, std::unordered_map<u32, size_t>> shaderToVertexDataSizes;
+		std::unordered_map<Shader*, std::unordered_map<u32, size_t>> shaderToIndicesSizes;
+	
+		// For each shader and for each mesh, store its corresponding render command.
+		std::unordered_map<Shader*, std::unordered_map<u32, IndirectCommand>> shaderToMeshCommand;
+
 		bool dataChanged = false;
-		u32 totalInstances = 0;
-
-		std::unordered_map<u32, u32> meshToInstancesMap;
-
-		std::unordered_map<Shader*, std::vector<Vertex>> shaderToVertexDataMap;
-		std::unordered_map<Shader*, std::vector<glm::mat4>> shaderToModelMatrixMap;
-		std::unordered_map<Shader*, std::unordered_map<u32, u32>> shaderToVertexDataSizesMap;
-		std::unordered_map<Shader*, std::unordered_map<u32, u32>> shaderToIndicesSizesMap;
-
-		std::unordered_map<Shader*, std::vector<u32>> shaderToIndicesMap;
-
-		std::unordered_map < Shader*, std::unordered_map<u32, IndirectCommand>> shaderToCommandMap;
 	};
 
 	class CameraSystem : public System

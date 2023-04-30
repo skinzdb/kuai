@@ -155,11 +155,6 @@ namespace kuai {
 			return componentManager->getComponentType<T>();
 		}
 
-		template<typename T>
-		void applyToComponents(std::function<void(T component)> fn)
-		{
-			componentManager->applyToComponents(fn);
-		}
 
 		// *** System Management **********************************************
 

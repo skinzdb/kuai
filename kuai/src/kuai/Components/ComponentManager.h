@@ -25,11 +25,11 @@ namespace kuai {
 		{
 			KU_CORE_ASSERT(entityToIndex.find(entity) == entityToIndex.end(), "Added duplicate component to entity");
 
-			entityToIndex[entity] = currentComponents;
-			indexToEntity[currentComponents] = entity;
+			entityToIndex[entity] = size;
+			indexToEntity[size] = entity;
 
-			components[currentComponents] = MakeBox<T>(args...);
-			currentComponents++;
+			components[size] = MakeBox<T>(args...);
+			size++;
 		}
 
 		void remove(EntityID entity)
@@ -38,13 +38,13 @@ namespace kuai {
 
 			// Update mappings s.t. entity of last component in array points to removed index and vice-versa
 			size_t removeIndex = entityToIndex[entity];
-			size_t lastElementIndex = currentComponents - 1;
+			size_t lastElementIndex = size;
 
 			EntityID lastElementEntity = indexToEntity[lastElementIndex];
 			entityToIndex[lastElementEntity] = removeIndex;
 			indexToEntity[removeIndex] = lastElementEntity;
 
-			// Move last element of array to removed index so components are properly indexed
+			// Move last element of array to removed index so components are mapped properly
 			components[removeIndex] = std::move(components[lastElementIndex]);
 
 			// Erase mappings of removed component and index of last component in the array
@@ -71,7 +71,9 @@ namespace kuai {
 		{
 			// If entity owns this component type
 			if (entityToIndex.find(entity) != entityToIndex.end())
+			{
 				remove(entity);
+			}
 		}
 
 		typename std::vector<T>::iterator begin() { return components.begin(); }
@@ -84,7 +86,7 @@ namespace kuai {
 		std::unordered_map<EntityID, size_t> entityToIndex;
 		std::unordered_map<size_t, EntityID> indexToEntity;
 
-		size_t currentComponents = 0;
+		size_t size = 0;
 	};
 
 	class ComponentManager
@@ -97,8 +99,8 @@ namespace kuai {
 
 			KU_CORE_ASSERT(componentTypes.find(typeName) == componentTypes.end(), "Registering a component type more than once")
 
-			componentTypes.insert({ typeName, nextComponentType++ });	// Increment for next component
-			componentContainers.insert({ typeName, MakeRc<ComponentContainer<T>>() });
+			componentTypes.emplace(typeName, nextComponentType++);	// Increment for next component
+			componentContainers.emplace(typeName, MakeRc<ComponentContainer<T>>());
 		}
 
 		template<typename T, typename... Args>
@@ -129,16 +131,6 @@ namespace kuai {
 		ComponentType getComponentType()
 		{
 			return componentTypes[typeid(T).name()];
-		}
-
-		template<typename T>
-		void applyToComponents(std::function<void(T component)> fn)
-		{
-			auto container = getComponentContainer<T>()->begin();
-			for (auto const& i : container)
-			{
-				fn(i);
-			}
 		}
 
 		void onEntityDestroyed(EntityID entity)

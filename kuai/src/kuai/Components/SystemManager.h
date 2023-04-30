@@ -55,7 +55,10 @@ namespace kuai {
 
 				// If entity's component mask matches this system, add it to the system's list
 				if (entityComponentMask == systemComponentMask || (system->acceptsSubset && (entityComponentMask & systemComponentMask)))
-					system->insertEntity(entity);
+				{
+					if (!system->hasEntity(entity))
+						system->insertEntity(entity);
+				}
 				else
 				{
 					if (system->hasEntity(entity))

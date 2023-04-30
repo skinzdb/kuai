@@ -135,12 +135,12 @@ namespace kuai {
     struct IndirectCommand
     {
         u32 count;          // Number of elements to be drawn per instance
-        u32 instanceCount;  // Number of instancs
-        u32 firstIndex;     // Offset of mesh in vertex buffer
-        i32 baseVertex;     // Offset of mesh in index buffer
+        u32 instanceCount;  // Number of instances
+        u32 firstIndex;     // Offset of mesh in index buffer
+        i32 baseVertex;     // Offset of mesh in vertex buffer
         u32 baseInstance;   // First instanced model index
     };
-
+             
     class IndirectBuffer
     {
     public:

@@ -3,10 +3,8 @@
 // @cond
 namespace kuai {
 
-	const uint32_t MAX_ENTITIES = 65536;
+	const uint32_t MAX_ENTITIES = 100000;
 	const uint32_t MAX_COMPONENTS = 32;
-
-	const uint32_t NULL_ENTITY = 0;
 
 	using EntityID = uint32_t;
 	using ComponentMask = uint32_t;
@@ -21,9 +19,8 @@ namespace kuai {
 	public:
 		EntityManager()
 		{
-			entityNo = 0;
-			for (EntityID entity = 0; entity < MAX_ENTITIES; entity++)
-				availableEntities.push_back(entity);
+			for (size_t i = 0; i < MAX_ENTITIES; i++)
+				availableEntities.push_back(MAX_ENTITIES - i);
 		}
 
 		EntityID createEntity()
@@ -60,7 +57,7 @@ namespace kuai {
 		// List of unused entity IDs
 		std::vector<EntityID> availableEntities;
 		// Number of entities currently in use
-		uint32_t entityNo;
+		uint32_t entityNo = 0;
 
 		// Components associated with each entity
 		ComponentMask componentMasks[MAX_ENTITIES];
