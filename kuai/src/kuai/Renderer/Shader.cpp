@@ -32,8 +32,8 @@ namespace kuai {
 	void Shader::createUniform(const std::string& name)
 	{
 		int uniformLoc = glGetUniformLocation(programId, name.c_str());
-		if (uniformLoc == -1)
-			KU_CORE_ERROR("[Shader {0}] Could not find the uniform {1}", programId, name);
+		//if (uniformLoc == -1)
+		//	KU_CORE_ERROR("[Shader {0}] Could not find the uniform {1}", programId, name);
 		uniforms[name] = uniformLoc;
 	}
 
@@ -181,7 +181,7 @@ namespace kuai {
 		{
 			char errStr[1024];
 			glGetProgramInfoLog(programId, 1024, nullptr, errStr);
-			KU_CORE_ERROR("[Shader {0}] Error validating shader code: {1}", programId, errStr);
+			//KU_CORE_ERROR("[Shader {0}] Error validating shader code: {1}", programId, errStr);
 		}
 	}
 }

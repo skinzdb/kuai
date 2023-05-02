@@ -33,15 +33,16 @@ namespace kuai {
 	// This is based on SFML - Simple and Fast Multimedia Library
 	// Copyright (C) 2007-2023 Laurent Gomila (laurent@sfml-dev.org)
 	// The do-while loop is needed so that alCheck can be used as a single statement in if/else branches
+
 	//#ifdef KU_DEBUG
-		#define alCheck(expr)                                      \
-			do                                                     \
-			{                                                      \
-				expr;                                              \
-				kuai::checkAlErrors(__FILE__, __LINE__, #expr);	   \
-			} while (false)
+	//	#define alCheck(expr)                                      \
+	//		do                                                     \
+	//		{                                                      \
+	//			expr;                                              \
+	//			kuai::checkAlErrors(__FILE__, __LINE__, #expr);	   \
+	//		} while (false)
 	//#else
-	//	#define alCheck(expr) expr
+		#define alCheck(expr) expr
 	//#endif
 
 	void checkAlErrors(const std::filesystem::path& file, unsigned int line, std::string_view expression);
