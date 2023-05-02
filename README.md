@@ -1,6 +1,8 @@
 # kuai
 3D Game Engine.
 
+To use the engine, you can simply copy the `pykuai.cp310-win_amd64.pyd` file into your directory and import it with `from pykuai import *`.
+
 ## Build
 
 This project uses CMake as its build system. To build kuai from scratch, follow these steps: 
@@ -136,4 +138,4 @@ The `sys` library is being used here to get the local file path of the program.
 
 ## Documentation
 
-The documentation for the C++ engine can be found here: http://www.reddit.com.
+The main documentation page for the C++ engine is located at `kuai/doc/index.html'.
