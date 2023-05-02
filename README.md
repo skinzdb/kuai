@@ -10,12 +10,12 @@ This project uses CMake as its build system. To build kuai from scratch, follow 
 2) Create a build folder inside the `PythonBinder/` directory.
 3) Create project files by running the following command inside the build folder:
 ``` cmake .. ```  
-Alternatively you can use the CMake GUI.
+Alternatively, you can use the CMake GUI.
 4) Open the generated Visual Studio project and build the ALL_BUILD target.
 5) Extract the Python module from the build destination (usually located in `Debug` or `Release` depending on your build configuration).
-6) Profit.
 
-Note that kuai engine only supports Windows x64 systems.
+
+Note that kuai engine only supports Windows x64 systems. If using the pre-built Python module, PLEASE ensure you run it using Python 3.10.x
 
 ## First Steps
 
@@ -63,14 +63,14 @@ app.run()
 ```
 
 ### Scene:
-Scenes facilitate the creation and destruction of entites. Lets initialise a scene and our first entity in the `MyLayer` class we made:
+Scenes facilitate the creation and destruction of entities. Let's initialise a scene and our first entity in the `MyLayer` class we made:
 ```Python
 class MyLayer(Layer):
     def __init__(self):
         Layer.__init__(self)
 
         self.scene = Scene()
-        self.myEntity = scene.createEntity()
+        self.myEntity = self.scene.createEntity()
         .
         .
         .
@@ -92,7 +92,7 @@ We can also retrieve these properties with ```getPos()```, ```getRot()``` and ``
 model = Model(<filename>)   # Load a 3D object
 
 self.myEntity.addRenderer() # Attach renderer component
-self.myEntity.getRenderer().addModel(model) # Set a model for the renderer component to draw
+self.myEntity.getRenderer().setModel(model) # Set a model for the renderer component to draw
 ```
 **NOTE**: The `Model` class loads a 3D object file from `<filename>`.   
 You may need to adjust the positioning of the object for it to appear in front of the camera. We can set the position of the entity forwards if need be:
@@ -101,7 +101,7 @@ self.myEntity.getTransform().setPos(0, 0, -1)
 ```
 **NOTE**: The forwards z-direction (i.e. going into the screen) is negative.
 
-If all has gone to plan then you should be able to see your model on the screen. Hooray!  
+If all has gone to plan then you should be able to see your model on the screen. 
 ### Final code listing:
 ```Python
 from pykuai import *
@@ -132,8 +132,8 @@ app.pushLayer(layer)
 app.run()
 ```
 
-The `sys` library is being used here to get the local file path of the program (you will need your own `bunny.obj` - sorry).
+The `sys` library is being used here to get the local file path of the program.
 
 ## Documentation
 
-Can be found somewhere.
+The documentation for the C++ engine can be found here: http://www.reddit.com.
