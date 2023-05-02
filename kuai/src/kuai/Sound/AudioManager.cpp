@@ -9,7 +9,7 @@ namespace kuai {
 	ALCdevice* AudioManager::device = nullptr;
 	ALCcontext* AudioManager::context = nullptr;
 
-	std::unordered_map<uint32_t, AudioSource*> AudioManager::sourceMap = std::unordered_map<uint32_t, AudioSource*>();
+	std::unordered_map<u32, Rc<AudioSource>> AudioManager::sourceMap = std::unordered_map<u32, Rc<AudioSource>>();
 
 	void AudioManager::init()
 	{
@@ -35,10 +35,11 @@ namespace kuai {
 	{
 		for (auto& pair : sourceMap)
 		{
-			AudioSource* source = pair.second;
-			source->stop();
-			delete source;
+			auto& source = pair.second;
+			source->cleanup();
 		}
+
+		sourceMap.clear();
 
 		if (context)
 		{
@@ -50,17 +51,29 @@ namespace kuai {
 		alcCloseDevice(device);
 	}
 
-	AudioSource* AudioManager::createAudioSource(bool stream)
+	Rc<AudioSource> AudioManager::createAudioSource(bool stream)
 	{
-		AudioSource* source = nullptr;
+		Rc<AudioSource> source = nullptr;
 		if (stream)
-			source = new MusicSource();
+			source = MakeRc<MusicSource>();
 		else
-			source = new AudioSource();
+			source = MakeRc<AudioSource>();
 
-		sourceMap.insert(std::pair<uint32_t, AudioSource*>(source->getId(), source));
+		sourceMap.emplace(source->getId(), source);
 
 		return source;
+	}
+
+	void AudioManager::destroyAudioSource(u32 id)
+	{
+		if (context && !sourceMap.empty())
+		{
+			auto& source = sourceMap.at(id);
+
+			source->cleanup();
+
+			sourceMap.erase(id);
+		}
 	}
 
 	float AudioManager::getGlobalGain()

@@ -316,7 +316,6 @@ namespace kuai {
 	};
 
 	// Forward declarations
-	class Listener;
 	class AudioSource;
 
 	/** \class AudioListener
@@ -325,7 +324,7 @@ namespace kuai {
 	class AudioListener : public Component
 	{
 	public:
-		AudioListener(Entity* entity);
+		AudioListener(Entity* entity) : Component(entity) {}
 
 		float getGain();
 		void setGain(float gain);
@@ -343,11 +342,15 @@ namespace kuai {
 	{
 	public:
 		AudioSourceComponent(Entity* entity, bool stream = false);
+		AudioSourceComponent(const AudioSourceComponent&) = delete;
+		~AudioSourceComponent();
 
-		AudioSource* source;
+		Rc<AudioSource> get();
 
 	private:
 		void update();
+
+		Rc<AudioSource> source;
 
 		friend class Transform;
 	};

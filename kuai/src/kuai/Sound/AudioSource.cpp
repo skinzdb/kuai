@@ -15,7 +15,13 @@ namespace kuai {
 
 	AudioSource::~AudioSource()
 	{
-		// Delete the buffers
+	}
+
+	void AudioSource::cleanup()
+	{
+		alCheck(alSourceStop(sourceId));
+
+		// Delete the buffers (This gets handled centrally by the AudioManager class)
 		alCheck(alSourcei(sourceId, AL_BUFFER, 0));
 		alCheck(alDeleteBuffers(BUF_COUNT, buffers));
 

@@ -21,6 +21,7 @@ namespace kuai {
 
         AudioSource();
 		virtual ~AudioSource();
+		void cleanup();
         
 		virtual void play();
 		virtual void pause();

@@ -14,7 +14,8 @@ namespace kuai {
 		static void init();
 		static void cleanup();
 
-		static AudioSource* createAudioSource(bool stream = false);
+		static Rc<AudioSource> createAudioSource(bool stream = false);
+		static void destroyAudioSource(u32 id);
 
 		static float getGlobalGain();
 		static void setGlobalGain(float gain);
@@ -26,7 +27,7 @@ namespace kuai {
 		static ALCdevice* device;
 		static ALCcontext* context;
 
-		static std::unordered_map<uint32_t, AudioSource*> sourceMap;
+		static std::unordered_map<u32, Rc<AudioSource>> sourceMap;
 	};
 	
 	// This is based on SFML - Simple and Fast Multimedia Library

@@ -44,10 +44,6 @@ namespace kuai {
 		}
 	}
 
-	AudioListener::AudioListener(Entity* entity) : Component(entity)
-	{
-	}
-
 	float AudioListener::getGain() { return AudioManager::getGlobalGain(); }
 	void AudioListener::setGain(float gain) { AudioManager::setGlobalGain(gain); }
 
@@ -62,9 +58,19 @@ namespace kuai {
 		source = AudioManager::createAudioSource(stream);
 	}
 
+	AudioSourceComponent::~AudioSourceComponent()
+	{
+		AudioManager::destroyAudioSource(source->getId());
+	}
+
 	void AudioSourceComponent::update()
 	{
 		source->setPos(getTransform().getPos());
 		source->setDir(getTransform().getForward());
+	}
+
+	Rc<AudioSource> AudioSourceComponent::get()
+	{
+		return source;
 	}
 }
