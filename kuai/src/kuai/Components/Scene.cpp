@@ -43,7 +43,7 @@ namespace kuai {
 
 		mainLight = createEntity();
 		mainLight->addComponent<Light>().setType(Light::LightType::Directional);
-		//mainLight->getComponent<Light>().setShadows(true);
+		mainLight->getComponent<Light>().setShadows(true);
 		mainLight->getComponent<Light>().setIntensity(0.5f);
 		mainLight->getTransform().setRot(-45.0f, -140.0f, 0.0f);
 	}
@@ -106,17 +106,17 @@ namespace kuai {
 	{
 		System::insertEntity(entity);
 
-		MeshRenderer& mRenderer = scene->getEntityById(entity)->getComponent<MeshRenderer>();
+		Rc<Model> model = scene->getEntityById(entity)->getComponent<MeshRenderer>().getModel();
 
 		// For every mesh in the model
-		for (size_t i = 0; i < mRenderer.getModel()->getMeshes().size(); i++)
+		for (size_t i = 0; i < model->getMeshes().size(); i++)
 		{
-			Rc<Mesh> mesh = mRenderer.getModel()->getMeshes()[i];
+			Rc<Mesh> mesh = model->getMeshes()[i];
 			u32 id = mesh->getId();
-			Shader* shader = mRenderer.getModel()->getMaterials()[i]->getShader();
+			Shader* shader = model->getMaterials()[i]->getShader();
 
 			IndirectCommand& cmd = shaderToMeshCommand[shader][id];
-			cmd.instanceCount = ++meshToNumInstances[id]; // Increment instance count by one
+			cmd.instanceCount = ++shaderMeshToNumInstances[shader][id]; // Increment instance count by one
 
 			if (cmd.instanceCount == 1) // First instance, so add its vertex data and indices to back of the list
 			{
@@ -137,30 +137,31 @@ namespace kuai {
 				dataChanged = true;
 			}
 
+			shaderToEntities[shader][entity] = 1;
+
 			shaderToMeshCommand[shader][id] = cmd;
 
 			shaderToInstances[shader]++;
 		}
 
 		// Resize model matrices and set commands
-		StaticShader::basic->getVertexArray()->getVertexBuffers()[1]->reset(nullptr, shaderToInstances[StaticShader::basic] * sizeof(glm::mat4), DrawHint::DYNAMIC);
+		for (auto& pair : shaderToInstances)
+			pair.first->getVertexArray()->getVertexBuffers()[1]->reset(nullptr, pair.second * sizeof(glm::mat4), DrawHint::DYNAMIC);
 		setCommands();
-
-		//Renderer::updateShadowMap(scene->getMainLight());
 	}
 
 	void RenderSystem::removeEntity(EntityID entity)
 	{
-		MeshRenderer& mRenderer = scene->getEntityById(entity)->getComponent<MeshRenderer>();
+		Rc<Model> model = scene->getEntityById(entity)->getComponent<MeshRenderer>().getModel();
 
-		for (size_t i = 0; i < mRenderer.getModel()->getMeshes().size(); i++)
+		for (size_t i = 0; i < model->getMeshes().size(); i++)
 		{
-			Rc<Mesh> mesh = mRenderer.getModel()->getMeshes()[i];
+			Rc<Mesh> mesh = model->getMeshes()[i];
 			u32 id = mesh->getId();
-			Shader* shader = mRenderer.getModel()->getMaterials()[i]->getShader();
+			Shader* shader = model->getMaterials()[i]->getShader();
 
 			IndirectCommand& cmd = shaderToMeshCommand[shader][id];
-			cmd.instanceCount = --meshToNumInstances[id]; // Decrement instance count by one
+			cmd.instanceCount = --shaderMeshToNumInstances[shader][id]; // Decrement instance count by one
 
 			if (cmd.instanceCount == 0) // No more instances of this mesh left -> remove its vertex data and indices from lists
 			{
@@ -188,7 +189,7 @@ namespace kuai {
 
 				shaderToVertexDataSizes[shader].erase(id);
 				shaderToIndicesSizes[shader].erase(id);
-				meshToNumInstances.erase(id);
+				shaderMeshToNumInstances[shader].erase(id);
 
 				dataChanged = true;
 			}
@@ -205,11 +206,14 @@ namespace kuai {
 			if (cmd.instanceCount == 0)
 				shaderToMeshCommand[shader].erase(id); // Remove the render command
 
+			shaderToEntities[shader].erase(entity);
+
 			shaderToInstances[shader]--;
 		}
 
 		// Resize model matrices and set commands
-		StaticShader::basic->getVertexArray()->getVertexBuffers()[1]->reset(nullptr, shaderToInstances[StaticShader::basic] * sizeof(glm::mat4), DrawHint::DYNAMIC);
+		for (auto& pair : shaderToInstances)
+			pair.first->getVertexArray()->getVertexBuffers()[1]->reset(nullptr, pair.second * sizeof(glm::mat4), DrawHint::DYNAMIC);
 		setCommands();
 
 		System::removeEntity(entity);
@@ -220,12 +224,12 @@ namespace kuai {
 		// Update model matrices every frame
 		// TODO: inefficient, only update when transform moves
 
-		for (auto& pair : shaderToInstances)
+		for (auto& pair : shaderToEntities)
 		{
-			std::vector<glm::mat4> modelMatrices(pair.second);
-			for (size_t i = 0; i < entities.size(); i++)
-				modelMatrices[i] = entities[i]->getTransform().getModelMatrix();
-			shaderToModelMatrices[StaticShader::basic] = modelMatrices;
+			std::vector<glm::mat4> modelMatrices;
+			for (auto& innerPair : pair.second)
+				modelMatrices.push_back(scene->getEntityById(innerPair.first)->getTransform().getModelMatrix());
+			shaderToModelMatrices[pair.first] = modelMatrices;
 		}
 	}
 
@@ -233,44 +237,104 @@ namespace kuai {
 	{
 		//KU_PROFILE_FUNCTION();
 
-		if (dataChanged)
+		// ---- SHADOWS ----
+
+		if (scene->getMainLight().castsShadows())
 		{
-			for (auto& pair : shaderToVertexData)
-				pair.first->getVertexArray()->getVertexBuffers()[0]->reset(pair.second.data(), pair.second.size() * sizeof(Vertex));
+			auto& basicShaderVertexData = shaderToVertexData[StaticShader::basic];
+			auto& basicShaderIndices = shaderToIndices[StaticShader::basic];
+			auto& basicShaderModelMatrices = shaderToModelMatrices[StaticShader::basic];
 
-			for (auto& pair : shaderToIndices)
-				pair.first->getVertexArray()->setIndexBuffer(MakeRc<IndexBuffer>(pair.second.data(), pair.second.size()));
+			StaticShader::depth->bind();
 
-			dataChanged = false;
+			StaticShader::depth->getVertexArray()->getVertexBuffers()[0]->reset(basicShaderVertexData.data(), basicShaderVertexData.size() * sizeof(Vertex));
+			StaticShader::depth->getVertexArray()->setIndexBuffer(MakeRc<IndexBuffer>(basicShaderIndices.data(), basicShaderIndices.size()));
+			StaticShader::depth->getVertexArray()->getVertexBuffers()[1]->reset(basicShaderModelMatrices.data(), basicShaderModelMatrices.size() * sizeof(glm::mat4));
+
+			std::vector<IndirectCommand> commands;
+			for (auto& pair : shaderToMeshCommand[StaticShader::basic])
+				commands.push_back(pair.second);
+			StaticShader::depth->setIndirectBufData(commands);
+
+			Renderer::updateShadowMap(scene->getMainLight());
 		}
-		else
-		{
-			for (auto& pair : shaderToModelMatrices)
-				pair.first->getVertexArray()->getVertexBuffers()[1]->setData(pair.second.data(), pair.second.size() * sizeof(glm::mat4));
-		}
 
-		// Renderer::updateShadowMap(scene->getMainLight());
+		// -----------------
 
 		Renderer::setViewport(0, 0, App::get().getWindow().getWidth(), App::get().getWindow().getHeight());
 		Renderer::clear();
 
-		// TODO: have some central list of shaders that the renderer cycles through
-		// Renderer::render(*StaticShader::skybox);
-		Renderer::render(*StaticShader::basic);
+		for (auto& pair : shaderToInstances)
+		{
+			Shader* shader = pair.first;
+			shader->bind();
+
+			u32 offset = 0;
+			for (auto& pair : shaderToEntities[shader])
+			{
+				Rc<Entity> entity = scene->getEntityById(pair.first);
+				Rc<Model> model = entity->getComponent<MeshRenderer>().getModel();
+
+				for (int i = 0; i < model->getMeshes().size(); i++)
+				{
+					// TODO: change this to a big texture array or something that doesn't send possibly duplicate materials
+					Rc<Mesh> mesh = model->getMeshes()[i];
+					Rc<Material> material = model->getMaterials()[i];
+
+					if (shader == StaticShader::skybox)
+					{
+						material->bind(0);
+						goto RENDER_LABEL;
+					}
+
+					if (offset >= 10)
+						goto RENDER_LABEL;
+
+					material->bind(offset * 3);
+
+					offset++;
+				}
+			}
+
+		RENDER_LABEL:
+
+			if (dataChanged)
+			{
+				auto& vertexData = shaderToVertexData[shader];
+				shader->getVertexArray()->getVertexBuffers()[0]->reset(vertexData.data(), vertexData.size() * sizeof(Vertex), DrawHint::DYNAMIC);
+
+				auto& indices = shaderToIndices[shader];
+
+				shader->getVertexArray()->setIndexBuffer(MakeRc<IndexBuffer>(indices.data(), indices.size()));
+			}
+			else
+			{
+				auto& modelMatrices = shaderToModelMatrices[shader];
+				shader->getVertexArray()->getVertexBuffers()[1]->setData(modelMatrices.data(), modelMatrices.size() * sizeof(glm::mat4));
+			}
+
+			Renderer::render(shader);
+		}
+		dataChanged = false;
 	}
 	
 	void RenderSystem::setCommands()
 	{
-		std::vector<IndirectCommand> commands;
+		int i = 0;
 		for (auto& pair : shaderToMeshCommand)
 		{
+			//KU_CORE_ERROR("Shader {0}:", i);
+			pair.first->bind();
+			std::vector<IndirectCommand> commands;
 			for (auto& innerPair : pair.second)
+			{
 				commands.push_back(innerPair.second);
+				//KU_CORE_ERROR("*** count:{0}, no. instances:{1}, vert offset:{2}, index offset:{3}, base instance:{4} ***", innerPair.second.count, innerPair.second.instanceCount, innerPair.second.firstIndex, innerPair.second.baseVertex, innerPair.second.baseInstance);
+			}
 			
 			pair.first->setIndirectBufData(commands);
-			commands.clear();
+			i++;
 		}
-		// KU_CORE_ERROR("*** count:{0}, no. instances:{1}, vert offset:{2}, index offset:{3}, base instance:{4} ***", innerPair.second.count, innerPair.second.instanceCount, innerPair.second.firstIndex, innerPair.second.baseVertex, innerPair.second.baseInstance);
 	}
 
 	void CameraSystem::setMainCam(CameraComponent& cam)
@@ -344,8 +408,13 @@ namespace kuai {
 
 				StaticShader::basic->setUniform("Lights", "lights[" + std::to_string(id) + "].castsShadows", &castsShadows, sizeof(int));
 
+				StaticShader::basic->setUniform("lightSpaceMatrix", scene->getMainLight().getLightSpaceMatrix());
+
 				l.changed = false;
 			}
 		}
+
+		int numLights = entities.size();
+		StaticShader::basic->setUniform("Lights", "numLights", &numLights, sizeof(int));
 	}
 }

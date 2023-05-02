@@ -15,8 +15,8 @@ namespace kuai {
 	Mesh::Mesh(const std::vector<float>& positions, const std::vector<float>& normals, const std::vector<float>& texCoords, const std::vector<u32>& indices)
 	{
 		u32 vertCount = positions.size() / 3;
+		
 		vertexData.resize(vertCount);
-
 		bool useNormals = positions.size() == normals.size();
 		
 		this->indices = indices;

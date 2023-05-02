@@ -30,7 +30,7 @@ namespace kuai {
         glEnable(GL_FRAMEBUFFER_SRGB); // TODO: IMPLEMENT THIS MANUALLY IN SHADER AND TEXTURES
 
         shadowMap = std::make_unique<Framebuffer>(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 1, 0);
-        glActiveTexture(GL_TEXTURE7);
+        glActiveTexture(GL_TEXTURE31);
         glBindTexture(GL_TEXTURE_2D, shadowMap->getDepthAttachment());
 
         StaticShader::init();
@@ -53,6 +53,10 @@ namespace kuai {
         if (!light.castsShadows())
             return;
        
+        StaticShader::depth->bind();
+        StaticShader::depth->setUniform("lightSpaceMatrix", light.getLightSpaceMatrix());
+
+        glActiveTexture(GL_TEXTURE31);
 		shadowMap->bind();
         glViewport(
             (light.getId() % LIGHTS_PER_ROW) * LIGHT_SHADOW_SIZE, 
@@ -60,18 +64,27 @@ namespace kuai {
             LIGHT_SHADOW_SIZE, 
             LIGHT_SHADOW_SIZE
         );
+      
         glClear(GL_DEPTH_BUFFER_BIT);
-        // glCullFace(GL_FRONT); // Helps avoid peter-panning; however completely removes objects with no back faces :(
-        render(*StaticShader::depth);
+        // glCullFace(GL_FRONT); // Helps avoid peter-panning; however completely removes shadows of objects with no back faces :(
+        render(StaticShader::depth);
         // glCullFace(GL_BACK);
         shadowMap->unbind();
     }
 
-    void Renderer::render(Shader& shader)
+    void Renderer::render(Shader* shader)
     {
-        shader.bind();
+        shader->bind();
 
-        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)0, shader.getCommandCount(), sizeof(IndirectCommand));
+        if (shader == StaticShader::skybox)
+        {
+            glDepthFunc(GL_LEQUAL);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            glDepthFunc(GL_LESS);
+            return;
+        }
+
+        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)0, shader->getCommandCount(), sizeof(IndirectCommand));
     }
 
     void Renderer::setViewport(u32 x, u32 y, u32 width, u32 height)
@@ -88,53 +101,6 @@ namespace kuai {
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
-
-    //void Renderer::render()
-    //{
-    //    KU_PROFILE_FUNCTION();
-    //
-    //    for (auto& renderEntity : renderData->renderEntities)
-    //    {
-    //        if (!renderEntity->getComponent<MeshRenderer>().getModel())
-	//			continue;
-    //        for (auto& mesh : renderEntity->getComponent<MeshRenderer>().getModel()->getMeshes())
-    //        {
-    //            Shader* shader = mesh->getMaterial()->getShader();
-    //            shader->bind();
-    //
-	//			if (shader == StaticShader::basic)
-	//			{
-    //              DefaultMaterial* mat = (DefaultMaterial*)mesh->getMaterial().get();
-	//			    shader->setUniform("modelMatrix", renderEntity->getTransform().getModelMatrix());
-	//				shader->setUniform("model3x3InvTransp", glm::inverseTranspose(glm::mat3(renderEntity->getTransform().getModelMatrix())));
-    //              shader->setUniform("material.reflections", mat->reflections);
-    //              shader->setUniform("material.shininess", mat->specularAmount);
-	//			}
-    //            mesh->render();
-    //        }
-    //    }
-    //}
-
-    //void Renderer::renderDepth()
-    //{
-    //    StaticShader::depth->bind();
-
-    //    for (auto& renderEntity : renderData->renderEntities)
-    //    {
-    //        MeshRenderer renderer = renderEntity->getComponent<MeshRenderer>();
-    //        if (!renderer.getModel() || !renderer.castsShadows())
-    //            continue;
-    //        
-    //        for (auto& mesh : renderEntity->getComponent<MeshRenderer>().getModel()->getMeshes())
-    //        {
-    //                if (mesh->getMaterial()->getShader() == StaticShader::skybox)
-    //                    continue;
-    //                StaticShader::depth->setUniform("modelMatrix", renderEntity->getTransform().getModelMatrix());
-    //                mesh->render();
-    //        }
-    //        
-    //    } 
-    //}
 }
 
 

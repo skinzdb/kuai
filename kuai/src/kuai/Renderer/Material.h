@@ -16,7 +16,7 @@ namespace kuai {
 	public:
 		Material() { materialId = materialCounter++; }
 
-		virtual void bind() = 0;
+		virtual void bind(u32 offset) = 0;
 
 		void setShader(Shader* shader) { this->shader = shader; };
 		Shader* getShader() { return shader; }
@@ -38,12 +38,12 @@ namespace kuai {
 			shader = StaticShader::basic;
 		}
 
-		virtual void bind()
+		virtual void bind(u32 offset)
 		{
-			diffuse->bind(materialId);
-			specular->bind(materialId + 1);
+			diffuse->bind(offset);
+			specular->bind(offset + 1);
 			if (reflectionMap)
-				reflectionMap->bind(materialId + 2);
+				reflectionMap->bind(offset + 2);
 		}
 
 		void setDiffuse(Rc<Texture> diffuse) { this->diffuse = diffuse; }
@@ -79,7 +79,7 @@ namespace kuai {
 			shader = StaticShader::skybox;
 		}
 
-		virtual void bind()
+		virtual void bind(u32 offset)
 		{
 			cubemap->bind(0);
 		}

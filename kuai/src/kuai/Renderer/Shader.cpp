@@ -14,8 +14,8 @@ namespace kuai {
 		fragShaderId = createShader(fragSrc.c_str(), GL_FRAGMENT_SHADER);
 		link();
 
-		vao = MakeBox<VertexArray>();
-		ibo = MakeRc<IndirectBuffer>(std::vector<IndirectCommand>());
+		vao = MakeRc<VertexArray>();
+		ibo = MakeBox<IndirectBuffer>(std::vector<IndirectCommand>());
 	}
 
 	Shader::~Shader()
@@ -116,7 +116,7 @@ namespace kuai {
 		return ibo->getCount();
 	}
 
-	void Shader::setIndirectBufData(std::vector<IndirectCommand> commands)
+	void Shader::setIndirectBufData(const std::vector<IndirectCommand>& commands)
 	{
 		ibo = MakeBox<IndirectBuffer>(commands);
 		ibo->bind();

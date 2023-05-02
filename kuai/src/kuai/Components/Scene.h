@@ -94,11 +94,13 @@ namespace kuai {
 		void setCommands();
 
 	private:
+		// Maps shader to entities within its control
+		std::unordered_map<Shader*, std::unordered_map<u32, u32>> shaderToEntities;
 		// Total number of instances shader owns
 		std::unordered_map<Shader*, size_t> shaderToInstances;
 
-		// Maps meshes to the number of instances they have.
-		std::unordered_map<u32, size_t> meshToNumInstances;
+		// Maps shader and mesh to the number of instances they have.
+		std::unordered_map<Shader*, std::unordered_map<u32, size_t>> shaderMeshToNumInstances;
 
 		// Map each shader to a list of vertices, indices and model matrices.
 		std::unordered_map<Shader*, std::vector<Vertex>> shaderToVertexData;

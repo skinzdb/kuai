@@ -15,9 +15,8 @@ namespace kuai {
 		layout (location = 0)	in vec3 aPos;
 		layout (location = 1)	in vec3 aNormal;
 		layout (location = 2)	in vec2 aTexCoord;
-		layout (location = 3)   in int  aMatId;
-		layout (location = 4)	in mat4 aModelMatrix;
-		// layout (location = 8) in mat3 aModel3x3InvTransp;
+		layout (location = 3)	in mat4 aModelMatrix;
+		// layout (location = 7) in mat3 aModel3x3InvTransp;
 
 		layout (binding = 0) uniform CamData
 		{
@@ -33,7 +32,6 @@ namespace kuai {
 		out vec2 texCoords;
 		out vec4 lightSpace;		   // TODO: change to array
 		out vec3 viewingPos;
-		out flat int matId;
 
 		void main()
 		{
@@ -41,7 +39,6 @@ namespace kuai {
 			mat3 model3x3InvTransp = mat3(transpose(inverse(aModelMatrix))); // TODO: remove in favour of vertex attribute
 			worldNorm = model3x3InvTransp * aNormal;
 			texCoords = aTexCoord;
-			matId = aMatId;
 			lightSpace = lightSpaceMatrix * worldPos;
 			viewingPos = viewPos;
 
@@ -50,7 +47,7 @@ namespace kuai {
 	)";
 
 	const char* DEFAULT_FRAG = R"(
-		#version 460
+		#version 450
 		#define MAX_LIGHTS 10
 
 		struct Light
@@ -72,6 +69,7 @@ namespace kuai {
 		layout (binding = 1) uniform Lights
 		{
 			Light lights[MAX_LIGHTS];
+			int numLights;
 		};
 
 		out vec4 fragCol;
@@ -81,7 +79,6 @@ namespace kuai {
 		in vec2 texCoords;
 		in vec4 lightSpace;		// TODO: change to array
 		in vec3 viewingPos;
-		in flat int matId;
 
 		struct Material
 		{
@@ -136,7 +133,7 @@ namespace kuai {
 
 			vec3 finalCol = vec3(0.0, 0.0, 0.0);
 
-			for (int i = 0; i < 1; i++)
+			for (int i = 0; i < numLights; i++)
 			{
 				if (lights[i].type == 0) // Directional Light
 				{
@@ -163,23 +160,23 @@ namespace kuai {
 				}
 
 				// Ambient
-				vec3 ambient = 0.1 * lights[i].col;// vec3(texture(materials[matId].diffuse, texCoords));
+				vec3 ambient = 0.1 * lights[i].col * vec3(texture(materials[0].diffuse, texCoords));
 
 				// Diffuse
 				float diff = max(dot(norm, lightDir), 0.0);
-				vec3 diffuse = lights[i].col * diff;//vec3(texture(materials[matId].diffuse, texCoords));
+				vec3 diffuse = diff * vec3(texture(materials[0].diffuse, texCoords));
 
 				// Specular
 				vec3 reflectDir = reflect(-lightDir, norm);
 				vec3 halfwayDir = normalize(lightDir + viewDir);
-				float spec = pow(max(dot(norm, halfwayDir), 0.0), materials[matId].shininess);
-				vec3 specular = spec * vec3(1.0,1.0,1.0);//vec3(texture(materials[matId].specular, texCoords));
+				float spec = pow(max(dot(norm, halfwayDir), 0.0), materials[0].shininess);
+				vec3 specular = lights[i].col * spec * vec3(texture(materials[0].specular, texCoords));
 
 				// Reflection Map
 				vec3 reflection = vec3(0.0);
-				if (materials[matId].reflections)
+				if (materials[0].reflections)
 				{
-					reflection = vec3(texture(materials[matId].reflectionMap, viewReflectDir));
+					reflection = vec3(texture(materials[0].reflectionMap, viewReflectDir));
 				}
 				
 				float shadow = 0.0;
@@ -205,7 +202,6 @@ namespace kuai {
 			{ ShaderDataType::VEC3, "pos" },
 			{ ShaderDataType::VEC3, "normal" },
 			{ ShaderDataType::VEC2, "texCoord" },
-			{ ShaderDataType::INT,  "texId" }
 		});
 		vbo2->setLayout(
 		{
@@ -217,7 +213,7 @@ namespace kuai {
 
 		bind();
 
-		createUniformBlock("CamData", { "projectionMatrix", "viewMatrix", "viewPos"}, 0);
+		createUniformBlock("CamData", { "projectionMatrix", "viewMatrix", "viewPos" }, 0);
 		
 		std::vector<std::string> lightNames;
 		std::vector<const char*> lightNamesCStr;
@@ -235,6 +231,7 @@ namespace kuai {
 		}
 		for (auto& name : lightNames)
 			lightNamesCStr.push_back(name.c_str());
+		lightNamesCStr.push_back("numLights");
 		createUniformBlock("Lights", lightNamesCStr, 1);
 
 		for (u8 i = 0; i < 10; i++)	
@@ -253,8 +250,10 @@ namespace kuai {
 			setUniform("materials[" + std::to_string(i) + "].reflections", 0);
 		}
 
+		createUniform("lightSpaceMatrix");
+
 		createUniform("shadowMap");
-		setUniform("shadowMap", 30);
+		setUniform("shadowMap", 31);
 	}
 
 	const char* SKYBOX_VERT = R"(
@@ -279,13 +278,11 @@ namespace kuai {
 	)";
 
 	const char* SKYBOX_FRAG = R"(
-		#version 460
+		#version 450
 
 		in vec3 texCoords;
 
 		out vec4 fragCol;
-
-		layout (binding = 2) uniform sampler2D textures[32];
 
 		uniform samplerCube skybox;
 
@@ -300,7 +297,12 @@ namespace kuai {
 		Rc<VertexBuffer> vbo1 = MakeRc<VertexBuffer>(0);
 		Rc<VertexBuffer> vbo2 = MakeRc<VertexBuffer>(0);
 
-		vbo1->setLayout({ { ShaderDataType::VEC3, "pos" } });
+		vbo1->setLayout(
+		{ 
+			{ ShaderDataType::VEC3, "pos" },
+			{ ShaderDataType::VEC3, "normal" },
+			{ ShaderDataType::VEC2, "texCoord" },
+		});
 		vbo2->setLayout({ { ShaderDataType::MAT4, "modelMatrix" } });
 
 		vao->addVertexBuffer(vbo1);
@@ -315,8 +317,9 @@ namespace kuai {
 	const char* DEPTH_VERT = R"(
 		#version 450
 		layout (location = 0) in vec3 pos;
-		layout (location = 1) in mat4 modelMatrix;
-		layout (location = 5) in mat4 lightSpaceMatrix;
+		layout (location = 3) in mat4 modelMatrix;
+
+		uniform mat4 lightSpaceMatrix;
 
 		void main()
 		{
@@ -338,15 +341,21 @@ namespace kuai {
 		Rc<VertexBuffer> vbo1 = MakeRc<VertexBuffer>(0);
 		Rc<VertexBuffer> vbo2 = MakeRc<VertexBuffer>(0);
 
-		vbo1->setLayout({ { ShaderDataType::VEC3, "pos" } });
+		vbo1->setLayout(
+		{ 
+			{ ShaderDataType::VEC3, "pos" },
+			{ ShaderDataType::VEC3, "normal" },
+			{ ShaderDataType::VEC2, "texCoord" },
+		});
 		vbo2->setLayout(
 		{ 
 			{ ShaderDataType::MAT4, "modelMatrix" },
-			{ ShaderDataType::MAT4, "lightSpaceMatrix" }
 		});
 
 		vao->addVertexBuffer(vbo1);
 		vao->addVertexBuffer(vbo2);
+
+		createUniform("lightSpaceMatrix");
 
 		bind();
 	}

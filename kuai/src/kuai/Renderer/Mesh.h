@@ -9,7 +9,6 @@ namespace kuai {
 		float pos[3];
 		float normal[3];
 		float texCoords[2];
-		u32 texId;
 	};
 
 	/** \class Mesh

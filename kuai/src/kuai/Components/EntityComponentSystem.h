@@ -110,6 +110,7 @@ namespace kuai {
 		void registerComponent()
 		{
 			componentManager->registerComponent<T>();
+
 			KU_CORE_INFO("Registered new component: {0}", typeid(T).name());
 		}
 

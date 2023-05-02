@@ -62,16 +62,14 @@ namespace kuai {
 			vertexData[i].pos[2] = mesh->mVertices[i].z;
 
 			vertexData[i].normal[0] = mesh->mNormals[i].x;
-			vertexData[i].normal[1] = mesh->mNormals[i].x;
-			vertexData[i].normal[2] = mesh->mNormals[i].x;
+			vertexData[i].normal[1] = mesh->mNormals[i].y;
+			vertexData[i].normal[2] = mesh->mNormals[i].z;
 
 			if (mesh->mTextureCoords[0])
 			{
 				vertexData[i].texCoords[0] = mesh->mTextureCoords[0][i].x;
 				vertexData[i].texCoords[1] = mesh->mTextureCoords[0][i].y;
 			}
-
-			vertexData[i].texId = 0;
 		}
 
 		// Indices

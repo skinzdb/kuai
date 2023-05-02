@@ -29,6 +29,7 @@ namespace kuai {
 			indexToEntity[size] = entity;
 
 			components[size] = MakeBox<T>(args...);
+
 			size++;
 		}
 

@@ -23,14 +23,14 @@ namespace kuai {
 
 		static void updateShadowMap(Light& light);
 
-		static void render(Shader& shader);
+		static void render(Shader* shader);
 
 		static void setViewport(u32 x, u32 y, u32 width, u32 height);
 		static void setClearCol(const glm::vec4& col);
 		static void clear();
 
 	private:
-		static void renderDepth();
+		// static void renderDepth();
 
 	private:
 		struct RenderData

@@ -27,7 +27,7 @@ namespace kuai {
 		Rc<VertexArray> getVertexArray();
 
 		u32 getCommandCount() const;
-		void setIndirectBufData(std::vector<IndirectCommand> commands);
+		void setIndirectBufData(const std::vector<IndirectCommand>& commands);
 
 		void bind() const;
 		void unbind() const;
@@ -42,9 +42,8 @@ namespace kuai {
 
 		std::unordered_map<std::string, u32> uniforms;
 
-		Rc<VertexArray> vao;				// Vertex array object
-		Rc<IndexBuffer>	ebo;				// List of indices that point to which vertices to draw
-		Rc<IndirectBuffer> ibo;				// Buffer containing mesh instance information
+		Rc<VertexArray> vao;	    // Vertex array object
+		Box<IndirectBuffer> ibo;	// Buffer containing mesh instance information
 
 	private:
 		// UBOs and member offsets are static as they are shared between all shaders
