@@ -8,7 +8,7 @@
 #include "AudioManager.h"
 
 #include <mutex>
-#include "..\Components\Components.h"
+#include "kuai/Components/Components.h"
 
 namespace kuai {
 	MusicSource::MusicSource()
@@ -26,14 +26,14 @@ namespace kuai {
 		PlaybackState threadStartStateT = PlaybackState::Stopped;
 
 		{
-			std::lock_guard lock(mutex);
+			std::lock_guard<std::recursive_mutex> lock(mutex);
 			isStreamingT = isStreaming;
 			threadStartStateT = threadStartState;
 		}
 
 		if (isStreamingT && (threadStartStateT == PlaybackState::Paused)) // Resume
 		{
-			std::lock_guard lock(mutex);
+			std::lock_guard<std::recursive_mutex> lock(mutex);
 			threadStartState = PlaybackState:: Playing;
 			alCheck(alSourcePlay(sourceId));
 			return;
@@ -44,7 +44,7 @@ namespace kuai {
 		}
 
 		{
-			std::lock_guard lock(mutex);
+			std::lock_guard<std::recursive_mutex> lock(mutex);
 			isStreaming = true;
 			threadStartState = PlaybackState::Playing;
 		}
@@ -54,7 +54,7 @@ namespace kuai {
 
 	void MusicSource::pause()
 	{
-		std::lock_guard lock(mutex);
+		std::lock_guard<std::recursive_mutex> lock(mutex);
 		isStreaming = false;
 	}
 
@@ -80,7 +80,7 @@ namespace kuai {
         // To compensate for the lag between play() and alSourceplay()
         if (state == PlaybackState::Stopped)
         {
-            std::lock_guard lock(mutex);
+            std::lock_guard<std::recursive_mutex> lock(mutex);
 
             if (isStreaming)
                 state = threadStartState;
@@ -94,7 +94,7 @@ namespace kuai {
 		bool requestStop = false;
 
 		{
-			std::lock_guard lock(mutex);
+			std::lock_guard<std::recursive_mutex> lock(mutex);
 
 			if (threadStartState == PlaybackState::Stopped) // Launching a thread in stopped state does nothing
 			{
@@ -113,7 +113,7 @@ namespace kuai {
 		alCheck(alSourcePlay(sourceId));
 
 		{
-			std::lock_guard lock(mutex);
+			std::lock_guard<std::recursive_mutex> lock(mutex);
 
 			if (threadStartState == PlaybackState::Paused) // If thread was launched paused
 				alCheck(alSourcePause(sourceId));
@@ -122,7 +122,7 @@ namespace kuai {
 		while (1)
 		{
 			{
-				std::lock_guard lock(mutex);
+				std::lock_guard<std::recursive_mutex> lock(mutex);
 				if (!isStreaming)
 					break;
 			}
@@ -132,7 +132,7 @@ namespace kuai {
 				if (requestStop)
 				{
 					// End streaming
-					std::lock_guard lock(mutex);
+					std::lock_guard<std::recursive_mutex> lock(mutex);
 					isStreaming = false;
 				}
 				else
@@ -211,7 +211,7 @@ namespace kuai {
 	{
 		// Request thread to join
 		{
-			std::lock_guard lock(mutex);
+			std::lock_guard<std::recursive_mutex> lock(mutex);
 			isStreaming = false;
 		}
 

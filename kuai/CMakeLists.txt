@@ -118,8 +118,8 @@ target_precompile_headers(${PROJECT_NAME}
     PUBLIC src/kpch.h
 )
 
-add_subdirectory(vendor/glfw)
-add_subdirectory(vendor/glad)
+add_subdirectory(vendor/GLFW)
+add_subdirectory(vendor/Glad)
 add_subdirectory(vendor/glm)
 add_subdirectory(vendor/assimp)
 add_subdirectory(vendor/openal-soft)
