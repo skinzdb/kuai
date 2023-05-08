@@ -47,6 +47,7 @@ namespace kuai {
 		* Returns vector of window instances.
 		*/
 		std::vector<Box<Window>>& getWindows() { return windows; }
+		Window* getActiveWindow();
 
 	private:
 		bool onWindowClose(WindowCloseEvent& e);

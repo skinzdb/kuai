@@ -48,8 +48,10 @@ namespace kuai {
 						layer->update(elapsedTime);
 				}
 			}
-
-			window->update();
+			for (auto& window : windows)
+			{
+				window->update();
+			}
 		}
 
 		AudioManager::cleanup();
@@ -77,8 +79,9 @@ namespace kuai {
 
 	void App::addWindow(const WindowProps& props)
 	{
-		auto& window = Box<Window>(Window::create(props));
+		auto window = Window::create(props);
 		window->setEventCallback(BIND(&App::onEvent));
+		windows.push_back(std::move(window));
 	}
 
 	void App::removeWindow()
@@ -104,6 +107,17 @@ namespace kuai {
 		Renderer::setViewport(0, 0, e.getWidth(), e.getHeight());
 
 		return false;
+	}
+
+	Window* App::getActiveWindow() {
+		assert(windows.size() > 0);
+		for (auto& window : windows)
+		{
+			if (window->isActive()) {
+				return window.get();
+			}
+		}
+		return windows[0].get();
 	}
 
 }

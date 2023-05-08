@@ -22,7 +22,7 @@ namespace kuai {
 	{
 	public:
 		template <typename ...Args>
-		void insert(EntityID entity, const Box<T> component)
+		void insert(EntityID entity, Box<T> component)
 		{
 			KU_CORE_ASSERT(entityToIndex.find(entity) == entityToIndex.end(), "Added duplicate component to entity");
 
@@ -71,11 +71,11 @@ namespace kuai {
 
 		EntityID getEntityIDFromComponent(const T& component) const
 		{
-			for (u64 index = 0; index < size; ++index)
+			for (size_t index = 0; index < size; ++index)
 			{
 				if (components[index].get() == &component)
 				{
-					return indexToEntity[index];
+					return indexToEntity.at(index);
 				}
 			}
 			return -1;
@@ -120,10 +120,10 @@ namespace kuai {
 		template<typename T, typename... Args>
 		void addComponent(EntityID entity, Args&&... args)
 		{
-			auto& component = MakeBox<T>(args...);
+			auto component = MakeBox<T>(args...);
 			component->cm = this;
 			component->id = entity;
-			getComponentContainer<T>()->insert(std::move(component), component);
+			getComponentContainer<T>()->insert(entity, std::move(component));
 		}
 
 		template<typename T>

@@ -46,6 +46,7 @@ namespace kuai {
 	class Transform : public Component
 	{
 	public:
+		Transform() : pos(0,0,0) {}
 		Transform(const glm::vec3& pos) : pos(pos) {}
 
 		glm::vec3& getPos() { return pos; }

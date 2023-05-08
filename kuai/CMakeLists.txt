@@ -94,7 +94,7 @@ set(MY_LIBS
     assimp
     sndfile
     OpenAL::OpenAL
-    opengl32
+    GL
 )
 
 if (WIN32)
