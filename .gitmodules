@@ -1,0 +1,9 @@
+[submodule "rekuai/vendor/spdlog"]
+	path = rekuai/vendor/spdlog
+	url = git@github.com:gabime/spdlog.git
+[submodule "rekuai/vendor/GLFW"]
+	path = rekuai/vendor/GLFW
+	url = git@github.com:glfw/glfw.git
+[submodule "rekuai/vendor/glm"]
+	path = rekuai/vendor/glm
+	url = git@github.com:g-truc/glm.git
