@@ -9,27 +9,56 @@ using namespace kuai;
 class MyApp : public App 
 {
 public:
-	MyApp()
+	MyApp() : scene(new Scene())
 	{
-		auto& view = ecs->register_system<Transform>();
-		EntityId e = ecs->create_entity();
-		ecs->add_component<Transform>(e);
+		auto& test = scene->create_entity();
+		
+		auto& mesh = Mesh("C:/Users/David/Documents/cube.obj");
+		auto& material = Material();
 
-		view->each([](float dt, Transform& transform) {
-			transform.pos += glm::vec3(dt, 0, 0);
-		});
+		test.add_component<Transform>();
+		test.add_component<MeshRenderer>(mesh, material);
+		
+
+		///*signal sketch*/
+
+		//
+		//
+		//fuck = ecs->create_signal<int(int)>();
+		//
+		//fuc
+		//
+
+
+		//
+		//view.each([&fuck](float dt, PlayerComponent comp) {
+		//	if (dt > 100) {
+		//		fuck->publish(65);
+		//	}
+		//});
+
+
+		//
+		//
+
+		//view->each([](float dt, Transform& transform) {
+		//	transform.pos += glm::vec3(dt, 0, 0);
+		//});
 
 	}
 
 	void update(float dt) 
 	{
-		ecs->update(dt);
+
 	}
 
 	void input(Event& e)
 	{
 
 	}
+
+private:
+	Scene* scene;
 };
 
 App* kuai::create_app() 

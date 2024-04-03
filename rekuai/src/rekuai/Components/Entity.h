@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ECS.h"
+#include "Scene.h"
 
 // The entity class is a wrapper for an EntityId
 namespace kuai {
@@ -10,14 +10,8 @@ namespace kuai {
 	class Entity
 	{
 	public:
-		Entity()
+		Entity(EntityId id, Scene* scene) : id(id), scene(scene) 
 		{
-
-		}
-
-		Entity(EntityId id, ECS* ecs) : id(id), ecs(ecs) 
-		{
-
 		}
 
 		/**
@@ -26,8 +20,8 @@ namespace kuai {
 		template<class T, typename ...Args>
 		T& add_component(Args&& ...args)
 		{
-			ecs->add_component<T>(id, std::forward<Args>(args)...);
-			return ecs->get_component<T>(id);
+			scene->ecs->add_component<T>(id, std::forward<Args>(args)...);
+			return scene->ecs->get_component<T>(id);
 		}
 
 		/**
@@ -36,7 +30,7 @@ namespace kuai {
 		template<class T>
 		T& get_component() const
 		{
-			return ecs->get_component<T>(id);
+			return scene->ecs->get_component<T>(id);
 		}
 
 		/**
@@ -45,7 +39,7 @@ namespace kuai {
 		template<class T>
 		bool has_component() const
 		{
-			return ecs->has_component<T>(id);
+			return scene->ecs->has_component<T>(id);
 		}
 
 		/**
@@ -54,10 +48,10 @@ namespace kuai {
 		template<class T>
 		void remove_component()
 		{
-			ecs->remove_component<T>(id);
+			scene->ecs->remove_component<T>(id);
 		}
 
-		EntityID get_id() const
+		EntityId get_id() const
 		{
 			return id;
 		}
@@ -78,7 +72,7 @@ namespace kuai {
 
 	private:
 		EntityId id;
-		ECS* ecs;
+		Scene* scene;
 	};
 
 }

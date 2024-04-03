@@ -36,12 +36,29 @@ add_library(${PROJECT_NAME}
     
     src/rekuai/Renderer/Renderer.h 
     src/rekuai/Renderer/Renderer.cpp 
+    src/rekuai/Renderer/Mesh.h
+    src/rekuai/Renderer/Mesh.cpp 
+    src/rekuai/Renderer/Buffer.h 
+    src/rekuai/Renderer/Buffer.cpp 
+    src/rekuai/Renderer/Shader.h
+    src/rekuai/Renderer/Shader.cpp
+    src/rekuai/Renderer/Framebuffer.h
+    src/rekuai/Renderer/Framebuffer.cpp
     
     src/rekuai/Components/Components.h
     src/rekuai/Components/EntityManager.h
     src/rekuai/Components/ComponentManager.h
     src/rekuai/Components/ECS.h
- "src/rekuai/Components/System.h" "src/rekuai/Components/SystemManager.h"  "src/rekuai/Components/Entity.h")
+    src/rekuai/Components/System.h
+    src/rekuai/Components/SystemManager.h
+    src/rekuai/Components/Entity.h 
+    
+    "src/rekuai/Events/Signal.h" "src/rekuai/Components/Scene.h" "src/rekuai/Components/Scene.cpp" "src/rekuai/Renderer/Material.h" "src/rekuai/Renderer/TextureArray.h"
+    
+    
+    vendor/tinyobjloader/tiny_obj_loader.h
+    vendor/tinyobjloader/tiny_obj_loader.cpp
+    )
 
 set(MY_LIBS
     glfw
@@ -79,6 +96,7 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC vendor/Glad/include
     PUBLIC vendor/glm
     PUBLIC vendor/spdlog/include
+    PUBLIC vendor/tinyobjloader
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${MY_LIBS})

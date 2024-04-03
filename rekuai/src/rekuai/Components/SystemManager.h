@@ -12,8 +12,17 @@ namespace kuai {
 	class SystemManager
 	{
 	public:
+		SystemManager() = default;
+		~SystemManager()
+		{
+			for (const auto& pair : systems)
+			{
+				delete pair.second;
+			}
+		}
+
 		template<typename... Cs>
-		Rc<System<Cs...>> register_system(ComponentManager* component_manager)
+		System<Cs...>* register_system(ComponentManager* component_manager)
 		{
 			ComponentMask system_mask = 0;
 
@@ -24,7 +33,7 @@ namespace kuai {
 
 			KU_CORE_ASSERT(systems.find(system_mask) == systems.end(), "Registering a system more than once");
 
-			auto system = make_rc<System<Cs...>>();
+			auto system = new System<Cs...>();
 			system->component_manager = component_manager;
 			systems.insert({ system_mask, system });
 			return system;
@@ -35,7 +44,7 @@ namespace kuai {
 			for (auto const& pair : systems)
 			{
 				auto const& system = pair.second;
-				system->entities.erase(std::remove(system->begin(), system->end(), entity), system->end());
+				system->remove(entity);
 			}
 		}
 
@@ -47,11 +56,12 @@ namespace kuai {
 				// If entity's component mask matches this system, add it to the system's list
 				if ((entity_component_mask & system_mask) == system_mask)
 				{
-					system->entities.push_back(entity);
+					system->insert(entity);
 				}
 				else
 				{
-					system->entities.erase(std::remove(system->begin(), system->end(), entity), system->end());
+					
+					system->remove(entity);
 				}
 			}
 		}
@@ -66,6 +76,6 @@ namespace kuai {
 
 	private:
 		// Maps system masks to systems
-		std::unordered_map<ComponentMask, Rc<SystemBase>> systems;
+		std::unordered_map<ComponentMask, SystemBase*> systems;
 	};
 }

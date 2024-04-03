@@ -4,48 +4,62 @@
 
 namespace kuai {
 
-	class SystemBase 
+	class SystemBase
 	{
 	public:
-		virtual ~SystemBase() {}
+		virtual void update(float dt) = 0;
+		virtual void insert(EntityId entity) = 0;
+		virtual void remove(EntityId entity) = 0;
 
 		std::vector<EntityId>::iterator begin() { return entities.begin(); }
 		std::vector<EntityId>::iterator end() { return entities.end(); }
 
 	protected:
-		virtual void update(float dt) = 0;
-
-	protected:
 		ComponentManager* component_manager;
 
 		std::vector<EntityId> entities;
-		ComponentMask mask;
 
 		friend class SystemManager;
 	};
 
-	template<class... Cs>
+	template <typename ...Cs>
 	class System : public SystemBase
 	{
-		using ActionFn = std::function<void(float, Cs&...)>;
+		using UpdateFn = std::function<void(float, EntityId, Cs&...)>;
+		using InOutFn = std::function<void(EntityId, Cs&...)>;
 
 	public:
-		System() = default;
-
-		void each(const ActionFn& action)
-		{
-			this->action = action;
-		}
+		void each(const UpdateFn& action) { update_fn = action; }
+		void on_insert(const InOutFn& action) { insert_fn = action; }
+		void on_remove(const InOutFn& action) { remove_fn = action; }
 
 	private:
 		void update(float dt)
 		{
 			for (auto entity : entities)
 			{
-				action(dt, { component_manager->get_component<Cs...>(entity) });
+				update_fn(dt, entity, component_manager->get_component<Cs>(entity)...);
 			}
 		}
 
-		ActionFn action;
+		void insert(EntityId entity)
+		{
+			entities.push_back(entity);
+			insert_fn(entity, component_manager->get_component<Cs>(entity)...);
+		}
+
+		void remove(EntityId entity)
+		{
+			size_t orig = entities.size();
+			entities.erase(std::remove(entities.begin(), entities.end(), entity), entities.end());
+			if (entities.size() != orig)
+			{
+				remove_fn(entity, component_manager->get_component<Cs>(entity)...);
+			}
+		}
+
+		UpdateFn update_fn;
+		InOutFn insert_fn;
+		InOutFn remove_fn;
 	};
 }

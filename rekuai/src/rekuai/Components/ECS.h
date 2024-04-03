@@ -96,7 +96,7 @@ namespace kuai {
 		// *** System Management **********************************************
 
 		template<typename ...Cs>
-		Rc<System<Cs...>> register_system()
+		System<Cs...>* register_system()
 		{
 			return system_manager->register_system<Cs...>(component_manager);
 		}

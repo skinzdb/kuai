@@ -18,17 +18,17 @@ namespace kuai {
 	class ComponentContainer : public IComponentContainer
 	{
 	public:
+		ComponentContainer() = default;
+
 		template <typename ...Args>
 		void insert(EntityId entity, Args&&... args)
 		{
 			KU_CORE_ASSERT(entity_to_idx.find(entity) == entity_to_idx.end(), "Added duplicate component to entity");
 
-			entity_to_idx[entity] = size;
-			idx_to_entity[size] = entity;
+			entity_to_idx[entity] = components.size();
+			idx_to_entity[components.size()] = entity;
 
-			components[size] = make_box<T>(args...);
-
-			size++;
+			components.emplace_back(args...);
 		}
 
 		void remove(EntityId entity)
@@ -37,7 +37,7 @@ namespace kuai {
 
 			// Update mappings s.t. entity of last component in array points to removed index and vice-versa
 			size_t remove_idx = entity_to_idx[entity];
-			size_t last_idx = size;
+			size_t last_idx = components.size();
 
 			EntityId last_entity = idx_to_entity[last_idx];
 			entity_to_idx[last_entity] = remove_idx;
@@ -58,7 +58,7 @@ namespace kuai {
 		{
 			KU_CORE_ASSERT(entity_to_idx.find(entity) != entity_to_idx.end(), "Retrieving component that does not exist");
 
-			return *(components[entity_to_idx[entity]].get()); // Return reference to entity's component
+			return components[entity_to_idx[entity]]; // Return reference to entity's component
 		}
 
 		bool has(EntityId entity)
@@ -75,22 +75,26 @@ namespace kuai {
 			}
 		}
 
-		typename std::vector<T>::iterator begin() { return components.begin(); }
-		typename std::vector<T>::iterator end() { return components.end(); }
-
 	private:
-		Box<T> components[MAX_ENTITIES];
+		std::vector<T> components;
 
 		// Mappings from entities to their respective index in components array and vice-versa
 		std::unordered_map<EntityId, size_t> entity_to_idx;
 		std::unordered_map<size_t, EntityId> idx_to_entity;
-
-		size_t size = 0;
 	};
 
 	class ComponentManager
 	{
 	public:
+
+		~ComponentManager()
+		{
+			for (auto const& pair : component_containers)
+			{
+				delete pair.second;
+			}
+		}
+
 		template<typename T>
 		void register_component()
 		{
@@ -99,7 +103,7 @@ namespace kuai {
 			KU_CORE_ASSERT(component_types.find(ty_name) == component_types.end(), "Registering a component type more than once")
 
 			component_types.emplace(ty_name, next_component_type++);	// Increment for next component
-			component_containers.emplace(ty_name, make_rc<ComponentContainer<T>>());
+			component_containers.emplace(ty_name, new ComponentContainer<T>());
 		}
 
 		template<typename T, typename... Args>
@@ -145,19 +149,19 @@ namespace kuai {
 		// Map of component names to their types (uint_8)
 		std::unordered_map<const char*, ComponentType> component_types;
 		// Map of component names to their containers
-		std::unordered_map<const char*, Rc<IComponentContainer>> component_containers;
+		std::unordered_map<const char*, IComponentContainer*> component_containers;
 
 		// Component type to be assigned to next registered component
-		ComponentType next_component_type = 0;
+		ComponentType next_component_type = 1;
 
 		template<typename T>
-		Rc<ComponentContainer<T>> get_component_container()
+		ComponentContainer<T>* get_component_container()
 		{
 			const char* ty_name = typeid(T).name();
 
 			KU_CORE_ASSERT(component_types.find(ty_name) != component_types.end(), "Component not registered");
 
-			return std::static_pointer_cast<ComponentContainer<T>>(component_containers[ty_name]);
+			return static_cast<ComponentContainer<T>*>(component_containers[ty_name]);
 		}
 	};
 }

@@ -24,7 +24,7 @@ namespace kuai {
 
 		Renderer::init();
 		ecs = new ECS();
-		ecs->register_component<Transform>();
+		//ecs->register_component<Transform>();
 		//AudioManager::init();
 	}
 

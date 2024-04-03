@@ -4,6 +4,8 @@
 
 namespace kuai {
 
+	RendererData Renderer::r_data = RendererData();
+
 	void Renderer::init()
 	{
 		glEnable(GL_DEPTH_TEST);
@@ -16,9 +18,99 @@ namespace kuai {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
+	/*
+	per frame render command:
+
+	render()
+	{
+		set_cam_uniforms(camera);
+		set_light_uniforms(lights);
+
+		begin_pass(shadow_map, flags...)
+
+		submit();
+
+		end_pass()
+
+
+		begin_pass(normal stuff)
+
+
+
+		end_pass()
+	}
+	
+	
+	*/
+
 	void Renderer::cleanup()
 	{
 
+	}
+
+	void Renderer::add_object(const MeshRenderer& m_renderer, Transform& transform)
+	{
+		auto& s_data = r_data.shader_map[m_renderer.material.shader->program_id];
+		auto& mesh = m_renderer.mesh;
+
+		r_data.transforms.push_back(transform);
+
+		if (r_data.offset_map.find(m_renderer.mesh.mesh_id) == r_data.offset_map.end()) // New mesh data => record offsets and add it to vertex_data and indices
+		{
+			r_data.offset_map[mesh.mesh_id].vertices_offset = r_data.vertex_data.size();
+			r_data.offset_map[mesh.mesh_id].indices_offset = r_data.indices.size();
+
+			r_data.vertex_data.insert(r_data.vertex_data.end(), mesh.vertex_data.begin(), mesh.vertex_data.end());
+			r_data.indices.insert(r_data.indices.end(), mesh.indices.begin(), mesh.indices.end());
+		}
+
+		IndirectCommand& cmd = s_data.mesh_to_cmd[mesh.mesh_id];
+
+		if (cmd.inst_count == 0)
+		{
+			cmd.count == mesh.indices.size();									 // Number of indices mesh uses	
+			cmd.first_idx = r_data.offset_map[mesh.mesh_id].indices_offset;	     // Offset of first index
+			cmd.base_vertex = r_data.offset_map[mesh.mesh_id].vertices_offset;	 // Offset of first vertex
+			cmd.base_inst = s_data.instances;									 // Offset of first instance
+		}
+
+		cmd.inst_count++;
+		s_data.instances++;
+	}
+
+	void Renderer::remove_object(const MeshRenderer& m_renderer, Transform& transform)
+	{
+		auto& s_data = r_data.shader_map[m_renderer.material.shader->program_id];
+
+		r_data.transforms.erase(std::find_if(r_data.transforms.cbegin(), r_data.transforms.cend(), [&](const std::reference_wrapper<Transform>& t) {
+			return t.get() == transform;	}));
+
+		s_data.mesh_to_cmd[m_renderer.mesh.mesh_id].inst_count--;
+		s_data.instances--;
+
+		// TODO: vertex data and indices will never get deleted from list
+
+		// Decrement base instances of all meshes that are further along the list as we deleted an instance 
+		for (auto& [_, cmd] : s_data.mesh_to_cmd)
+		{
+			if (cmd.base_inst > cmd.base_inst)
+			{
+				cmd.base_inst--;
+			}
+		}
+
+		if (s_data.instances == 0)
+		{
+			r_data.shader_map.erase(m_renderer.material.shader->program_id);
+		}
+	}
+
+	void Renderer::begin_pass()
+	{
+	}
+
+	void Renderer::end_pass()
+	{
 	}
 
 	void Renderer::set_viewport(u32 x, u32 y, u32 width, u32 height)
@@ -33,6 +125,7 @@ namespace kuai {
 
 	void Renderer::clear()
 	{
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 

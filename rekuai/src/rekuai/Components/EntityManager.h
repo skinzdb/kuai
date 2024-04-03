@@ -18,7 +18,7 @@ namespace kuai {
 	class EntityManager
 	{
 	public:
-		EntityManager()
+		EntityManager() : entity_count(0)
 		{
 			for (size_t i = 1; i <= MAX_ENTITIES; i++)
 			{
@@ -60,7 +60,7 @@ namespace kuai {
 		// List of unused entity IDs
 		std::vector<EntityId> available;
 		// Number of entities currently in use
-		u32 entity_count = 0;
+		u32 entity_count;
 
 		// Components associated with each entity
 		ComponentMask component_masks[MAX_ENTITIES];
