@@ -14,7 +14,3 @@
 #include <filesystem>
 
 #include "rekuai/Core/Log.h"
-
-#ifdef SM_PLATFORM_WINDOWS
-	#include <Windows.h>
-#endif

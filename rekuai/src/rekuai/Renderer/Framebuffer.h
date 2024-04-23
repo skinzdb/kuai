@@ -36,7 +36,7 @@ namespace kuai {
         unsigned int get_texture_target(bool multisampling);
 
     private:
-        u32 framebuf_id = 0;
+        u32 id = 0;
 
         std::vector<u32> col_attachments;
         u32 depth_attachments = 0;

@@ -1,7 +1,12 @@
 #pragma once
 
+#include "Texture.h"
+
 namespace kuai {
 	/* Texture Array
+	* 
+	* first texture of array is empty texture (equivalent to gmod missing texture)
+	* 
 	*  - each texture will have its unique id
 	*  - how to work out which texture will be used? a meshrenderer will have a material which in-turn has a texture
 	*  - we get the id of this texture which will act as the index into the texturearray
@@ -22,6 +27,24 @@ namespace kuai {
 	*/
 	class TextureArray
 	{
+	public:
+		TextureArray(u32 width, u32 height, u32 layers);
+		~TextureArray();
 
+		void insert(const Texture& tex);
+		void remove(const Texture& tex);
+
+		void bind(u32 active_tex);
+
+
+	private:
+		u32 id;
+
+		u32 width, height;
+		u32 layers;
+
+		int capacity;
+
+		std::vector<u32> tex_ids;
 	};
 }

@@ -9,6 +9,7 @@ namespace kuai {
 	{
 		ecs->register_component<Transform>();
 		ecs->register_component<MeshRenderer>();
+		ecs->register_component<Camera>();
 
 		auto render_sys = ecs->register_system<MeshRenderer, Transform>();
 
@@ -27,7 +28,6 @@ namespace kuai {
 
 	Scene::~Scene()
 	{
-		KU_CORE_CRITICAL("stinky");
 		delete ecs;
 	}
 
@@ -35,7 +35,6 @@ namespace kuai {
 	{
 		Renderer::begin_pass();
 
-		
 
 		Renderer::end_pass();
 
@@ -49,7 +48,6 @@ namespace kuai {
 	Entity& Scene::create_entity()
 	{
 		EntityId entity = ecs->create_entity();
-		entities.emplace_back(entity, this);
-		return entities.back();
+		return entities.emplace_back(entity, this);
 	}
 }

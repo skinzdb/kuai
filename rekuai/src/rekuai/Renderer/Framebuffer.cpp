@@ -15,7 +15,7 @@ namespace kuai {
 
 	Framebuffer::~Framebuffer()
 	{
-		glDeleteFramebuffers(1, &framebuf_id);
+		glDeleteFramebuffers(1, &id);
 		glDeleteTextures(col_attachments.size(), col_attachments.data());
 		glDeleteTextures(1, &depth_attachments);
 	}
@@ -32,7 +32,7 @@ namespace kuai {
 
 	void Framebuffer::bind()
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuf_id);
+		glBindFramebuffer(GL_FRAMEBUFFER, id);
 		glBindTexture(get_texture_target(props.samples > 1), depth_attachments);
 		// glViewport(0, 0, props.width, props.height);
 	}
@@ -58,9 +58,9 @@ namespace kuai {
 
 	void Framebuffer::reset()
 	{
-		if (framebuf_id)
+		if (id)
 		{
-			glDeleteFramebuffers(1, &framebuf_id);
+			glDeleteFramebuffers(1, &id);
 			glDeleteTextures(col_attachments.size(), col_attachments.data());
 			glDeleteTextures(1, &depth_attachments);
 
@@ -69,8 +69,8 @@ namespace kuai {
 		}
 
 		// Create framebuffer
-		glGenFramebuffers(1, &framebuf_id);
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuf_id);
+		glGenFramebuffers(1, &id);
+		glBindFramebuffer(GL_FRAMEBUFFER, id);
 
 		bool multisampling = props.samples > 1;
 

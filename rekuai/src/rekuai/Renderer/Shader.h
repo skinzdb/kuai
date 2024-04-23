@@ -27,17 +27,17 @@ namespace kuai {
 		void bind() const;
 		void unbind() const;
 
-	protected:
+	private:
 		int create_shader(const char* src, int type);
 		void link();
 
-		int program_id;
-		int vert_shader_id;
-		int frag_shader_id;
+	private:
+		int id;
+		int vert_id;
+		int frag_id;
 
 		std::unordered_map<std::string, u32> uniforms;
 
-	private:
 		// UBOs and member offsets are static as they are shared between all shaders
 		static std::unordered_map<std::string, u32> ubos;
 		static std::unordered_map<std::string, u32> ubo_offsets;

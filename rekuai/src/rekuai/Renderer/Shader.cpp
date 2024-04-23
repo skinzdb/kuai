@@ -8,9 +8,9 @@ namespace kuai {
 
 	Shader::Shader(const std::string& vert_src, const std::string& frag_src)
 	{
-		program_id = glCreateProgram();
-		vert_shader_id = create_shader(vert_src.c_str(), GL_VERTEX_SHADER);
-		frag_shader_id = create_shader(frag_src.c_str(), GL_FRAGMENT_SHADER);
+		id = glCreateProgram();
+		vert_id = create_shader(vert_src.c_str(), GL_VERTEX_SHADER);
+		frag_id = create_shader(frag_src.c_str(), GL_FRAGMENT_SHADER);
 		link();
 	}
 
@@ -21,13 +21,13 @@ namespace kuai {
 		for (auto& pair : ubos)
 			glDeleteBuffers(1, &pair.second);
 
-		if (program_id)
-			glDeleteProgram(program_id);
+		if (id)
+			glDeleteProgram(id);
 	}
 
 	void Shader::create_uniform(const std::string& name)
 	{
-		int uniformLoc = glGetUniformLocation(program_id, name.c_str());
+		int uniformLoc = glGetUniformLocation(id, name.c_str());
 		uniforms[name] = uniformLoc;
 	}
 
@@ -69,15 +69,15 @@ namespace kuai {
 	void Shader::create_uniform_block(const std::string& name, const std::vector<const char*>& members, u32 binding)
 	{
 		// Get block index and block size
-		uint32_t block_idx = glGetUniformBlockIndex(program_id, name.c_str());
+		uint32_t block_idx = glGetUniformBlockIndex(id, name.c_str());
 		int block_size;
-		glGetActiveUniformBlockiv(program_id, block_idx, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
+		glGetActiveUniformBlockiv(id, block_idx, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
 
 		// Get indices of member variables, and then their offsets
 		GLuint* indices = new GLuint[members.size()];
-		glGetUniformIndices(program_id, members.size(), &members[0], indices);
+		glGetUniformIndices(id, members.size(), &members[0], indices);
 		GLint* offsets = new GLint[members.size()];
-		glGetActiveUniformsiv(program_id, members.size(), indices, GL_UNIFORM_OFFSET, offsets);
+		glGetActiveUniformsiv(id, members.size(), indices, GL_UNIFORM_OFFSET, offsets);
 
 		for (size_t i = 0; i < members.size(); i++)
 		{
@@ -104,7 +104,7 @@ namespace kuai {
 
 	void Shader::bind() const
 	{
-		glUseProgram(program_id);
+		glUseProgram(id);
 	}
 
 	void Shader::unbind() const
@@ -117,7 +117,7 @@ namespace kuai {
 		int shaderId = glCreateShader(type);
 		if (!shaderId)
 		{
-			KU_CORE_ERROR("[Shader {0}] Failed to create shader ({1})", program_id, type);
+			KU_CORE_ERROR("[Shader {0}] Failed to create shader ({1})", id, type);
 		}
 
 		glShaderSource(shaderId, 1, &src, nullptr);
@@ -129,43 +129,43 @@ namespace kuai {
 		{
 			char errStr[1024];
 			glGetShaderInfoLog(shaderId, 1024, nullptr, errStr); // Set max length of character buffer to 1024
-			KU_CORE_ERROR("[Shader {0}] Error compiling shader code: {1}", program_id, errStr);
+			KU_CORE_ERROR("[Shader {0}] Error compiling shader code: {1}", id, errStr);
 		}
 
-		glAttachShader(program_id, shaderId);
+		glAttachShader(id, shaderId);
 
 		return shaderId;
 	}
 
 	void Shader::link()
 	{
-		glLinkProgram(program_id);
+		glLinkProgram(id);
 		int linkSuccess;
-		glGetProgramiv(program_id, GL_LINK_STATUS, &linkSuccess);
+		glGetProgramiv(id, GL_LINK_STATUS, &linkSuccess);
 		if (!linkSuccess)
 		{
 			char errStr[1024];
-			glGetProgramInfoLog(program_id, 1024, nullptr, errStr);
-			KU_CORE_ERROR("[Shader {0}] Error linking shader code: {1}", program_id, errStr);
+			glGetProgramInfoLog(id, 1024, nullptr, errStr);
+			KU_CORE_ERROR("[Shader {0}] Error linking shader code: {1}", id, errStr);
 		}
 
-		if (vert_shader_id)
+		if (vert_id)
 		{
-			glDetachShader(program_id, vert_shader_id);
+			glDetachShader(id, vert_id);
 		}
-		if (frag_shader_id)
+		if (frag_id)
 		{
-			glDetachShader(program_id, frag_shader_id);
+			glDetachShader(id, frag_id);
 		}
 
-		glValidateProgram(program_id);
+		glValidateProgram(id);
 		int validateSuccess;
-		glGetProgramiv(program_id, GL_VALIDATE_STATUS, &validateSuccess);
+		glGetProgramiv(id, GL_VALIDATE_STATUS, &validateSuccess);
 		if (!validateSuccess)
 		{
 			char errStr[1024];
-			glGetProgramInfoLog(program_id, 1024, nullptr, errStr);
-			KU_CORE_ERROR("[Shader {0}] Error validating shader code: {1}", program_id, errStr);
+			glGetProgramInfoLog(id, 1024, nullptr, errStr);
+			KU_CORE_ERROR("[Shader {0}] Error validating shader code: {1}", id, errStr);
 		}
 	}
 }

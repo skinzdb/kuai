@@ -19,7 +19,6 @@ namespace kuai {
 	class App {
 	public:
 		App();
-		virtual ~App();
 
 		/**
 		* Starts the application mainloop which in turn updates all layers.
@@ -46,9 +45,6 @@ namespace kuai {
 
 		bool on_window_close(WindowCloseEvent& e);
 		bool on_window_resize(WindowResizeEvent& e);
-
-	protected:
-		ECS* ecs;
 
 	private:
 		std::unique_ptr<Window> window;

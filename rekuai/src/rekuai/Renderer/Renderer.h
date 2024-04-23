@@ -68,7 +68,7 @@ namespace kuai {
 		static void begin_pass();
 		static void end_pass();
 
-		//static void submit(Shader* shader);
+		static void submit(Shader* shader);
 
 		static void set_viewport(u32 x, u32 y, u32 width, u32 height);
 		static void set_clear_col(const glm::vec4& col);

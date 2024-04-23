@@ -23,14 +23,7 @@ namespace kuai {
 		running = true;
 
 		Renderer::init();
-		ecs = new ECS();
-		//ecs->register_component<Transform>();
 		//AudioManager::init();
-	}
-
-	App::~App() 
-	{
-		delete ecs;
 	}
 
 	void App::run() 

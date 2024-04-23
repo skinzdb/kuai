@@ -27,17 +27,12 @@ namespace kuai {
 			 const std::vector<u32>& indices
 		);
 
-		Mesh(const std::vector<Vertex>& vertex_data, const std::vector<u32> indices);
-
 		Mesh(const std::string& filename);
 
 		virtual ~Mesh();
 
 	private:
-		u32 get_id() const { return mesh_id; }
-
-	private:
-		u32 mesh_id;
+		u32 id;
 
 		std::vector<Vertex> vertex_data;
 		std::vector<u32> indices;

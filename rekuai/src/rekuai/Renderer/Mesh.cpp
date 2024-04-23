@@ -35,11 +35,7 @@ namespace kuai {
 				vertex_data[i].tex_coords[1] = tex_coords[i * 2 + 1];
 			}
 		}
-		mesh_id = next_id++;
-	}
-
-	Mesh::Mesh(const std::vector<Vertex>& vertex_data, const std::vector<u32> indices) : mesh_id(next_id++), vertex_data(vertex_data), indices(indices)
-	{
+		id = next_id++;
 	}
 
 	Mesh::Mesh(const std::string& filename)
@@ -91,7 +87,7 @@ namespace kuai {
 				// shapes[s].mesh.material_ids[f];
 			}
 		}
-		mesh_id = next_id++;
+		id = next_id++;
 	}
 
 	Mesh::~Mesh()

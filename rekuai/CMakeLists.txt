@@ -5,9 +5,6 @@ project(rekuai VERSION 0.1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
-option(BUILD_SHARED_LIBS OFF)
-set(LIBTYPE STATIC) # Sets OpenAL build type to static
-
 add_library(${PROJECT_NAME}
     src/kpch.h
     src/kpch.cpp
@@ -54,11 +51,13 @@ add_library(${PROJECT_NAME}
     src/rekuai/Components/Entity.h 
     
     "src/rekuai/Events/Signal.h" "src/rekuai/Components/Scene.h" "src/rekuai/Components/Scene.cpp" "src/rekuai/Renderer/Material.h" "src/rekuai/Renderer/TextureArray.h"
-    
+      "src/rekuai/Renderer/Texture.h" "src/rekuai/Renderer/Texture.cpp"
     
     vendor/tinyobjloader/tiny_obj_loader.h
     vendor/tinyobjloader/tiny_obj_loader.cpp
-    )
+    vendor/stb_image/stb_image.h
+    vendor/stb_image/stb_image.cpp
+ "src/rekuai/Renderer/TextureArray.cpp" "vendor/stb_image/stb_image_resize.h" "vendor/stb_image/stb_image_resize.cpp" "src/rekuai/Renderer/TextureManager.h" "src/rekuai/Renderer/TextureManager.cpp")
 
 set(MY_LIBS
     glfw
@@ -97,6 +96,7 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC vendor/glm
     PUBLIC vendor/spdlog/include
     PUBLIC vendor/tinyobjloader
+    PUBLIC vendor/stb_image
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${MY_LIBS})

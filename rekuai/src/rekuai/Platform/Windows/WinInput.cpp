@@ -1,7 +1,8 @@
 #include "kpch.h"
-#include "rekuai/Core/Input.h"
 
+#include "rekuai/Core/Input.h"
 #include "rekuai/Core/App.h"
+
 #include <GLFW/glfw3.h>
 
 namespace kuai {
