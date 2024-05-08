@@ -22,7 +22,7 @@ namespace kuai {
 		void set_uniform(const std::string& name, const glm::mat4& val) const;
 
 		void create_uniform_block(const std::string& name, const std::vector<const char*>& members, u32 binding);
-		void set_uniform(const std::string& name, const std::string& member, const void* data, u32 size) const;
+		static void set_uniform(const std::string& name, const std::string& member, const void* data, u32 size);
 
 		void bind() const;
 		void unbind() const;

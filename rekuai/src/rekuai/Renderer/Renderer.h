@@ -48,8 +48,10 @@ namespace kuai {
 
 	struct RendererData
 	{
-		std::vector<std::reference_wrapper<Transform>> transforms;
-		std::unordered_map<u32, ShaderData> shader_map;	// Maps shader ID to its commands and total number of instances
+		 
+
+		std::vector<Transform> transforms;
+		std::unordered_map<Shader, ShaderData> shader_map;	// Maps shader to its commands and total number of instances
 		std::unordered_map<u32, OffsetData> offset_map;	// Maps mesh ID to its vertex and index offsets
 
 		std::vector<Vertex> vertex_data;
@@ -65,10 +67,9 @@ namespace kuai {
 		static void add_object(const MeshRenderer& m_renderer, Transform& transform);
 		static void remove_object(const MeshRenderer& m_renderer, Transform& transform);
 
-		static void begin_pass();
-		static void end_pass();
+		static void set_camera(const Camera& camera);
 
-		static void submit(Shader* shader);
+		static void update();
 
 		static void set_viewport(u32 x, u32 y, u32 width, u32 height);
 		static void set_clear_col(const glm::vec4& col);

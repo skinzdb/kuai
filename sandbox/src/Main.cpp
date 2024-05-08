@@ -39,7 +39,25 @@ const char* vert_src = R"(
 	}
 )";
 
-const char* frag_src = R"()";
+const char* frag_src = R"(
+	#version 450
+
+	in vec4 world_pos;
+	in vec3 world_norm;
+	in vec2 tex_coords;
+
+	in flat float tex_index;
+	in flat float tiling;
+
+	uniform sampler2DArray sprites;
+
+	out vec4 fragCol;
+
+	void main()
+	{
+		fragCol = texture(sprites, vec3(tex_coords * tiling, int(tex_index)));
+	}
+)";
 
 
 class MyApp : public App 
@@ -53,8 +71,8 @@ public:
 
 		cam.add_component<Camera>(60, get_window().get_width(), get_window().get_height(), 0.1f, 100.0f);
 
-		auto& shader = Shader(vert_src, frag_src);
-		auto& mesh = Mesh("C:/Users/David/Documents/cube.obj");
+		Shader shader = Shader(vert_src, frag_src);
+		Mesh mesh = Mesh("C:/Users/David/Documents/cube.obj");
 		//auto& material = Material(shader);
 
 		test.add_component<Transform>();

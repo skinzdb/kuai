@@ -25,7 +25,7 @@ namespace kuai {
 
 	void Renderer::add_object(const MeshRenderer& m_renderer, Transform& transform)
 	{
-		auto& s_data = r_data.shader_map[m_renderer.material.shader->id];
+		auto& s_data = r_data.shader_map[m_renderer.material.shader];
 		auto& mesh = m_renderer.mesh;
 
 		r_data.transforms.push_back(transform);
@@ -43,10 +43,10 @@ namespace kuai {
 
 		if (cmd.inst_count == 0)
 		{
-			cmd.count = mesh.indices.size();									 // Number of indices mesh uses	
+			cmd.count = mesh.indices.size();							     // Number of indices mesh uses	
 			cmd.first_idx = r_data.offset_map[mesh.id].indices_offset;	     // Offset of first index
 			cmd.base_vertex = r_data.offset_map[mesh.id].vertices_offset;	 // Offset of first vertex
-			cmd.base_inst = s_data.instances;									 // Offset of first instance
+			cmd.base_inst = s_data.instances;								 // Offset of first instance
 		}
 
 		cmd.inst_count++;
@@ -55,10 +55,9 @@ namespace kuai {
 
 	void Renderer::remove_object(const MeshRenderer& m_renderer, Transform& transform)
 	{
-		auto& s_data = r_data.shader_map[m_renderer.material.shader->id];
+		auto& s_data = r_data.shader_map[m_renderer.material.shader];
 
-		r_data.transforms.erase(std::find_if(r_data.transforms.cbegin(), r_data.transforms.cend(), [&](const std::reference_wrapper<Transform>& t) {
-			return t.get() == transform;	}));
+		r_data.transforms.erase(std::remove(r_data.transforms.begin(), r_data.transforms.end(), transform), r_data.transforms.end());
 
 		s_data.mesh_to_cmd[m_renderer.mesh.id].inst_count--;
 		s_data.instances--;
@@ -76,25 +75,26 @@ namespace kuai {
 
 		if (s_data.instances == 0)
 		{
-			r_data.shader_map.erase(m_renderer.material.shader->id);
+			r_data.shader_map.erase(m_renderer.material.shader);
 		}
 	}
 
-	void Renderer::begin_pass()
+	void Renderer::set_camera(const Camera& camera)
 	{
 	}
 
-	void Renderer::end_pass()
+	void Renderer::update()
 	{
-	}
+		Shader::set_uniform("proj_matrix", )
 
-	void Renderer::submit(Shader* shader)
-	{
-		shader->bind();
+		for (auto& [shader, _] : r_data.shader_map)
+		{
+			shader.bind();
 
-		size_t cmd_count = r_data.shader_map[shader->id].mesh_to_cmd.size();
+			size_t cmd_count = r_data.shader_map[shader].mesh_to_cmd.size();
 
-		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)0, cmd_count, sizeof(IndirectCommand));
+			glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)0, cmd_count, sizeof(IndirectCommand));
+		}
 	}
 
 	void Renderer::set_viewport(u32 x, u32 y, u32 width, u32 height)

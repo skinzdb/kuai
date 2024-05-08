@@ -7,9 +7,12 @@ namespace kuai {
 	class Material
 	{
 	public:
+		Material(const Shader& shader) : shader(shader) 
+		{
+		}
 
-	private:
-		Shader* shader;
+	protected:
+		Shader shader;
 
 		friend class Renderer;
 	};
@@ -17,8 +20,8 @@ namespace kuai {
 	class BasicMaterial : public Material
 	{
 	public:
-		BasicMaterial(Texture* diffuse, Texture* normal, const glm::vec2& tiling = { 1.0f, 1.0f })
-			: diffuse(diffuse), normal(normal), tiling(tiling), shininess(1.0f)
+		BasicMaterial(const Shader& shader, Texture* diffuse, Texture* normal, const glm::vec2& tiling = { 1.0f, 1.0f })
+			: Material(shader), diffuse(diffuse), normal(normal), tiling(tiling), shininess(1.0f)
 		{
 		}
 	

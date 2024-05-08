@@ -97,7 +97,7 @@ namespace kuai {
 		ubos[name] = ubo;
 	}
 
-	void Shader::set_uniform(const std::string& name, const std::string& member, const void* data, u32 size) const
+	void Shader::set_uniform(const std::string& name, const std::string& member, const void* data, u32 size)
 	{
 		glNamedBufferSubData(ubos.at(name), ubo_offsets.at(member), size, data);
 	}
