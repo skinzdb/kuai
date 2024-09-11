@@ -33,16 +33,16 @@ namespace kuai {
 
 	void Scene::update(float dt)
 	{
-		Renderer::begin_pass();
+		//Renderer::begin_pass();
 
 
-		Renderer::end_pass();
+		//Renderer::end_pass();
 
 
-		Renderer::begin_pass();
+		//Renderer::begin_pass();
 
 
-		Renderer::end_pass();
+		//Renderer::end_pass();
 	}
 
 	Entity& Scene::create_entity()

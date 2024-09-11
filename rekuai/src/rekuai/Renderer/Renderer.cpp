@@ -25,7 +25,7 @@ namespace kuai {
 
 	void Renderer::add_object(const MeshRenderer& m_renderer, Transform& transform)
 	{
-		auto& s_data = r_data.shader_map[m_renderer.material.shader];
+		auto& s_data = r_data.shader_map[m_renderer.material.shader.id];
 		auto& mesh = m_renderer.mesh;
 
 		r_data.transforms.push_back(transform);
@@ -55,7 +55,7 @@ namespace kuai {
 
 	void Renderer::remove_object(const MeshRenderer& m_renderer, Transform& transform)
 	{
-		auto& s_data = r_data.shader_map[m_renderer.material.shader];
+		auto& s_data = r_data.shader_map[m_renderer.material.shader.id];
 
 		r_data.transforms.erase(std::remove(r_data.transforms.begin(), r_data.transforms.end(), transform), r_data.transforms.end());
 
@@ -75,7 +75,7 @@ namespace kuai {
 
 		if (s_data.instances == 0)
 		{
-			r_data.shader_map.erase(m_renderer.material.shader);
+			r_data.shader_map.erase(m_renderer.material.shader.id);
 		}
 	}
 
@@ -85,13 +85,13 @@ namespace kuai {
 
 	void Renderer::update()
 	{
-		Shader::set_uniform("proj_matrix", )
+		//Shader::set_uniform("proj_matrix", )
 
-		for (auto& [shader, _] : r_data.shader_map)
+		for (auto& shader : r_data.shaders)
 		{
 			shader.bind();
 
-			size_t cmd_count = r_data.shader_map[shader].mesh_to_cmd.size();
+			size_t cmd_count = r_data.shader_map[shader.id].mesh_to_cmd.size();
 
 			glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)0, cmd_count, sizeof(IndirectCommand));
 		}

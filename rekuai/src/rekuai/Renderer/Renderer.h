@@ -51,7 +51,9 @@ namespace kuai {
 		 
 
 		std::vector<Transform> transforms;
-		std::unordered_map<Shader, ShaderData> shader_map;	// Maps shader to its commands and total number of instances
+		std::vector<Shader> shaders;
+		
+		std::unordered_map<u32, ShaderData> shader_map;	// Maps shader ID to its commands and total number of instances
 		std::unordered_map<u32, OffsetData> offset_map;	// Maps mesh ID to its vertex and index offsets
 
 		std::vector<Vertex> vertex_data;
