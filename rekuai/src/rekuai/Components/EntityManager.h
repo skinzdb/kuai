@@ -1,12 +1,14 @@
 #pragma once
 
+#include "rekuai/Core/Core.h"
+
 namespace kuai {
 
-	const u32 MAX_ENTITIES = 10000;
-	const u32 MAX_COMPONENTS = 32;
+	const uint32_t MAX_ENTITIES = 10000;
+	const uint32_t MAX_COMPONENTS = 32;
 
-	using EntityId = u32;
-	using ComponentMask = u32;
+	using EntityId = uint32_t;
+	using ComponentMask = uint32_t;
 
 	static const EntityId null_entity = 0;
 
@@ -60,7 +62,7 @@ namespace kuai {
 		// List of unused entity IDs
 		std::vector<EntityId> available;
 		// Number of entities currently in use
-		u32 entity_count;
+		uint32_t entity_count;
 
 		// Components associated with each entity
 		ComponentMask component_masks[MAX_ENTITIES];

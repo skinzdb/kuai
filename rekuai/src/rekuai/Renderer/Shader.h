@@ -1,31 +1,29 @@
 #pragma once
 
 #include <glm/glm.hpp>
-
-#include "Buffer.h"
+#include <memory>
 
 namespace kuai {
 
 	class Shader
 	{
 	public:
-		Shader(const std::string& vert_src, const std::string& frag_src);
-		~Shader();
+		virtual ~Shader() = default;
 
-		void create_uniform(const std::string& name);
-		void set_uniform(const std::string& name, int val) const;
-		void set_uniform(const std::string& name, float val) const;
-		void set_uniform(const std::string& name, const glm::vec2& val) const;
-		void set_uniform(const std::string& name, const glm::vec3& val) const;
-		void set_uniform(const std::string& name, const glm::vec4& val) const;
-		void set_uniform(const std::string& name, const glm::mat3& val) const;
-		void set_uniform(const std::string& name, const glm::mat4& val) const;
+		virtual void bind() const = 0;
+		virtual void unbind() const = 0;
 
-		void create_uniform_block(const std::string& name, const std::vector<const char*>& members, u32 binding);
-		static void set_uniform(const std::string& name, const std::string& member, const void* data, u32 size);
 
-		void bind() const;
-		void unbind() const;
+		virtual void create_uniform(const std::string& name) = 0;
+		virtual void set_uniform(const std::string& name, int val) const = 0;
+		virtual void set_uniform(const std::string& name, float val) const = 0;
+		virtual void set_uniform(const std::string& name, const glm::vec2& val) const = 0;
+		virtual void set_uniform(const std::string& name, const glm::vec3& val) const = 0;
+		virtual void set_uniform(const std::string& name, const glm::vec4& val) const = 0;
+		virtual void set_uniform(const std::string& name, const glm::mat3& val) const = 0;
+		virtual void set_uniform(const std::string& name, const glm::mat4& val) const = 0;
+
+		static std::unique_ptr<Shader> create(const std::string& vert_src, const std::string& frag_src);
 
 	private:
 		int create_shader(const char* src, int type);
@@ -36,14 +34,12 @@ namespace kuai {
 		int vert_id;
 		int frag_id;
 
-		std::unordered_map<std::string, u32> uniforms;
+		std::unordered_map<std::string, uint32_t> uniforms;
 
 		// UBOs and member offsets are static as they are shared between all shaders
-		static std::unordered_map<std::string, u32> ubos;
-		static std::unordered_map<std::string, u32> ubo_offsets;
+		static std::unordered_map<std::string, uint32_t> ubos;
+		static std::unordered_map<std::string, uint32_t> ubo_offsets;
 
 		friend class Renderer;
 	};
 }
-
-

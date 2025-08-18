@@ -1,4 +1,4 @@
-#include "kpch.h"
+#include "GLFW/glfw3.h"
 
 #include "WinWindow.h"
 
@@ -26,7 +26,8 @@ namespace kuai {
 
 	WinWindow::~WinWindow()
 	{
-		cleanup();
+	    glfwDestroyWindow(window);
+		glfwTerminate();
 	}
 
 	void WinWindow::init(const WindowProps& props)
@@ -42,21 +43,23 @@ namespace kuai {
 			int success = glfwInit();
 
 			KU_CORE_ASSERT(success, "Failed to initialise GLFW");
-			
+
 			glfwInitialised = true;
 		}
 
+		#ifdef KU_PLATFORM_APPLE
+		    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+			glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+		#endif
+
 		window = glfwCreateWindow((int)props.width, (int)props.height, props.title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(window);
-
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress); // Initialise Glad
-		KU_CORE_ASSERT(status, "Failed to initialise Glad");
 
 		glfwSetWindowUserPointer(window, &data); // We can store anything in this user pointer, set it to reference of WindowData struct
 		set_vsync(true);
 
 		// ************************************************************
-		// Set GLFW callbacks		
+		// Set GLFW callbacks
 		// ************************************************************
 
 		glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height)
@@ -65,7 +68,7 @@ namespace kuai {
 			data.width = width;
 			data.height = height;
 
-			WindowResizeEvent event(width, height); 
+			WindowResizeEvent event(width, height);
 			data.event_callback(event); // Dispatch event
 		});
 
@@ -106,7 +109,7 @@ namespace kuai {
 		glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-			
+
 			switch (action)
 			{
 				case GLFW_PRESS:
@@ -139,11 +142,6 @@ namespace kuai {
 		});
 
 		//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	}
-
-	void WinWindow::cleanup()
-	{
-		glfwDestroyWindow(window);
 	}
 
 	void WinWindow::update()

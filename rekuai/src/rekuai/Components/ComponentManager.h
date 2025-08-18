@@ -1,10 +1,12 @@
 #pragma once
 
 #include "kpch.h"
+#include "rekuai/Core/Core.h"
 
 // @cond
 namespace kuai {
-	using ComponentType = u8;
+	using ComponentType = uint8_t;
+	using EntityId = uint32_t;
 
 	class IComponentContainer
 	{
@@ -117,7 +119,7 @@ namespace kuai {
 		{
 			get_component_container<T>()->remove(entity);
 		}
-		
+
 		template<typename T>
 		T& get_component(EntityId entity)
 		{
@@ -144,7 +146,7 @@ namespace kuai {
 				component->on_entity_destroyed(entity);
 			}
 		}
-		
+
 	private:
 		// Map of component names to their types (uint_8)
 		std::unordered_map<const char*, ComponentType> component_types;

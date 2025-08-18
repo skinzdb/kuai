@@ -2,7 +2,7 @@
 
 #include "rekuai/Core/Window.h"
 
-#include <glad/glad.h>
+#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
 // @cond
@@ -25,10 +25,9 @@ namespace kuai {
 		virtual void set_vsync(bool enabled) override;
 		virtual bool is_vsync() const override;
 
-		virtual void* get_native_window() const { return window; }
+		virtual void* get_native_window() const override { return window; }
 	private:
 		virtual void init(const WindowProps& props);
-		virtual void cleanup();
 
 		GLFWwindow* window;
 

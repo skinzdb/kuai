@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "Material.h"
 
+#include "RendererAPI.h"
 #include "rekuai/Components/Components.h"
 
 namespace kuai {
@@ -36,8 +37,8 @@ namespace kuai {
 
 	struct ShaderData
 	{
-		std::unordered_map<u32, IndirectCommand> mesh_to_cmd;
-		u32 instances;
+		std::unordered_map<uint32_t, IndirectCommand> mesh_to_cmd;
+		uint32_t instances;
 	};
 
 	struct OffsetData
@@ -48,8 +49,6 @@ namespace kuai {
 
 	struct RendererData
 	{
-		 
-
 		std::vector<Transform> transforms;
 		std::vector<Shader> shaders;
 		
@@ -57,7 +56,7 @@ namespace kuai {
 		std::unordered_map<u32, OffsetData> offset_map;	// Maps mesh ID to its vertex and index offsets
 
 		std::vector<Vertex> vertex_data;
-		std::vector<u32> indices;
+		std::vector<uint32_t> indices;
 	};
 
 	class Renderer
@@ -73,12 +72,12 @@ namespace kuai {
 
 		static void update();
 
-		static void set_viewport(u32 x, u32 y, u32 width, u32 height);
+		static void set_viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
 		static void set_clear_col(const glm::vec4& col);
 		static void clear();
 
 	private:
+		static std::unique_ptr<RendererAPI> api;
 		static RendererData r_data;
 	};
 }
-

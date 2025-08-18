@@ -10,7 +10,7 @@ namespace kuai {
 	class Entity
 	{
 	public:
-		Entity(EntityId id, Scene* scene) : id(id), scene(scene) 
+		Entity(EntityId id, Scene* scene) : id(id), scene(scene)
 		{
 		}
 
@@ -56,7 +56,7 @@ namespace kuai {
 			return id;
 		}
 
-		operator u32() const { return (u32)id; }
+		operator uint32_t() const { return (uint32_t)id; }
 
 		operator bool() const { return id != null_entity; }
 

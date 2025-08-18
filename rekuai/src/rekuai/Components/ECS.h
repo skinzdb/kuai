@@ -6,7 +6,7 @@
 
 namespace kuai {
 
-	class ECS 
+	class ECS
 	{
 	public:
 		ECS()
@@ -101,11 +101,7 @@ namespace kuai {
 			return system_manager->register_system<Cs...>(component_manager);
 		}
 
-		template<typename T>
-		void set_system_mask(ComponentMask mask)
-		{
-			system_manager->set_component_mask<T>(mask);
-		}
+
 
 	private:
 		EntityManager* entity_manager;

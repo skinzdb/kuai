@@ -7,7 +7,7 @@ namespace kuai {
 	class Material
 	{
 	public:
-		Material(const Shader& shader) : shader(shader) 
+		Material(const Shader& shader) : shader(shader)
 		{
 		}
 
@@ -24,7 +24,7 @@ namespace kuai {
 			: Material(shader), diffuse(diffuse), normal(normal), tiling(tiling), shininess(1.0f)
 		{
 		}
-	
+
 		Texture* diffuse;
 		Texture* normal;
 

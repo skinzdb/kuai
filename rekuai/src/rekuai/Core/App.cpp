@@ -3,8 +3,6 @@
 #include "Log.h"
 
 #include "rekuai/Renderer/Renderer.h"
-#include "rekuai/Components/Components.h"
-
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -13,7 +11,7 @@ namespace kuai {
 
 	App* App::instance = nullptr;
 
-	App::App() 
+	App::App()
 	{
 		KU_CORE_ASSERT(!instance, "Application already exists");
 		instance = this;
@@ -26,13 +24,13 @@ namespace kuai {
 		//AudioManager::init();
 	}
 
-	void App::run() 
+	void App::run()
 	{
-		while (running) 
+		while (running)
 		{
 			float elapsedTime = timer.get_elapsed(); // Time since last frame
 			//KU_CORE_INFO("FPS: {0}", 1.0f / elapsedTime);
-						
+
 			if (!minimised)
 			{
 				update(elapsedTime);

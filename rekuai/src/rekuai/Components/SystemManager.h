@@ -1,5 +1,7 @@
 #pragma once
 
+#include "rekuai/Core/Core.h"
+
 #include "EntityManager.h"
 #include "ComponentManager.h"
 #include "System.h"
@@ -60,7 +62,7 @@ namespace kuai {
 				}
 				else
 				{
-					
+
 					system->remove(entity);
 				}
 			}

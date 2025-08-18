@@ -1,5 +1,6 @@
 #include "kpch.h"
 
+#include "rekuai/Core/Core.h"
 #include "TextureManager.h"
 #include "Texture.h"
 
@@ -16,11 +17,11 @@ namespace kuai {
 		glBindTextures(GL_TEXTURE_2D_ARRAY, TEX_ARRAY_COUNT, &tex_array_ids[0]);
 
 		glTexStorage3D(
-			GL_TEXTURE_2D_ARRAY,	
+			GL_TEXTURE_2D_ARRAY,
 			1, // No mipmaps
-			GL_RGBA8, 
-			TEX_ARRAY_WIDTH, 
-			TEX_ARRAY_HEIGHT, 
+			GL_RGBA8,
+			TEX_ARRAY_WIDTH,
+			TEX_ARRAY_HEIGHT,
 			1  // Number of layers
 		);
 

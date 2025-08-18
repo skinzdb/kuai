@@ -47,7 +47,7 @@ namespace kuai {
 	struct MeshRenderer
 	{
 		MeshRenderer(const Mesh& mesh, const Material& material) : mesh(mesh), material(material) {}
-		
+
 		Mesh mesh;
 		Material material;
 	};
@@ -60,8 +60,8 @@ namespace kuai {
 			Ortho
 		};
 
-		Camera(float fov, float width, float height, float z_near, float z_far) : 
-			proj_type(ProjectionType::Perspective),	fov(fov), aspect(width / height), z_near(z_near), z_far(z_far) 
+		Camera(float fov, float width, float height, float z_near, float z_far) :
+			proj_type(ProjectionType::Perspective),	fov(fov), aspect(width / height), z_near(z_near), z_far(z_far)
 		{
 			update_view_matrix(glm::vec3(), glm::vec3());
 			update_proj_matrix();

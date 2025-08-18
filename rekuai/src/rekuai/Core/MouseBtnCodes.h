@@ -1,10 +1,8 @@
 #pragma once
 
-#include "kpch.h"
-
 namespace kuai
 {
-	using MouseBtnCode = u16;
+	using MouseBtnCode = uint16_t;
 
 	namespace Mouse
 	{

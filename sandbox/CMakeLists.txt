@@ -13,8 +13,10 @@ if (WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         KU_PLATFORM_WINDOWS
     )
-else()
-
+elseif (APPLE)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        KU_PLATFORM_APPLE
+    )
 endif()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../rekuai ${CMAKE_CURRENT_BINARY_DIR}/rekuai)
@@ -27,6 +29,6 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ../rekuai/vendor/spdlog/include
 )
 
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(${PROJECT_NAME}
     PRIVATE rekuai
 )

@@ -1,15 +1,14 @@
-#include "kpch.h"
 #include "Mesh.h"
 
 #include "tiny_obj_loader.h"
 
 namespace kuai {
 
-	u32 Mesh::next_id = 0;
+	uint32_t Mesh::next_id = 0;
 
-	Mesh::Mesh(const std::vector<float>& positions, const std::vector<float>& normals, const std::vector<float>& tex_coords, const std::vector<u32>& indices)
+	Mesh::Mesh(const std::vector<float>& positions, const std::vector<float>& normals, const std::vector<float>& tex_coords, const std::vector<uint32_t>& indices)
 	{
-		u32 vert_count = positions.size() / 3;
+		uint32_t vert_count = positions.size() / 3;
 
 		vertex_data.resize(vert_count);
 		bool use_normals = positions.size() == normals.size();
@@ -48,8 +47,8 @@ namespace kuai {
 
 		bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, &warn, filename.c_str());
 
-		if (!err.empty()) 
-		{ 
+		if (!err.empty())
+		{
 			KU_CORE_ERROR(err);
 		}
 		if (!warn.empty())
@@ -57,16 +56,16 @@ namespace kuai {
 			KU_CORE_WARN(warn);
 		}
 
-		for (size_t s = 0; s < shapes.size(); s++) 
+		for (size_t s = 0; s < shapes.size(); s++)
 		{
 			// Loop over faces (polygon)
 			size_t idx_offset = 0;
-			for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) 
+			for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++)
 			{
 				int fv = shapes[s].mesh.num_face_vertices[f];
 
 				// Loop over vertices in the face
-				for (size_t v = 0; v < fv; v++) 
+				for (size_t v = 0; v < fv; v++)
 				{
 					tinyobj::index_t idx = shapes[s].mesh.indices[idx_offset + v];
 					vertex_data.emplace_back(

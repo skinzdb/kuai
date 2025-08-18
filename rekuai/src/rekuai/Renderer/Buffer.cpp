@@ -1,50 +1,32 @@
-#include "kpch.h"
-
+#include "rekuai/Core/Core.h"
 #include "Buffer.h"
 
 #include "glad/glad.h"
+#include "rekuai/Platform/Vulkan/VulkanBuffer.h"
+#include "rekuai/Renderer/RendererAPI.h"
+#include <cstddef>
+#include <memory>
 
 namespace kuai {
 
-	static GLenum get_opengl_type(ShaderDataType type)
-	{
-		switch (type)
-		{
-		case ShaderDataType::INT:
-			return GL_INT;
-		case ShaderDataType::FLOAT:
-		case ShaderDataType::VEC2:
-		case ShaderDataType::VEC3:
-		case ShaderDataType::VEC4:
-		case ShaderDataType::MAT3:
-		case ShaderDataType::MAT4:
-			return GL_FLOAT;
-		}
-
-		KU_CORE_ASSERT(false, "Unknown shader data type.");
-		return 0;
-	}
-
 	// Vertex Buffer *********************************************************
 
-	VertexBuffer::VertexBuffer(u32 size)
-	{
-		glCreateBuffers(1, &buf_id);
-		glBindBuffer(GL_ARRAY_BUFFER, buf_id);
-		glBufferData(buf_id, size, nullptr, GL_DYNAMIC_DRAW);
-	}
+    std::unique_ptr<VertexBuffer> VertexBuffer::create(uint32_t size) {
+        switch (RendererAPI::getAPI()) {
 
-	VertexBuffer::VertexBuffer(const float* vertices, u32 size, DrawHint drawHint)
-	{
-		glCreateBuffers(1, &buf_id);
-		glBindBuffer(GL_ARRAY_BUFFER, buf_id);
-		glBufferData(GL_ARRAY_BUFFER, size, vertices, drawHint == DrawHint::STATIC ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
-	}
+        case RendererAPI::API::None:
+            return nullptr;
+        case RendererAPI::API::OpenGL:
+            return nullptr;
+        case RendererAPI::API::Vulkan:
+            return std::make_unique<VulkanBuffer>(size);
+        }
+    }
 
-	VertexBuffer::~VertexBuffer()
-	{
-		glDeleteBuffers(1, &buf_id);
-	}
+ //    VertexBuffer::~VertexBuffer()
+	// {
+	// 	glDeleteBuffers(1, &buf_id);
+	// }
 
 	void VertexBuffer::bind() const
 	{
@@ -56,25 +38,19 @@ namespace kuai {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
-	void VertexBuffer::set_data(const void* data, u32 size)
+	void VertexBuffer::set_data(const void* data, uint32_t size)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, buf_id);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 	}
 
-	void VertexBuffer::reset(const void* data, u32 size, DrawHint drawHint)
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, buf_id);
-		glBufferData(GL_ARRAY_BUFFER, size, data, drawHint == DrawHint::STATIC ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
-	}
-
 	// Index Buffer ***********************************************************
 
-	IndexBuffer::IndexBuffer(u32* indices, u32 count) : count(count)
+	IndexBuffer::IndexBuffer(uint32_t* indices, uint32_t count) : count(count)
 	{
 		glCreateBuffers(1, &buf_id);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_id);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(u32) * count, indices, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * count, indices, GL_STATIC_DRAW);
 	}
 
 	IndexBuffer::~IndexBuffer()
@@ -139,7 +115,7 @@ namespace kuai {
 		glBindVertexArray(0);
 	}
 
-	void VertexArray::add_vertex_buffer(Box<VertexBuffer> buf)
+	void VertexArray::add_vertex_buffer(std::unique_ptr<VertexBuffer> buf)
 	{
 		KU_CORE_ASSERT(buf->get_layout().get_elements().size(), "Vertex buffer has no layout.");
 
@@ -184,8 +160,8 @@ namespace kuai {
 			case ShaderDataType::MAT4:
 			{
 				// The maximum size of a vertex attribute is 4 elements (vec4), so need to assign mutiple vertex attribute slots for a matrix
-				u8 count = element.get_component_count();
-				for (u8 i = 0; i < count; i++)
+				uint8_t count = element.get_component_count();
+				for (size_t i = 0; i < count; i++)
 				{
 					glEnableVertexAttribArray(index);
 					glVertexAttribPointer(
@@ -206,7 +182,7 @@ namespace kuai {
 		vertex_bufs.push_back(std::move(buf));
 	}
 
-	void VertexArray::set_index_buffer(Box<IndexBuffer> buf)
+	void VertexArray::set_index_buffer(std::unique_ptr<IndexBuffer> buf)
 	{
 		glBindVertexArray(vao_id);
 		buf->bind();

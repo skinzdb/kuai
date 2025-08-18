@@ -1,10 +1,8 @@
 #pragma once
 
-#include "kpch.h"
-
 namespace kuai
 {
-	using KeyCode = u16;
+	using KeyCode = uint16_t;
 
 	namespace Key
 	{

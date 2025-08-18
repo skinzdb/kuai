@@ -24,7 +24,7 @@ namespace kuai {
 		Mesh(const std::vector<float>& positions,
 			 const std::vector<float>& normals,
 			 const std::vector<float>& tex_coords,
-			 const std::vector<u32>& indices
+			 const std::vector<uint32_t>& indices
 		);
 
 		Mesh(const std::string& filename);
@@ -32,14 +32,13 @@ namespace kuai {
 		virtual ~Mesh();
 
 	private:
-		u32 id;
+		uint32_t id;
 
 		std::vector<Vertex> vertex_data;
-		std::vector<u32> indices;
+		std::vector<uint32_t> indices;
 
-		static u32 next_id;
+		static uint32_t next_id;
 
 		friend class Renderer;
 	};
 }
-

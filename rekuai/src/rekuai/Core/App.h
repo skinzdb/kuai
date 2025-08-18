@@ -5,8 +5,6 @@
 #include "rekuai/Events/Event.h"
 #include "rekuai/Events/AppEvent.h"
 
-#include "rekuai/Components/ECS.h"
-
 #include "Window.h"
 #include "Timer.h"
 
@@ -58,4 +56,3 @@ namespace kuai {
 	// To be defined in client
 	App* create_app();
 }
-

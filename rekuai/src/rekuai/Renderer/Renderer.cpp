@@ -1,21 +1,24 @@
 #include "Renderer.h"
-
-#include "glad/glad.h"
+#include "rekuai/Renderer/RendererAPI.h"
+#include <memory>
 
 namespace kuai {
 
 	RendererData Renderer::r_data = RendererData();
+	std::unique_ptr<RendererAPI> Renderer::api = RendererAPI::create();
 
 	void Renderer::init()
 	{
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
+	    api->init();
 
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
+		// glEnable(GL_DEPTH_TEST);
+		// glDepthFunc(GL_LESS);
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// glEnable(GL_CULL_FACE);
+		// glCullFace(GL_BACK);
+
+		// glEnable(GL_BLEND);
+		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 	void Renderer::cleanup()
@@ -39,18 +42,18 @@ namespace kuai {
 			r_data.indices.insert(r_data.indices.end(), mesh.indices.begin(), mesh.indices.end());
 		}
 
-		IndirectCommand& cmd = s_data.mesh_to_cmd[mesh.id];
+		// IndirectCommand& cmd = s_data.mesh_to_cmd[mesh.id];
 
-		if (cmd.inst_count == 0)
-		{
-			cmd.count = mesh.indices.size();							     // Number of indices mesh uses	
-			cmd.first_idx = r_data.offset_map[mesh.id].indices_offset;	     // Offset of first index
-			cmd.base_vertex = r_data.offset_map[mesh.id].vertices_offset;	 // Offset of first vertex
-			cmd.base_inst = s_data.instances;								 // Offset of first instance
-		}
+		// if (cmd.inst_count == 0)
+		// {
+		// 	cmd.count = mesh.indices.size();							     // Number of indices mesh uses
+		// 	cmd.first_idx = r_data.offset_map[mesh.id].indices_offset;	     // Offset of first index
+		// 	cmd.base_vertex = r_data.offset_map[mesh.id].vertices_offset;	 // Offset of first vertex
+		// 	cmd.base_inst = s_data.instances;								 // Offset of first instance
+		// }
 
-		cmd.inst_count++;
-		s_data.instances++;
+		// cmd.inst_count++;
+		// s_data.instances++;
 	}
 
 	void Renderer::remove_object(const MeshRenderer& m_renderer, Transform& transform)
@@ -59,19 +62,19 @@ namespace kuai {
 
 		r_data.transforms.erase(std::remove(r_data.transforms.begin(), r_data.transforms.end(), transform), r_data.transforms.end());
 
-		s_data.mesh_to_cmd[m_renderer.mesh.id].inst_count--;
-		s_data.instances--;
+		// s_data.mesh_to_cmd[m_renderer.mesh.id].inst_count--;
+		// s_data.instances--;
 
 		// TODO: vertex data and indices will never get deleted from list
 
-		// Decrement base instances of all meshes that are further along the list as we deleted an instance 
-		for (auto& [_, cmd] : s_data.mesh_to_cmd)
-		{
-			if (cmd.base_inst > cmd.base_inst)
-			{
-				cmd.base_inst--;
-			}
-		}
+		// Decrement base instances of all meshes that are further along the list as we deleted an instance
+		// for (auto& [_, cmd] : s_data.mesh_to_cmd)
+		// {
+		// 	if (cmd.base_inst > cmd.base_inst)
+		// 	{
+		// 		cmd.base_inst--;
+		// 	}
+		// }
 
 		if (s_data.instances == 0)
 		{
@@ -93,25 +96,23 @@ namespace kuai {
 
 			size_t cmd_count = r_data.shader_map[shader.id].mesh_to_cmd.size();
 
-			glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)0, cmd_count, sizeof(IndirectCommand));
-		}
+		// 	glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)0, cmd_count, sizeof(IndirectCommand));
+		// }
 	}
 
-	void Renderer::set_viewport(u32 x, u32 y, u32 width, u32 height)
+	void Renderer::set_viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 	{
-		glViewport(x, y, width, height);
+		// glViewport(x, y, width, height);
 	}
 
 	void Renderer::set_clear_col(const glm::vec4& col)
 	{
-		glClearColor(col.r, col.g, col.b, col.a);
+		// glClearColor(col.r, col.g, col.b, col.a);
 	}
 
 	void Renderer::clear()
 	{
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
 }
-

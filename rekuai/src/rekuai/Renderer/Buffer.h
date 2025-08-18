@@ -1,5 +1,9 @@
 #pragma once
 
+#include "rekuai/Core/Core.h"
+#include <cstdint>
+#include <memory>
+
 namespace kuai {
 
     enum class ShaderDataType
@@ -7,12 +11,7 @@ namespace kuai {
         NONE = 0, INT, FLOAT, VEC2, VEC3, VEC4, MAT3, MAT4
     };
 
-    enum class DrawHint
-    {
-        STATIC, DYNAMIC
-    };
-
-    static u32 sizeOfShaderDataType(ShaderDataType type)
+    static uint32_t sizeOfShaderDataType(ShaderDataType type)
     {
         switch (type)
         {
@@ -23,25 +22,25 @@ namespace kuai {
         case ShaderDataType::VEC4:  return 16;
         case ShaderDataType::MAT3:  return 36;
         case ShaderDataType::MAT4:  return 64;
+        default:
+            KU_CORE_ASSERT(false, "Unknown shader data type.");
+            return 0;
         }
-
-        KU_CORE_ASSERT(false, "Unknown shader data type.");
-        return 0;
     }
 
     struct BufferElement
     {
         std::string name;
         ShaderDataType type;
-        u32 size;
-        u32 offset;
+        uint32_t size;
+        uint32_t offset;
 
         BufferElement() = default;
 
         BufferElement(ShaderDataType type, const std::string& name) :
             name(name), type(type), size(sizeOfShaderDataType(type)), offset(0) {}
 
-        u32 get_component_count() const
+        uint32_t get_component_count() const
         {
             switch (type)
             {
@@ -52,9 +51,8 @@ namespace kuai {
             case ShaderDataType::VEC4:  return 4;
             case ShaderDataType::MAT3:  return 3; // (3 * Vec3)
             case ShaderDataType::MAT4:  return 4; // (4 * Vec4)
+            case ShaderDataType::NONE:  return 0;
             }
-
-            return 0;
         }
     };
 
@@ -69,7 +67,7 @@ namespace kuai {
             calc_offsets_and_stride();
         }
 
-        u32 get_stride() const { return stride; }
+        uint32_t get_stride() const { return stride; }
         const std::vector<BufferElement>& get_elements() const { return elements; }
 
         std::vector<BufferElement>::iterator begin() { return elements.begin(); }
@@ -80,7 +78,7 @@ namespace kuai {
     private:
         void calc_offsets_and_stride()
         {
-            u32 offset = 0;
+            uint32_t offset = 0;
             stride = 0;
             for (auto& element : elements)
             {
@@ -92,53 +90,51 @@ namespace kuai {
 
     private:
         std::vector<BufferElement> elements;
-        u32 stride = 0;
+        uint32_t stride = 0;
     };
 
     class VertexBuffer
     {
     public:
-        VertexBuffer(u32 size);
-        VertexBuffer(const float* vertices, u32 size, DrawHint drawHint = DrawHint::STATIC);
-        ~VertexBuffer();
+        virtual ~VertexBuffer() = default;
 
-        void bind() const;
-        void unbind() const;
+        virtual void bind() const = 0;
+        virtual void unbind() const = 0;
 
-        void set_data(const void* data, u32 size);
-        void reset(const void* data, u32 size, DrawHint drawHint = DrawHint::STATIC);
+        virtual void set_data(const void* data, uint32_t size) = 0;
 
-        BufferLayout& get_layout() { return layout; }
-        void set_layout(const BufferLayout& layout) { this->layout = layout; }
+        virtual BufferLayout& get_layout() { return layout; }
+        virtual void set_layout(const BufferLayout& layout) { this->layout = layout; }
 
+        static std::unique_ptr<VertexBuffer> create(uint32_t size);
     private:
-        u32 buf_id;
+        uint32_t buf_id;
         BufferLayout layout;
     };
 
     class IndexBuffer
     {
     public:
-        IndexBuffer(u32* indices, u32 count);
+        IndexBuffer(uint32_t* indices, uint32_t count);
         ~IndexBuffer();
 
         void bind() const;
         void unbind() const;
 
-        u32 get_count() const { return count; }
+        uint32_t get_count() const { return count; }
 
     private:
-        u32 buf_id;
-        u32 count;
+        uint32_t buf_id;
+        uint32_t count;
     };
 
     struct IndirectCommand
     {
-        u32 count;        // Number of elements to be drawn per instance
-        u32 inst_count;   // Number of instances
-        u32 first_idx;    // Offset of mesh in index buffer
-        i32 base_vertex;  // Offset of mesh in vertex buffer
-        u32 base_inst;    // First instanced model index
+        uint32_t count;        // Number of elements to be drawn per instance
+        uint32_t inst_count;   // Number of instances
+        uint32_t first_idx;    // Offset of mesh in index buffer
+        int32_t base_vertex;  // Offset of mesh in vertex buffer
+        uint32_t base_inst;    // First instanced model index
     };
 
     class IndirectBuffer
@@ -150,11 +146,11 @@ namespace kuai {
         void bind() const;
         void unbind() const;
 
-        u32 get_count() const { return count; }
+        uint32_t get_count() const { return count; }
 
     private:
-        u32 buf_id;
-        u32 count;
+        uint32_t buf_id;
+        uint32_t count;
     };
 
     class VertexArray
@@ -166,14 +162,14 @@ namespace kuai {
         void bind() const;
         void unbind() const;
 
-        void add_vertex_buffer(Box<VertexBuffer> buf);
+        void add_vertex_buffer(std::unique_ptr<VertexBuffer> buf);
 
-        void set_index_buffer(Box<IndexBuffer> buf);
+        void set_index_buffer(std::unique_ptr<IndexBuffer> buf);
 
     private:
-        std::vector<Box<VertexBuffer>> vertex_bufs;
-        Box<IndexBuffer> index_buf;
-        u32 vao_id;
-        u32 index = 0;
+        std::vector<std::unique_ptr<VertexBuffer>> vertex_bufs;
+        std::unique_ptr<IndexBuffer> index_buf;
+        uint32_t vao_id;
+        uint32_t index = 0;
     };
 }
