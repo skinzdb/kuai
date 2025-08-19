@@ -17,6 +17,7 @@ namespace kuai {
 	class App {
 	public:
 		App();
+		virtual ~App();
 
 		/**
 		* Starts the application mainloop which in turn updates all layers.

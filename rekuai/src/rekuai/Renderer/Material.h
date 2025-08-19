@@ -2,34 +2,33 @@
 
 #include "Shader.h"
 #include "Texture.h"
+#include <memory>
 
 namespace kuai {
 	class Material
 	{
 	public:
-		Material(const Shader& shader) : shader(shader)
+		Material(std::unique_ptr<Shader> shader) : shader(std::move(shader))
 		{
 		}
 
 	protected:
-		Shader shader;
-
-		friend class Renderer;
+		std::unique_ptr<Shader> shader;
 	};
 
-	class BasicMaterial : public Material
-	{
-	public:
-		BasicMaterial(const Shader& shader, Texture* diffuse, Texture* normal, const glm::vec2& tiling = { 1.0f, 1.0f })
-			: Material(shader), diffuse(diffuse), normal(normal), tiling(tiling), shininess(1.0f)
-		{
-		}
+	// class BasicMaterial : public Material
+	// {
+	// public:
+	// 	BasicMaterial(const Shader& shader, Texture* diffuse, Texture* normal, const glm::vec2& tiling = { 1.0f, 1.0f })
+	// 		: Material(shader), diffuse(diffuse), normal(normal), tiling(tiling), shininess(1.0f)
+	// 	{
+	// 	}
 
-		Texture* diffuse;
-		Texture* normal;
+	// 	Texture* diffuse;
+	// 	Texture* normal;
 
-		glm::vec2 tiling;
-		float shininess;
-	};
+	// 	glm::vec2 tiling;
+	// 	float shininess;
+	// };
 
 }

@@ -28,19 +28,19 @@ namespace kuai {
 
 	void Renderer::add_object(const MeshRenderer& m_renderer, Transform& transform)
 	{
-		auto& s_data = r_data.shader_map[m_renderer.material.shader.id];
-		auto& mesh = m_renderer.mesh;
+		// auto& s_data = r_data.shader_map[m_renderer.material.shader.id];
+		// auto& mesh = m_renderer.mesh;
 
-		r_data.transforms.push_back(transform);
+		// r_data.transforms.push_back(transform);
 
-		if (r_data.offset_map.find(m_renderer.mesh.id) == r_data.offset_map.end()) // New mesh data => record offsets and add it to vertex_data and indices
-		{
-			r_data.offset_map[mesh.id].vertices_offset = r_data.vertex_data.size();
-			r_data.offset_map[mesh.id].indices_offset = r_data.indices.size();
+		// if (r_data.offset_map.find(m_renderer.mesh.id) == r_data.offset_map.end()) // New mesh data => record offsets and add it to vertex_data and indices
+		// {
+		// 	r_data.offset_map[mesh.id].vertices_offset = r_data.vertex_data.size();
+		// 	r_data.offset_map[mesh.id].indices_offset = r_data.indices.size();
 
-			r_data.vertex_data.insert(r_data.vertex_data.end(), mesh.vertex_data.begin(), mesh.vertex_data.end());
-			r_data.indices.insert(r_data.indices.end(), mesh.indices.begin(), mesh.indices.end());
-		}
+		// 	r_data.vertex_data.insert(r_data.vertex_data.end(), mesh.vertex_data.begin(), mesh.vertex_data.end());
+		// 	r_data.indices.insert(r_data.indices.end(), mesh.indices.begin(), mesh.indices.end());
+		// }
 
 		// IndirectCommand& cmd = s_data.mesh_to_cmd[mesh.id];
 
@@ -58,9 +58,9 @@ namespace kuai {
 
 	void Renderer::remove_object(const MeshRenderer& m_renderer, Transform& transform)
 	{
-		auto& s_data = r_data.shader_map[m_renderer.material.shader.id];
+		// auto& s_data = r_data.shader_map[m_renderer.material.shader.id];
 
-		r_data.transforms.erase(std::remove(r_data.transforms.begin(), r_data.transforms.end(), transform), r_data.transforms.end());
+		// r_data.transforms.erase(std::remove(r_data.transforms.begin(), r_data.transforms.end(), transform), r_data.transforms.end());
 
 		// s_data.mesh_to_cmd[m_renderer.mesh.id].inst_count--;
 		// s_data.instances--;
@@ -76,10 +76,10 @@ namespace kuai {
 		// 	}
 		// }
 
-		if (s_data.instances == 0)
-		{
-			r_data.shader_map.erase(m_renderer.material.shader.id);
-		}
+		// if (s_data.instances == 0)
+		// {
+		// 	r_data.shader_map.erase(m_renderer.material.shader.id);
+		// }
 	}
 
 	void Renderer::set_camera(const Camera& camera)
@@ -90,11 +90,11 @@ namespace kuai {
 	{
 		//Shader::set_uniform("proj_matrix", )
 
-		for (auto& shader : r_data.shaders)
-		{
-			shader.bind();
+		// for (auto& shader : r_data.shaders)
+		// {
+		// 	shader.bind();
 
-			size_t cmd_count = r_data.shader_map[shader.id].mesh_to_cmd.size();
+		// 	size_t cmd_count = r_data.shader_map[shader.id].mesh_to_cmd.size();
 
 		// 	glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)0, cmd_count, sizeof(IndirectCommand));
 		// }

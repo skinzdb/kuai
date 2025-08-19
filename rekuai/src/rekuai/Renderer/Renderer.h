@@ -37,7 +37,7 @@ namespace kuai {
 
 	struct ShaderData
 	{
-		std::unordered_map<uint32_t, IndirectCommand> mesh_to_cmd;
+		// std::unordered_map<uint32_t, IndirectCommand> mesh_to_cmd;
 		uint32_t instances;
 	};
 
@@ -51,9 +51,9 @@ namespace kuai {
 	{
 		std::vector<Transform> transforms;
 		std::vector<Shader> shaders;
-		
-		std::unordered_map<u32, ShaderData> shader_map;	// Maps shader ID to its commands and total number of instances
-		std::unordered_map<u32, OffsetData> offset_map;	// Maps mesh ID to its vertex and index offsets
+
+		std::unordered_map<uint32_t, ShaderData> shader_map;	// Maps shader ID to its commands and total number of instances
+		std::unordered_map<uint32_t, OffsetData> offset_map;	// Maps mesh ID to its vertex and index offsets
 
 		std::vector<Vertex> vertex_data;
 		std::vector<uint32_t> indices;

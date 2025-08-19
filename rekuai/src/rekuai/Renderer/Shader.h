@@ -13,7 +13,6 @@ namespace kuai {
 		virtual void bind() const = 0;
 		virtual void unbind() const = 0;
 
-
 		virtual void create_uniform(const std::string& name) = 0;
 		virtual void set_uniform(const std::string& name, int val) const = 0;
 		virtual void set_uniform(const std::string& name, float val) const = 0;
@@ -24,10 +23,6 @@ namespace kuai {
 		virtual void set_uniform(const std::string& name, const glm::mat4& val) const = 0;
 
 		static std::unique_ptr<Shader> create(const std::string& vert_src, const std::string& frag_src);
-
-	private:
-		int create_shader(const char* src, int type);
-		void link();
 
 	private:
 		int id;

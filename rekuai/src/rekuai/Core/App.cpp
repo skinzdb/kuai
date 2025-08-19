@@ -24,6 +24,12 @@ namespace kuai {
 		//AudioManager::init();
 	}
 
+	App::~App()
+	{
+	    Renderer::cleanup();
+		//AudioManager::cleanup();
+	}
+
 	void App::run()
 	{
 		while (running)
@@ -38,9 +44,6 @@ namespace kuai {
 
 			window->update();
 		}
-
-		//AudioManager::cleanup();
-		Renderer::cleanup();
 	}
 
 	void App::on_event(Event& e)

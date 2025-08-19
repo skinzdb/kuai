@@ -1,13 +1,11 @@
-#include "Shader.h"
+#include "OpenGLShader.h"
 
 #include <glad/glad.h>
 #include <unordered_map>
 
 namespace kuai {
-	std::unordered_map<std::string, uint32_t> Shader::ubos = std::unordered_map<std::string, uint32_t>();
-	std::unordered_map<std::string, uint32_t> Shader::ubo_offsets = std::unordered_map<std::string, uint32_t>();
 
-	Shader::Shader(const std::string& vert_src, const std::string& frag_src) : uniforms(std::unordered_map<std::string, uint32_t>())
+	OpenGLShader::OpenGLShader(const std::string& vert_src, const std::string& frag_src) : uniforms(std::unordered_map<std::string, uint32_t>())
 	{
 		id = glCreateProgram();
 		vert_id = create_shader(vert_src.c_str(), GL_VERTEX_SHADER);
@@ -15,7 +13,7 @@ namespace kuai {
 		link();
 	}
 
-	Shader::~Shader()
+	OpenGLShader::~OpenGLShader()
 	{
 		unbind();
 
@@ -26,94 +24,94 @@ namespace kuai {
 			glDeleteProgram(id);
 	}
 
-	void Shader::create_uniform(const std::string& name)
+	void OpenGLShader::create_uniform(const std::string& name)
 	{
 		int uniformLoc = glGetUniformLocation(id, name.c_str());
 		uniforms[name] = uniformLoc;
 	}
 
-	void Shader::set_uniform(const std::string& name, int val) const
+	void OpenGLShader::set_uniform(const std::string& name, int val) const
 	{
 		glUniform1i(uniforms.at(name), val);
 	}
 
-	void Shader::set_uniform(const std::string& name, float val) const
+	void OpenGLShader::set_uniform(const std::string& name, float val) const
 	{
 		glUniform1f(uniforms.at(name), val);
 	}
 
-	void Shader::set_uniform(const std::string& name, const glm::vec2& val) const
+	void OpenGLShader::set_uniform(const std::string& name, const glm::vec2& val) const
 	{
 		glUniform2f(uniforms.at(name), val.x, val.y);
 	}
 
-	void Shader::set_uniform(const std::string& name, const glm::vec3& val) const
+	void OpenGLShader::set_uniform(const std::string& name, const glm::vec3& val) const
 	{
 		glUniform3f(uniforms.at(name), val.x, val.y, val.z);
 	}
 
-	void Shader::set_uniform(const std::string& name, const glm::vec4& val) const
+	void OpenGLShader::set_uniform(const std::string& name, const glm::vec4& val) const
 	{
 		glUniform4f(uniforms.at(name), val.x, val.y, val.z, val.w);
 	}
 
-	void Shader::set_uniform(const std::string& name, const glm::mat3& val) const
+	void OpenGLShader::set_uniform(const std::string& name, const glm::mat3& val) const
 	{
 		glUniformMatrix3fv(uniforms.at(name), 1, GL_FALSE, &val[0][0]);
 	}
 
-	void Shader::set_uniform(const std::string& name, const glm::mat4& val) const
+	void OpenGLShader::set_uniform(const std::string& name, const glm::mat4& val) const
 	{
 		glUniformMatrix4fv(uniforms.at(name), 1, GL_FALSE, &val[0][0]);
 	}
 
-	void Shader::create_uniform_block(const std::string& name, const std::vector<const char*>& members, uint32_t binding)
-	{
-		// Get block index and block size
-		uint32_t block_idx = glGetUniformBlockIndex(id, name.c_str());
-		int block_size;
-		glGetActiveUniformBlockiv(id, block_idx, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
+	// void OpenGLShader::create_uniform_block(const std::string& name, const std::vector<const char*>& members, uint32_t binding)
+	// {
+	// 	// Get block index and block size
+	// 	uint32_t block_idx = glGetUniformBlockIndex(id, name.c_str());
+	// 	int block_size;
+	// 	glGetActiveUniformBlockiv(id, block_idx, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
 
-		// Get indices of member variables, and then their offsets
-		GLuint* indices = new GLuint[members.size()];
-		glGetUniformIndices(id, members.size(), &members[0], indices);
-		GLint* offsets = new GLint[members.size()];
-		glGetActiveUniformsiv(id, members.size(), indices, GL_UNIFORM_OFFSET, offsets);
+	// 	// Get indices of member variables, and then their offsets
+	// 	GLuint* indices = new GLuint[members.size()];
+	// 	glGetUniformIndices(id, members.size(), &members[0], indices);
+	// 	GLint* offsets = new GLint[members.size()];
+	// 	glGetActiveUniformsiv(id, members.size(), indices, GL_UNIFORM_OFFSET, offsets);
 
-		for (size_t i = 0; i < members.size(); i++)
-		{
-			ubo_offsets[members[i]] = offsets[i];
-		}
+	// 	for (size_t i = 0; i < members.size(); i++)
+	// 	{
+	// 		ubo_offsets[members[i]] = offsets[i];
+	// 	}
 
-		delete[] indices;
-		delete[] offsets;
+	// 	delete[] indices;
+	// 	delete[] offsets;
 
-		// Create uniform buffer object
-		uint32_t ubo;
-		glGenBuffers(1, &ubo);
-		glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-		glBufferData(GL_UNIFORM_BUFFER, block_size, nullptr, GL_STATIC_DRAW);
-		glBindBufferBase(GL_UNIFORM_BUFFER, binding, ubo);
+	// 	// Create uniform buffer object
+	// 	uint32_t ubo;
+	// 	glGenBuffers(1, &ubo);
+	// 	glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+	// 	glBufferData(GL_UNIFORM_BUFFER, block_size, nullptr, GL_STATIC_DRAW);
+	// 	glBindBufferBase(GL_UNIFORM_BUFFER, binding, ubo);
 
-		ubos[name] = ubo;
-	}
+	// 	ubos[name] = ubo;
+	// }
 
-	void Shader::set_uniform(const std::string& name, const std::string& member, const void* data, uint32_t size)
-	{
-		glNamedBufferSubData(ubos.at(name), ubo_offsets.at(member), size, data);
-	}
+	// void OpenGLShader::set_uniform(const std::string& name, const std::string& member, const void* data, uint32_t size)
+	// {
+	// 	glNamedBufferSubData(ubos.at(name), ubo_offsets.at(member), size, data);
+	// }
 
-	void Shader::bind() const
+	void OpenGLShader::bind() const
 	{
 		glUseProgram(id);
 	}
 
-	void Shader::unbind() const
+	void OpenGLShader::unbind() const
 	{
 		glUseProgram(0);
 	}
 
-	int Shader::create_shader(const char* src, int type)
+	int OpenGLShader::create_shader(const char* src, int type)
 	{
 		int shaderId = glCreateShader(type);
 		if (!shaderId)
@@ -138,7 +136,7 @@ namespace kuai {
 		return shaderId;
 	}
 
-	void Shader::link()
+	void OpenGLShader::link()
 	{
 		glLinkProgram(id);
 		int linkSuccess;

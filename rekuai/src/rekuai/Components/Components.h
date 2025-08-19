@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/glm.hpp"
 #include "glm/gtx/quaternion.hpp"
@@ -46,10 +47,10 @@ namespace kuai {
 
 	struct MeshRenderer
 	{
-		MeshRenderer(const Mesh& mesh, const Material& material) : mesh(mesh), material(material) {}
+		MeshRenderer(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) : mesh(mesh), material(material) {}
 
-		Mesh mesh;
-		Material material;
+		std::shared_ptr<Mesh> mesh;
+		std::shared_ptr<Material> material;
 	};
 
 	struct Camera
