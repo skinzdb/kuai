@@ -40,49 +40,49 @@ namespace kuai {
 
 	void TextureManager::insert(const Texture& tex)
 	{
-		// Load file using stbi library
-		int width, height, col_channels;
-		stbi_set_flip_vertically_on_load(true);
-		unsigned char* data = stbi_load(tex.filename.c_str(), &width, &height, &col_channels, 0);
+		// // Load file using stbi library
+		// int width, height, col_channels;
+		// stbi_set_flip_vertically_on_load(true);
+		// unsigned char* data = stbi_load(tex.filename.c_str(), &width, &height, &col_channels, 0);
 
-		if (!data)
-		{
-			KU_CORE_ERROR("Failed to load texture: {0}", tex.filename);
-			return;
-		}
+		// if (!data)
+		// {
+		// 	KU_CORE_ERROR("Failed to load texture: {0}", tex.filename);
+		// 	return;
+		// }
 
-		GLenum format = 0;
-		if (col_channels == 1)
-			format = GL_RED;
-		else if (col_channels == 3)
-			format = GL_RGB;
-		else if (col_channels == 4)
-			format = GL_RGBA;
+		// GLenum format = 0;
+		// if (col_channels == 1)
+		// 	format = GL_RED;
+		// else if (col_channels == 3)
+		// 	format = GL_RGB;
+		// else if (col_channels == 4)
+		// 	format = GL_RGBA;
 
-		KU_CORE_ASSERT(format, "Texture file format not supported");
+		// KU_CORE_ASSERT(format, "Texture file format not supported");
 
-		KU_CORE_ASSERT(tex_ids.size() <= capacity, "Maximum number of textures exceeded");
+		// KU_CORE_ASSERT(tex_ids.size() <= capacity, "Maximum number of textures exceeded");
 
-		if (std::find(tex_ids.begin(), tex_ids.end(), tex.id) != tex_ids.end())
-			return;
+		// if (std::find(tex_ids.begin(), tex_ids.end(), tex.id) != tex_ids.end())
+		// 	return;
 
-		KU_CORE_INFO("Loaded texture: {0} ({1}x{2})", tex.filename, width, height);
+		// KU_CORE_INFO("Loaded texture: {0} ({1}x{2})", tex.filename, width, height);
 
-		//unsigned char new_data[TEX_ARRAY_WIDTH * TEX_ARRAY_HEIGHT];
+		// //unsigned char new_data[TEX_ARRAY_WIDTH * TEX_ARRAY_HEIGHT];
 
-		//if (width > TEX_ARRAY_WIDTH || height > TEX_ARRAY_HEIGHT)
-		//{
-		//	stbir_resize_uint8(new_data, width, height, 0, data, TEX_ARRAY_WIDTH, TEX_ARRAY_HEIGHT, 0, 4);
-		//}
+		// //if (width > TEX_ARRAY_WIDTH || height > TEX_ARRAY_HEIGHT)
+		// //{
+		// //	stbir_resize_uint8(new_data, width, height, 0, data, TEX_ARRAY_WIDTH, TEX_ARRAY_HEIGHT, 0, 4);
+		// //}
 
-		//int pow2 = pow(2, floor(log2(width)));
+		// //int pow2 = pow(2, floor(log2(width)));
 
 
-		tex_ids.push_back(tex.id);
+		// tex_ids.push_back(tex.id);
 
-		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, tex.id, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+		// glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, tex.id, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
-		stbi_image_free(data);
+		// stbi_image_free(data);
 	}
 
 	void TextureManager::remove(const Texture& tex)

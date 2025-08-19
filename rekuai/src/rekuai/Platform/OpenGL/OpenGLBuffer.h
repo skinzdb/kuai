@@ -1,6 +1,5 @@
 #pragma once
 
-#include "rekuai/Core/Core.h"
 #include "rekuai/Renderer/Buffer.h"
 
 namespace kuai {
@@ -9,79 +8,71 @@ namespace kuai {
     {
     public:
         OpenGLBuffer(uint32_t size);
+        OpenGLBuffer(float* vertices, uint32_t size);
         ~OpenGLBuffer();
 
         void bind() const override;
         void unbind() const override;
 
-        void set_data(const void* data, uint32_t size);
-        void reset(const void* data, uint32_t size, DrawHint drawHint = DrawHint::STATIC);
+        void set_data(const void* data, uint32_t size) override;
+        void reset(const void* data, uint32_t size);
 
-        BufferLayout& get_layout() { return layout; }
-        void set_layout(const BufferLayout& layout) { this->layout = layout; }
+        BufferLayout& get_layout() override { return layout; }
+        void set_layout(const BufferLayout& layout) override { this->layout = layout; }
 
     private:
         uint32_t buf_id;
         BufferLayout layout;
     };
 
-    class IndexBuffer
+    class OpenGLIndexBuffer : public IndexBuffer
     {
     public:
-        IndexBuffer(uint32_t* indices, uint32_t count);
-        ~IndexBuffer();
+        OpenGLIndexBuffer(uint32_t* indices, uint32_t count);
+        ~OpenGLIndexBuffer();
 
-        void bind() const;
-        void unbind() const;
+        void bind() const override;
+        void unbind() const override;
 
-        uint32_t get_count() const { return count; }
+        uint32_t get_count() const override { return count; }
 
     private:
         uint32_t buf_id;
         uint32_t count;
     };
 
-    struct IndirectCommand
-    {
-        uint32_t count;        // Number of elements to be drawn per instance
-        uint32_t inst_count;   // Number of instances
-        uint32_t first_idx;    // Offset of mesh in index buffer
-        int32_t base_vertex;  // Offset of mesh in vertex buffer
-        uint32_t base_inst;    // First instanced model index
-    };
-
-    class IndirectBuffer
+    class OpenGLIndirectBuffer : public IndirectBuffer
     {
     public:
-        IndirectBuffer(const std::vector<IndirectCommand>& commands);
-        ~IndirectBuffer();
+        OpenGLIndirectBuffer(const std::vector<IndirectCommand>& commands);
+        ~OpenGLIndirectBuffer();
 
-        void bind() const;
-        void unbind() const;
+        virtual void bind() const override;
+        virtual void unbind() const override;
 
-        uint32_t get_count() const { return count; }
+        virtual uint32_t get_count() const override { return count; }
 
     private:
         uint32_t buf_id;
         uint32_t count;
     };
 
-    class VertexArray
+    class OpenGLVertexArray : public VertexArray
     {
     public:
-        VertexArray();
-        ~VertexArray();
+        OpenGLVertexArray();
+        ~OpenGLVertexArray();
 
-        void bind() const;
-        void unbind() const;
+        void bind() const override;
+        void unbind() const override;
 
-        void add_vertex_buffer(std::unique_ptr<VertexBuffer> buf);
-
-        void set_index_buffer(std::unique_ptr<IndexBuffer> buf);
+        void add_vertex_buffer(std::unique_ptr<VertexBuffer> buf) override;
+        void set_index_buffer(std::unique_ptr<IndexBuffer> buf) override;
 
     private:
         std::vector<std::unique_ptr<VertexBuffer>> vertex_bufs;
         std::unique_ptr<IndexBuffer> index_buf;
+
         uint32_t vao_id;
         uint32_t index = 0;
     };

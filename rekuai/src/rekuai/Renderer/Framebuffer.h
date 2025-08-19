@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 namespace kuai {
     const uint32_t MAX_FRAMEBUFFER_SIZE = 3840;
 
@@ -16,31 +17,16 @@ namespace kuai {
     class Framebuffer
     {
     public:
-        Framebuffer(uint32_t width, uint32_t height, uint32_t samples, uint32_t attachments);
-        ~Framebuffer();
+        virtual ~Framebuffer() = default;
 
         const uint32_t get_depth_attachment();
         const std::vector<uint32_t>& get_col_attachments();
 
-        void bind();
-        void unbind();
+        virtual void bind() = 0;
+        virtual void unbind() = 0;
 
-        void resize(uint32_t width, uint32_t height);
+        virtual void resize(uint32_t width, uint32_t height) = 0;
 
-    private:
-        void reset();
-
-        void attach_col_texture(uint32_t index);
-        void attach_depth_texture();
-
-        unsigned int get_texture_target(bool multisampling);
-
-    private:
-        uint32_t id = 0;
-
-        std::vector<uint32_t> col_attachments;
-        uint32_t depth_attachments = 0;
-
-        FramebufferProps props;
+        static std::shared_ptr<Framebuffer> create(uint32_t width, uint32_t height, uint32_t samples, uint32_t attachments);
     };
 }

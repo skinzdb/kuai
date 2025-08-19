@@ -1,17 +1,18 @@
 #include "kpch.h"
+#include "rekuai/Renderer/RendererAPI.h"
 #include "Texture.h"
-#include "TextureManager.h"
 
 namespace kuai {
-	uint32_t Texture::next_id = 0;
+    std::shared_ptr<Texture2D> Texture2D::create(const std::string& filename) {
+        switch (RendererAPI::getAPI()) {
+            case RendererAPI::API::None:
+                return nullptr;
 
-	Texture::Texture(const std::string& filename) : id(next_id++), filename(filename)
-	{
-		TextureManager::insert(*this);
-	}
+            case RendererAPI::API::OpenGL:
+                return nullptr;
 
-	Texture::~Texture()
-	{
-		TextureManager::remove(*this);
-	}
+            case RendererAPI::API::Vulkan:
+                return nullptr;
+        }
+    }
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "rekuai/Core/Core.h"
-#include <cstdint>
 #include <memory>
 
 namespace kuai {
@@ -107,6 +106,8 @@ namespace kuai {
         virtual void set_layout(const BufferLayout& layout) { this->layout = layout; }
 
         static std::unique_ptr<VertexBuffer> create(uint32_t size);
+        static std::unique_ptr<VertexBuffer> create(float* vertices, uint32_t size);
+
     private:
         uint32_t buf_id;
         BufferLayout layout;
@@ -115,17 +116,14 @@ namespace kuai {
     class IndexBuffer
     {
     public:
-        IndexBuffer(uint32_t* indices, uint32_t count);
-        ~IndexBuffer();
+        virtual ~IndexBuffer() = default;
 
-        void bind() const;
-        void unbind() const;
+        virtual void bind() const = 0;
+        virtual void unbind() const = 0;
 
-        uint32_t get_count() const { return count; }
+        virtual uint32_t get_count() const = 0;
 
-    private:
-        uint32_t buf_id;
-        uint32_t count;
+        static std::unique_ptr<IndexBuffer> create(uint32_t* indices, uint32_t count);
     };
 
     struct IndirectCommand
@@ -133,43 +131,34 @@ namespace kuai {
         uint32_t count;        // Number of elements to be drawn per instance
         uint32_t inst_count;   // Number of instances
         uint32_t first_idx;    // Offset of mesh in index buffer
-        int32_t base_vertex;  // Offset of mesh in vertex buffer
+        int32_t base_vertex;   // Offset of mesh in vertex buffer
         uint32_t base_inst;    // First instanced model index
     };
 
     class IndirectBuffer
     {
     public:
-        IndirectBuffer(const std::vector<IndirectCommand>& commands);
-        ~IndirectBuffer();
+        virtual ~IndirectBuffer() = default;
 
-        void bind() const;
-        void unbind() const;
+        virtual void bind() const = 0;
+        virtual void unbind() const = 0;
 
-        uint32_t get_count() const { return count; }
+        virtual uint32_t get_count() const = 0;
 
-    private:
-        uint32_t buf_id;
-        uint32_t count;
+        static std::unique_ptr<IndirectBuffer> create(const std::vector<IndirectCommand>& commands);
     };
 
     class VertexArray
     {
     public:
-        VertexArray();
-        ~VertexArray();
+        virtual ~VertexArray() = default;
 
-        void bind() const;
-        void unbind() const;
+        virtual void bind() const = 0;
+        virtual void unbind() const = 0;
 
-        void add_vertex_buffer(std::unique_ptr<VertexBuffer> buf);
+        virtual void add_vertex_buffer(std::unique_ptr<VertexBuffer> buf) = 0;
+        virtual void set_index_buffer(std::unique_ptr<IndexBuffer> buf) = 0;
 
-        void set_index_buffer(std::unique_ptr<IndexBuffer> buf);
-
-    private:
-        std::vector<std::unique_ptr<VertexBuffer>> vertex_bufs;
-        std::unique_ptr<IndexBuffer> index_buf;
-        uint32_t vao_id;
-        uint32_t index = 0;
+        static std::unique_ptr<VertexArray> create();
     };
 }

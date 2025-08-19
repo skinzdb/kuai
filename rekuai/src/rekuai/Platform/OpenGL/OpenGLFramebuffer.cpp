@@ -1,10 +1,10 @@
-#include "Framebuffer.h"
+#include "rekuai/Platform/OpenGL/OpenGLFramebuffer.h"
 
 #include "rekuai/Core/Core.h"
 #include "glad/glad.h"
 
 namespace kuai {
-	Framebuffer::Framebuffer(uint32_t width, uint32_t height, uint32_t samples, uint32_t attachments)
+	OpenGLFramebuffer::OpenGLFramebuffer(uint32_t width, uint32_t height, uint32_t samples, uint32_t attachments)
 	{
 		props.width = width;
 		props.height = height;
@@ -14,36 +14,36 @@ namespace kuai {
 		reset();
 	}
 
-	Framebuffer::~Framebuffer()
+	OpenGLFramebuffer::~OpenGLFramebuffer()
 	{
 		glDeleteFramebuffers(1, &id);
 		glDeleteTextures(col_attachments.size(), col_attachments.data());
 		glDeleteTextures(1, &depth_attachments);
 	}
 
-	const uint32_t Framebuffer::get_depth_attachment()
+	const uint32_t OpenGLFramebuffer::get_depth_attachment()
 	{
 		return depth_attachments;
 	}
 
-	const std::vector<uint32_t>& Framebuffer::get_col_attachments()
+	const std::vector<uint32_t>& OpenGLFramebuffer::get_col_attachments()
 	{
 		return col_attachments;
 	}
 
-	void Framebuffer::bind()
+	void OpenGLFramebuffer::bind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, id);
 		glBindTexture(get_texture_target(props.samples > 1), depth_attachments);
 		// glViewport(0, 0, props.width, props.height);
 	}
 
-	void Framebuffer::unbind()
+	void OpenGLFramebuffer::unbind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void Framebuffer::resize(uint32_t width, uint32_t height)
+	void OpenGLFramebuffer::resize(uint32_t width, uint32_t height)
 	{
 		if (width == 0 || height == 0 || width > MAX_FRAMEBUFFER_SIZE || height > MAX_FRAMEBUFFER_SIZE)
 		{
@@ -57,7 +57,7 @@ namespace kuai {
 		reset();
 	}
 
-	void Framebuffer::reset()
+	void OpenGLFramebuffer::reset()
 	{
 		if (id)
 		{
@@ -105,7 +105,7 @@ namespace kuai {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void Framebuffer::attach_col_texture(uint32_t index)
+	void OpenGLFramebuffer::attach_col_texture(uint32_t index)
 	{
 		bool multisampling = props.samples > 1;
 		if (multisampling)
@@ -125,7 +125,7 @@ namespace kuai {
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, get_texture_target(multisampling), col_attachments[index], 0);
 	}
 
-	void Framebuffer::attach_depth_texture()
+	void OpenGLFramebuffer::attach_depth_texture()
 	{
 		bool multisampling = props.samples > 1;
 		if (multisampling)
@@ -148,7 +148,7 @@ namespace kuai {
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, get_texture_target(multisampling), depth_attachments, 0);
 	}
 
-	unsigned int Framebuffer::get_texture_target(bool multisampling)
+	unsigned int OpenGLFramebuffer::get_texture_target(bool multisampling)
 	{
 		return multisampling ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 	}

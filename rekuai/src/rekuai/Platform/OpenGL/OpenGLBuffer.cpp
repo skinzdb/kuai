@@ -1,8 +1,9 @@
+#include "OpenGLBuffer.h"
+
 #include "rekuai/Core/Core.h"
-#include "Buffer.h"
+#include "rekuai/Renderer/Buffer.h"
 
 #include "glad/glad.h"
-#include <cstddef>
 
 namespace kuai {
 
@@ -19,82 +20,82 @@ namespace kuai {
 		case ShaderDataType::MAT3:
 		case ShaderDataType::MAT4:
 			return GL_FLOAT;
+		default:
+			KU_CORE_ASSERT(false, "Unknown shader data type");
+			return 0;
 		}
-
-		KU_CORE_ASSERT(false, "Unknown shader data type.");
-		return 0;
 	}
 
 	// Vertex Buffer *********************************************************
 
-	VertexBuffer::VertexBuffer(uint32_t size)
+	OpenGLBuffer::OpenGLBuffer(uint32_t size)
 	{
 		glCreateBuffers(1, &buf_id);
 		glBindBuffer(GL_ARRAY_BUFFER, buf_id);
 		glBufferData(buf_id, size, nullptr, GL_DYNAMIC_DRAW);
 	}
 
-	VertexBuffer::VertexBuffer(const float* vertices, uint32_t size, DrawHint drawHint)
+	OpenGLBuffer::OpenGLBuffer(float* vertices, uint32_t size)
 	{
 		glCreateBuffers(1, &buf_id);
 		glBindBuffer(GL_ARRAY_BUFFER, buf_id);
-		glBufferData(GL_ARRAY_BUFFER, size, vertices, drawHint == DrawHint::STATIC ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
 	}
 
-	VertexBuffer::~VertexBuffer()
+	OpenGLBuffer::~OpenGLBuffer()
 	{
 		glDeleteBuffers(1, &buf_id);
 	}
 
-	void VertexBuffer::bind() const
+	void OpenGLBuffer::bind() const
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, buf_id);
 	}
 
-	void VertexBuffer::unbind() const
+	void OpenGLBuffer::unbind() const
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
-	void VertexBuffer::set_data(const void* data, uint32_t size)
+	void OpenGLBuffer::set_data(const void* data, uint32_t size)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, buf_id);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 	}
 
-	void VertexBuffer::reset(const void* data, uint32_t size, DrawHint drawHint)
+	void OpenGLBuffer::reset(const void* data, uint32_t size)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, buf_id);
-		glBufferData(GL_ARRAY_BUFFER, size, data, drawHint == DrawHint::STATIC ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 	}
 
 	// Index Buffer ***********************************************************
 
-	IndexBuffer::IndexBuffer(uint32_t* indices, uint32_t count) : count(count)
+	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count) : count(count)
 	{
 		glCreateBuffers(1, &buf_id);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_id);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * count, indices, GL_STATIC_DRAW);
 	}
 
-	IndexBuffer::~IndexBuffer()
+	OpenGLIndexBuffer::~OpenGLIndexBuffer()
 	{
 		glDeleteBuffers(1, &buf_id);
 	}
 
-	void IndexBuffer::bind() const
+	void OpenGLIndexBuffer::bind() const
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_id);
 	}
 
-	void IndexBuffer::unbind() const
+	void OpenGLIndexBuffer::unbind() const
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	// Indirect Buffer ********************************************************
 
-	IndirectBuffer::IndirectBuffer(const std::vector<IndirectCommand>& commands)
+	OpenGLIndirectBuffer::OpenGLIndirectBuffer(const std::vector<IndirectCommand>& commands)
 	{
 		glCreateBuffers(1, &buf_id);
 		count = commands.size();
@@ -102,44 +103,44 @@ namespace kuai {
 		glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(IndirectCommand) * count, commands.data(), GL_STATIC_DRAW);
 	}
 
-	IndirectBuffer::~IndirectBuffer()
+	OpenGLIndirectBuffer::~OpenGLIndirectBuffer()
 	{
 		glDeleteBuffers(1, &buf_id);
 	}
 
-	void IndirectBuffer::bind() const
+	void OpenGLIndirectBuffer::bind() const
 	{
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, buf_id);
 	}
 
-	void IndirectBuffer::unbind() const
+	void OpenGLIndirectBuffer::unbind() const
 	{
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 	}
 
 	// Vertex Array ***********************************************************
 
-	VertexArray::VertexArray()
+	OpenGLVertexArray::OpenGLVertexArray()
 	{
 		glCreateVertexArrays(1, &vao_id);
 	}
 
-	VertexArray::~VertexArray()
+	OpenGLVertexArray::~OpenGLVertexArray()
 	{
 		glDeleteVertexArrays(1, &vao_id);
 	}
 
-	void VertexArray::bind() const
+	void OpenGLVertexArray::bind() const
 	{
 		glBindVertexArray(vao_id);
 	}
 
-	void VertexArray::unbind() const
+	void OpenGLVertexArray::unbind() const
 	{
 		glBindVertexArray(0);
 	}
 
-	void VertexArray::add_vertex_buffer(std::unique_ptr<VertexBuffer> buf)
+	void OpenGLVertexArray::add_vertex_buffer(std::unique_ptr<VertexBuffer> buf)
 	{
 		KU_CORE_ASSERT(buf->get_layout().get_elements().size(), "Vertex buffer has no layout.");
 
@@ -159,7 +160,8 @@ namespace kuai {
 					element.get_component_count(),
 					GL_INT,
 					layout.get_stride(),
-					(const void*)element.offset);
+					reinterpret_cast<const void*>(element.offset)
+				);
 				index++;
 				break;
 			}
@@ -175,7 +177,7 @@ namespace kuai {
 					GL_FLOAT,
 					GL_FALSE,
 					layout.get_stride(),
-					(const void*)element.offset
+					reinterpret_cast<const void*>(element.offset)
 				);
 				index++;
 				break;
@@ -200,13 +202,15 @@ namespace kuai {
 					index++;
 				}
 			}
+			case ShaderDataType::NONE:
+    			KU_CORE_ASSERT(false, "Unknown shader data type");
 			}
 		}
 
 		vertex_bufs.push_back(std::move(buf));
 	}
 
-	void VertexArray::set_index_buffer(std::unique_ptr<IndexBuffer> buf)
+	void OpenGLVertexArray::set_index_buffer(std::unique_ptr<IndexBuffer> buf)
 	{
 		glBindVertexArray(vao_id);
 		buf->bind();
