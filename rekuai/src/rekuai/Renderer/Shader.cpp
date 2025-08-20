@@ -11,6 +11,9 @@
 #include "rekuai/Renderer/RendererAPI.h"
 
 namespace kuai {
+    std::unordered_map<std::string, uint32_t> OpenGLShader::ubos{};
+	std::unordered_map<std::string, uint32_t> OpenGLShader::ubo_offsets{};
+    
     std::unordered_map<uint32_t, std::shared_ptr<Shader>> Shader::shader_map{};
 
     std::shared_ptr<Shader> Shader::create(const std::string &vert_src, const std::string &frag_src) {

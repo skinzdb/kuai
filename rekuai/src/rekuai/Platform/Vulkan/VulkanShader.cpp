@@ -34,7 +34,17 @@ namespace kuai {
 
 	}
 
-	void VulkanShader::bind() const {
+    void VulkanShader::create_uniform_block(const std::string &name, const std::vector<const char *> &members, uint32_t binding)
+    {
+
+    }
+
+    void VulkanShader::set_uniform_block(const std::string &name, const std::string &member, const void *data, uint32_t size)
+    {
+		
+    }
+
+    void VulkanShader::bind() const {
 
 	}
 

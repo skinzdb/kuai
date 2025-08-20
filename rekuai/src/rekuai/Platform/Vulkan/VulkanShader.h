@@ -18,6 +18,9 @@ namespace kuai {
 		virtual void set_uniform(const std::string& name, const glm::mat3& val) const override;
 		virtual void set_uniform(const std::string& name, const glm::mat4& val) const override;
 
+		virtual void create_uniform_block(const std::string& name, const std::vector<const char*>& members, uint32_t binding) override;
+		virtual void set_uniform_block(const std::string& name, const std::string& member, const void* data, uint32_t size) override;
+
 		virtual void bind() const override;
 		virtual void unbind() const override;
 
