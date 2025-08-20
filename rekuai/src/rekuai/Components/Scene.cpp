@@ -18,11 +18,11 @@ namespace kuai {
 		});
 
 		render_sys->on_insert([](EntityId entity, MeshRenderer& mesh_renderer, Transform& transform) {
-			Renderer::add_object(mesh_renderer, transform);
+
 		});
 
 		render_sys->on_remove([](EntityId entity, MeshRenderer& mesh_renderer, Transform& transform) {
-			Renderer::remove_object(mesh_renderer, transform);
+
 		});
 	}
 
@@ -33,16 +33,7 @@ namespace kuai {
 
 	void Scene::update(float dt)
 	{
-		//Renderer::begin_pass();
-
-
-		//Renderer::end_pass();
-
-
-		//Renderer::begin_pass();
-
-
-		//Renderer::end_pass();
+	    
 	}
 
 	Entity& Scene::create_entity()

@@ -101,8 +101,6 @@ namespace kuai {
 			return system_manager->register_system<Cs...>(component_manager);
 		}
 
-
-
 	private:
 		EntityManager* entity_manager;
 		ComponentManager* component_manager;

@@ -62,7 +62,6 @@ namespace kuai {
 				}
 				else
 				{
-
 					system->remove(entity);
 				}
 			}

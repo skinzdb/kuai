@@ -3,17 +3,29 @@
 #include "tiny_obj_loader.h"
 
 namespace kuai {
+    Mesh::Mesh(const std::vector<Vertex>& vertex_data, const std::vector<uint32_t>& indices) {
+        auto vertex_buf = VertexBuffer::create(vertex_data.size());
+		vertex_buf->set_layout(BufferLayout {
+            BufferElement(ShaderDataType::VEC3, "positions"),
+            BufferElement(ShaderDataType::VEC3, "normals"),
+            BufferElement(ShaderDataType::VEC2, "tex_coords")
+		});
+		vertex_buf->set_data(&vertex_data[0], vertex_data.size());
+		vertex_array->add_vertex_buffer(std::move(vertex_buf));
 
-	uint32_t Mesh::next_id = 0;
+		auto index_buf = IndexBuffer::create(&indices[0], indices.size());
+		vertex_array->set_index_buffer(std::move(index_buf));
+    }
 
-	Mesh::Mesh(const std::vector<float>& positions, const std::vector<float>& normals, const std::vector<float>& tex_coords, const std::vector<uint32_t>& indices)
+	Mesh::Mesh(const std::vector<float>& positions,
+	           const std::vector<float>& normals,
+			   const std::vector<float>& tex_coords,
+			   const std::vector<uint32_t>& indices)
 	{
 		uint32_t vert_count = positions.size() / 3;
 
-		vertex_data.resize(vert_count);
+		auto vertex_data = std::vector<Vertex>(vert_count);
 		bool use_normals = positions.size() == normals.size();
-
-		this->indices = indices;
 
 		for (size_t i = 0; i < vert_count; i++)
 		{
@@ -34,7 +46,8 @@ namespace kuai {
 				vertex_data[i].tex_coords[1] = tex_coords[i * 2 + 1];
 			}
 		}
-		id = next_id++;
+
+		Mesh(vertex_data, indices);
 	}
 
 	Mesh::Mesh(const std::string& filename)
@@ -56,37 +69,33 @@ namespace kuai {
 			KU_CORE_WARN(warn);
 		}
 
-		for (size_t s = 0; s < shapes.size(); s++)
-		{
-			// Loop over faces (polygon)
-			size_t idx_offset = 0;
-			for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++)
-			{
-				int fv = shapes[s].mesh.num_face_vertices[f];
+		auto vertex_data = std::vector<Vertex>();
+		std::map<Vertex, uint32_t> unique_vertices{};
+		auto indices = std::vector<uint32_t>();
 
-				// Loop over vertices in the face
-				for (size_t v = 0; v < fv; v++)
-				{
-					tinyobj::index_t idx = shapes[s].mesh.indices[idx_offset + v];
-					vertex_data.emplace_back(
-						Vertex
-						{ attrib.vertices[3 * idx.vertex_index + 0],
-					      attrib.vertices[3 * idx.vertex_index + 1],
-						  attrib.vertices[3 * idx.vertex_index + 2],
-						  attrib.normals[3 * idx.normal_index + 0],
-						  attrib.normals[3 * idx.normal_index + 1],
-						  attrib.normals[3 * idx.normal_index + 2],
-					      attrib.texcoords[2 * idx.texcoord_index + 0],
-					      attrib.texcoords[2 * idx.texcoord_index + 1]
-						}
-					);
+		for (const auto& shape : shapes) {
+            for (const auto& idx : shape.mesh.indices) {
+				Vertex vert = Vertex {
+				  attrib.vertices[3 * idx.vertex_index + 0],
+			      attrib.vertices[3 * idx.vertex_index + 1],
+				  attrib.vertices[3 * idx.vertex_index + 2],
+				  attrib.normals[3 * idx.normal_index + 0],
+				  attrib.normals[3 * idx.normal_index + 1],
+				  attrib.normals[3 * idx.normal_index + 2],
+			      attrib.texcoords[2 * idx.texcoord_index + 0],
+			      attrib.texcoords[2 * idx.texcoord_index + 1]
+				};
+
+				if (unique_vertices.count(vert) == 0) {
+				    unique_vertices[vert] = static_cast<uint32_t>(vertex_data.size());
+					vertex_data.push_back(vert);
 				}
-				idx_offset += fv;
-				// Per-face material
-				// shapes[s].mesh.material_ids[f];
+
+				indices.push_back(unique_vertices[vert]);
 			}
 		}
-		id = next_id++;
+
+		Mesh(vertex_data, indices);
 	}
 
 	Mesh::~Mesh()

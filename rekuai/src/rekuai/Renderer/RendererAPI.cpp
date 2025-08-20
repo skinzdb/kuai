@@ -1,6 +1,7 @@
 
 #include "RendererAPI.h"
 
+#include "rekuai/Platform/OpenGL/OpenGLAPI.h"
 #include "rekuai/Platform/Vulkan/VulkanAPI.h"
 
 namespace kuai {
@@ -13,7 +14,7 @@ namespace kuai {
                 return nullptr;
 
             case API::OpenGL:
-                return nullptr;
+                return std::make_unique<OpenGLAPI>();
 
             case API::Vulkan:
                 return std::make_unique<VulkanAPI>();

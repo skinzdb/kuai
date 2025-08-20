@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <vulkan/vulkan.h>
 
+#include "rekuai/Renderer/Buffer.h"
 #include "rekuai/Renderer/RendererAPI.h"
 #include "vulkan/vulkan_core.h"
 
@@ -28,7 +29,11 @@ namespace kuai {
         virtual void init() override;
         virtual void clear() override;
 
-        ~VulkanAPI() override;
+        virtual void set_viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
+
+        virtual void draw_indexed(const std::shared_ptr<VertexArray>& vertex_array, uint32_t index_count) override;
+
+        ~VulkanAPI();
 
     private:
         void create_instance();

@@ -31,8 +31,20 @@ add_library(${PROJECT_NAME}
     src/rekuai/platform/Windows/wininput.cpp
     src/rekuai/platform/Windows/winwindow.h
     src/rekuai/platform/Windows/winwindow.cpp
+
+    src/rekuai/platform/OpenGL/OpenGLAPI.h
+    src/rekuai/platform/OpenGL/OpenGLAPI.cpp
+    src/rekuai/platform/OpenGL/OpenGLBuffer.h
+    src/rekuai/platform/OpenGL/OpenGLBuffer.cpp
+    src/rekuai/platform/OpenGL/OpenGLShader.h
+    src/rekuai/platform/OpenGL/OpenGLShader.cpp
+
     src/rekuai/platform/Vulkan/VulkanAPI.h
     src/rekuai/platform/Vulkan/VulkanAPI.cpp
+    src/rekuai/platform/Vulkan/VulkanBuffer.h
+    src/rekuai/platform/Vulkan/VulkanBuffer.cpp
+    src/rekuai/platform/Vulkan/VulkanShader.h
+    src/rekuai/platform/Vulkan/VulkanShader.cpp
 
     src/rekuai/Renderer/Renderer.h
     src/rekuai/Renderer/Renderer.cpp

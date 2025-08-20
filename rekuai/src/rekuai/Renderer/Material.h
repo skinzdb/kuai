@@ -8,12 +8,12 @@ namespace kuai {
 	class Material
 	{
 	public:
-		Material(std::unique_ptr<Shader> shader) : shader(std::move(shader))
+		Material(std::shared_ptr<Shader> shader) : shader(shader)
 		{
 		}
 
 	protected:
-		std::unique_ptr<Shader> shader;
+		std::shared_ptr<Shader> shader;
 	};
 
 	// class BasicMaterial : public Material

@@ -17,8 +17,8 @@ namespace kuai {
 	{
 		unbind();
 
-		for (auto& pair : ubos)
-			glDeleteBuffers(1, &pair.second);
+		// for (auto& pair : ubos)
+		// 	glDeleteBuffers(1, &pair.second);
 
 		if (id)
 			glDeleteProgram(id);

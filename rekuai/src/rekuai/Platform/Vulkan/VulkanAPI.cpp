@@ -4,6 +4,7 @@
 #include "rekuai/Core/Window.h"
 #include "vulkan/vulkan_core.h"
 
+#include <cstdint>
 #include <set>
 #include <GLFW/glfw3.h>
 #include <vector>
@@ -142,6 +143,14 @@ namespace kuai {
     }
 
     void VulkanAPI::clear() {
+
+    }
+
+    void VulkanAPI::set_viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
+
+    }
+
+    void VulkanAPI::draw_indexed(const std::shared_ptr<VertexArray>& vertex_array, uint32_t index_count) {
 
     }
 

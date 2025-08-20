@@ -6,16 +6,32 @@
 #include <glad/glad.h>
 
 namespace kuai {
-    std::unique_ptr<Shader> Shader::create(const std::string &vert_src, const std::string &frag_src) {
+    auto Shader::shader_map = std::unordered_map<uint32_t, std::shared_ptr<Shader>>();
+
+    std::shared_ptr<Shader> Shader::create(const std::string &vert_src, const std::string &frag_src) {
         switch (RendererAPI::getAPI()) {
             case RendererAPI::API::None:
                 return nullptr;
 
-            case RendererAPI::API::OpenGL:
-                return std::make_unique<OpenGLShader>(vert_src, frag_src);
+            case RendererAPI::API::OpenGL: {
+                auto shader = std::make_shared<OpenGLShader>(vert_src, frag_src);
+                shader_map[shader->get_id()] = shader;
+                return shader;
+            }
+            case RendererAPI::API::Vulkan: {
+                auto shader = std::make_shared<VulkanShader>(vert_src, frag_src);
+                shader_map[shader->get_id()] = shader;
+                return shader;
+            }
+        }
+    }
 
-            case RendererAPI::API::Vulkan:
-                return std::make_unique<VulkanShader>(vert_src, frag_src);
+    std::shared_ptr<Shader> Shader::get(uint32_t id) {
+        try {
+            auto shader = shader_map.at(id);
+            return shader;
+        } catch (std::out_of_range e) {
+            return nullptr;
         }
     }
 }

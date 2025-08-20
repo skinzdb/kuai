@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 namespace kuai {
     const uint32_t MAX_FRAMEBUFFER_SIZE = 3840;
 

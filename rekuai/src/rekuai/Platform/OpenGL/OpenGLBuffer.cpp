@@ -35,7 +35,7 @@ namespace kuai {
 		glBufferData(buf_id, size, nullptr, GL_DYNAMIC_DRAW);
 	}
 
-	OpenGLBuffer::OpenGLBuffer(float* vertices, uint32_t size)
+	OpenGLBuffer::OpenGLBuffer(const float* vertices, uint32_t size)
 	{
 		glCreateBuffers(1, &buf_id);
 		glBindBuffer(GL_ARRAY_BUFFER, buf_id);
@@ -71,7 +71,7 @@ namespace kuai {
 
 	// Index Buffer ***********************************************************
 
-	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count) : count(count)
+	OpenGLIndexBuffer::OpenGLIndexBuffer(const uint32_t* indices, uint32_t count) : count(count)
 	{
 		glCreateBuffers(1, &buf_id);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_id);

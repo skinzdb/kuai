@@ -1,11 +1,17 @@
 #pragma once
 
+#include "rekuai/Renderer/Buffer.h"
+
 namespace kuai {
 	struct Vertex
 	{
 		float pos[3];
 		float normal[3];
 		float tex_coords[2];
+
+  		bool operator<(const kuai::Vertex& other) const {
+            return pos < other.pos;
+        }
 	};
 
 	/** \class Mesh
@@ -29,16 +35,11 @@ namespace kuai {
 
 		Mesh(const std::string& filename);
 
+		Mesh(const std::vector<Vertex>& vertex_data, const std::vector<uint32_t>& indices);
+
 		virtual ~Mesh();
 
 	private:
-		uint32_t id;
-
-		std::vector<Vertex> vertex_data;
-		std::vector<uint32_t> indices;
-
-		static uint32_t next_id;
-
-		friend class Renderer;
+	    std::unique_ptr<VertexArray> vertex_array;
 	};
 }

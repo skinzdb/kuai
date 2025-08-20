@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core.h"
 #include "App.h"
 
 extern kuai::App* kuai::create_app();

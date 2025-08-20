@@ -7,6 +7,8 @@ namespace kuai {
 	class SystemBase
 	{
 	public:
+		virtual ~SystemBase() = default;
+
 		virtual void update(float dt) = 0;
 		virtual void insert(EntityId entity) = 0;
 		virtual void remove(EntityId entity) = 0;

@@ -27,6 +27,8 @@ namespace kuai {
 		virtual void bind() const override;
 		virtual void unbind() const override;
 
+		virtual uint32_t get_id() const override { return id; }
+
 	private:
 		int create_shader(const char* src, int type);
 		void link();

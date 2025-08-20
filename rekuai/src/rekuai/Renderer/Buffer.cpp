@@ -20,7 +20,7 @@ namespace kuai {
         }
     }
 
-    std::unique_ptr<VertexBuffer> VertexBuffer::create(float* vertices, uint32_t size) {
+    std::unique_ptr<VertexBuffer> VertexBuffer::create(const float* vertices, uint32_t size) {
         switch (RendererAPI::getAPI()) {
 
         case RendererAPI::API::None:
@@ -32,7 +32,7 @@ namespace kuai {
         }
     }
 
-    std::unique_ptr<IndexBuffer> IndexBuffer::create(uint32_t* indices, uint32_t count) {
+    std::unique_ptr<IndexBuffer> IndexBuffer::create(const uint32_t* indices, uint32_t count) {
         switch (RendererAPI::getAPI()) {
 
         case RendererAPI::API::None:

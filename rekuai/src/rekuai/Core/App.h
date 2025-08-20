@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Core.h"
-
 #include "rekuai/Events/Event.h"
 #include "rekuai/Events/AppEvent.h"
 

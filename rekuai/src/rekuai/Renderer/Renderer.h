@@ -8,55 +8,59 @@
 
 #include "RendererAPI.h"
 #include "rekuai/Components/Components.h"
+#include <cstdint>
 
 namespace kuai {
 
-	enum RenderFlag : int
-	{
-		Never = 0x200,
-		Less = 0x201,
-		Equal = 0x202,
-		LEqual = 0x203,
-		Greater = 0x204,
-		NotEqual = 0x205,
-		GEqual = 0x206,
-		Always = 0x207,
-
-		Depth = 0x00000100,
-		Col = 0x00000400,
-		Stencil = 0x00004000
+	enum RenderFlag {
+		NEVER,
+		LT,
+		EQ,
+		LE,
+		GT,
+		NE,
+		GE,
+		ALWAYS,
+		DEPTH,
+		COLOUR,
+		STENCIL
 	};
 
-	struct RenderState
-	{
-		RenderFlag depth_test = RenderFlag::Less;
-		int clear_flags = RenderFlag::Col | RenderFlag::Depth;
-		// uniforms?
-		// textures?
+	enum RenderPass : uint8_t {
+	    Opaque = 0,
+		Transparent = 1,
+		Shadow = 2
 	};
 
-	struct ShaderData
-	{
-		// std::unordered_map<uint32_t, IndirectCommand> mesh_to_cmd;
-		uint32_t instances;
+	struct SortKey {
+	    uint64_t value = 0;
+
+        SortKey(RenderPass pass, uint16_t prog, uint16_t material, uint16_t mesh, uint8_t depth_bucket) {
+            value = (uint64_t(pass) << 56)
+                  | (uint64_t(prog) << 40)
+                  | (uint64_t(material) << 24)
+                  | (uint64_t(mesh) << 8)
+                  | depth_bucket;
+        }
 	};
 
-	struct OffsetData
-	{
-		size_t vertices_offset;
-		size_t indices_offset;
-	};
+	struct RenderCmd {
+        SortKey key;
+        RenderPass pass;
+        uint32_t program_id;
+        uint32_t material_id;
+        uint32_t mesh_id;
+        bool instanced;
+        glm::mat4 model;
 
-	struct RendererData
-	{
-		std::vector<Transform> transforms;
-		std::vector<Shader> shaders;
-
-		std::unordered_map<uint32_t, ShaderData> shader_map;	// Maps shader ID to its commands and total number of instances
-		std::unordered_map<uint32_t, OffsetData> offset_map;	// Maps mesh ID to its vertex and index offsets
-
-		std::vector<Vertex> vertex_data;
-		std::vector<uint32_t> indices;
+        RenderCmd(RenderPass pass, uint32_t program_id, uint32_t material_id, uint32_t mesh_id, bool instanced, glm::mat4 model) :
+            key(SortKey(pass, uint16_t(program_id), uint16_t(material_id), uint16_t(mesh_id), 0)),
+            pass(pass),
+            program_id(program_id),
+            material_id(material_id),
+            mesh_id(mesh_id),
+            instanced(instanced),
+            model(model) {}
 	};
 
 	class Renderer
@@ -65,19 +69,13 @@ namespace kuai {
 		static void init();
 		static void cleanup();
 
-		static void add_object(const MeshRenderer& m_renderer, Transform& transform);
-		static void remove_object(const MeshRenderer& m_renderer, Transform& transform);
-
 		static void set_camera(const Camera& camera);
-
+		static void submit(const RenderCmd& cmd);
 		static void update();
 
-		static void set_viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
-		static void set_clear_col(const glm::vec4& col);
-		static void clear();
-
 	private:
+	    static std::vector<RenderCmd> render_queue;
+
 		static std::unique_ptr<RendererAPI> api;
-		static RendererData r_data;
 	};
 }
