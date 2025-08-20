@@ -2,12 +2,12 @@
 #include "rekuai/Core/App.h"
 #include "rekuai/Core/Log.h"
 #include "rekuai/Core/Window.h"
-#include "vulkan/vulkan_core.h"
 
-#include <cstdint>
+
 #include <set>
-#include <GLFW/glfw3.h>
 #include <vector>
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 
 namespace kuai {
     const std::vector<const char*> validationLayers = {

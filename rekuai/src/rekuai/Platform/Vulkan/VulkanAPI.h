@@ -1,11 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include <optional>
 #include <vulkan/vulkan.h>
 
 #include "rekuai/Renderer/Buffer.h"
 #include "rekuai/Renderer/RendererAPI.h"
-#include "vulkan/vulkan_core.h"
 
 namespace kuai {
 

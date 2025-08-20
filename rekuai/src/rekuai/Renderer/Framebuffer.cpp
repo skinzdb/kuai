@@ -1,18 +1,24 @@
 #include "Framebuffer.h"
-#include "rekuai/Platform/OpenGL/OpenGLFramebuffer.h"
 #include "rekuai/Renderer/RendererAPI.h"
+
+#ifdef KU_VULKAN
+
+#endif 
+
+#ifdef KU_OPENGL
+    #include "rekuai/Platform/OpenGL/OpenGLFramebuffer.h"
+#endif
 
 namespace kuai {
     std::shared_ptr<Framebuffer> Framebuffer::create(uint32_t width, uint32_t height, uint32_t samples, uint32_t attachments) {
-        switch (RendererAPI::getAPI()) {
-            case RendererAPI::API::None:
-                return nullptr;
+        #ifdef KU_VULKAN
+            return nullptr;
+        #endif 
 
-            case RendererAPI::API::OpenGL:
-                return std::make_unique<OpenGLFramebuffer>(width, height, samples, attachments);
-
-            case RendererAPI::API::Vulkan:
-                return nullptr;
-        }
+        #ifdef KU_OPENGL
+            return std::make_unique<OpenGLFramebuffer>(width, height, samples, attachments);
+        #endif 
+          
+        return nullptr;
     }
 }

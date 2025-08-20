@@ -39,13 +39,6 @@ add_library(${PROJECT_NAME}
     src/rekuai/platform/OpenGL/OpenGLShader.h
     src/rekuai/platform/OpenGL/OpenGLShader.cpp
 
-    src/rekuai/platform/Vulkan/VulkanAPI.h
-    src/rekuai/platform/Vulkan/VulkanAPI.cpp
-    src/rekuai/platform/Vulkan/VulkanBuffer.h
-    src/rekuai/platform/Vulkan/VulkanBuffer.cpp
-    src/rekuai/platform/Vulkan/VulkanShader.h
-    src/rekuai/platform/Vulkan/VulkanShader.cpp
-
     src/rekuai/Renderer/Renderer.h
     src/rekuai/Renderer/Renderer.cpp
     src/rekuai/Renderer/RendererAPI.h
@@ -92,26 +85,21 @@ set(MY_LIBS
     glad
 )
 
-if (WIN32)
-    # Add dwmapi and windows multimedia for audio
-    set(MY_LIBS ${MY_LIBS} opengl32 dwmapi winmm)
+set(MY_DEFS GLFW_INCLUDE_NONE)
 
-    target_compile_definitions(${PROJECT_NAME} PUBLIC
-        KU_PLATFORM_WINDOWS
-        WIN32_LEAN_AND_MEAN
-        NOMINMAX
-        GLFW_INCLUDE_NONE
-        _CRT_SECURE_NO_WARNINGS
+find_package(Vulkan)
+
+if(Vulkan_FOUND)
+    add_library(${PROJECT_NAME}
+        src/rekuai/platform/Vulkan/VulkanAPI.h
+        src/rekuai/platform/Vulkan/VulkanAPI.cpp
+        src/rekuai/platform/Vulkan/VulkanBuffer.h
+        src/rekuai/platform/Vulkan/VulkanBuffer.cpp
+        src/rekuai/platform/Vulkan/VulkanShader.h
+        src/rekuai/platform/Vulkan/VulkanShader.cpp
     )
-elseif(APPLE)
-    # Find Vulkan
-    find_package(Vulkan REQUIRED)
 
-    if(NOT Vulkan_FOUND)
-        message(FATAL_ERROR "Could not find Vulkan")
-    endif()
-
-    # Link Vulkan
+    # Vulkan include dirs
     target_include_directories(${PROJECT_NAME} PUBLIC vendor/vulkan)
 
     # Link the libraries to the target
@@ -120,13 +108,29 @@ elseif(APPLE)
         Vulkan::Vulkan
     )
 
-    target_compile_definitions(${PROJECT_NAME} PUBLIC
-        KU_PLATFORM_APPLE
-        GLFW_INCLUDE_NONE
+    set(MY_DEFS ${MY_DEFS} KU_VULKAN)
+else()
+    set(MY_DEFS ${MY_DEFS} KU_OPENGL)
+endif()
+
+if (WIN32)
+    # Add dwmapi and windows multimedia for audio
+    set(MY_LIBS ${MY_LIBS} opengl32 dwmapi winmm)
+
+    set(MY_DEFS ${MY_DEFS}
+        KU_PLATFORM_WINDOWS
+        WIN32_LEAN_AND_MEAN
+        NOMINMAX
+        _CRT_SECURE_NO_WARNINGS
     )
+elseif(APPLE)
+    set(MY_DEFS ${PROJECT_NAME} KU_PLATFORM_APPLE)
 else()
 
 endif()
+
+message(STATUS "${MY_DEFS}")
+target_compile_definitions(${PROJECT_NAME} PUBLIC ${MY_DEFS})
 
 target_precompile_headers(${PROJECT_NAME}
     PUBLIC src/kpch.h

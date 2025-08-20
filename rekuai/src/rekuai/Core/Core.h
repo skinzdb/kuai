@@ -1,5 +1,7 @@
 #pragma once
 
+#include "rekuai/Core/Log.h"
+
 // @cond
 
 #define KU_ENABLE_ASSERTS // TODO: add to premake for debug configurations

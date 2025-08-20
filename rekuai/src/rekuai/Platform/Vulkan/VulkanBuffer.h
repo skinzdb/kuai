@@ -11,7 +11,5 @@ namespace kuai {
         virtual void unbind() const override;
 
         virtual void set_data(const void* data, uint32_t size) override;
-
-        static std::unique_ptr<VertexBuffer> create(uint32_t size);
     };
 }

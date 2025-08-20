@@ -1,7 +1,7 @@
 #pragma once
 
-#include "rekuai/Core/Core.h"
 #include <memory>
+#include "rekuai/Core/Core.h"
 
 namespace kuai {
 
