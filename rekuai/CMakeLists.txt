@@ -38,11 +38,16 @@ add_library(${PROJECT_NAME}
     src/rekuai/platform/OpenGL/OpenGLBuffer.cpp
     src/rekuai/platform/OpenGL/OpenGLShader.h
     src/rekuai/platform/OpenGL/OpenGLShader.cpp
+    src/rekuai/platform/OpenGL/OpenGLTexture.h
+    src/rekuai/platform/OpenGL/OpenGLTexture.cpp
+    src/rekuai/platform/OpenGL/OpenGLTextureArray.h
+    src/rekuai/platform/OpenGL/OpenGLTextureArray.cpp
 
     src/rekuai/Renderer/Renderer.h
     src/rekuai/Renderer/Renderer.cpp
     src/rekuai/Renderer/RendererAPI.h
     src/rekuai/Renderer/RendererAPI.cpp
+    src/rekuai/Renderer/Material.h
     src/rekuai/Renderer/Mesh.h
     src/rekuai/Renderer/Mesh.cpp
     src/rekuai/Renderer/Buffer.h
@@ -51,6 +56,10 @@ add_library(${PROJECT_NAME}
     src/rekuai/Renderer/Shader.cpp
     src/rekuai/Renderer/Framebuffer.h
     src/rekuai/Renderer/Framebuffer.cpp
+    src/rekuai/Renderer/TextureArray.h
+    src/rekuai/Renderer/TextureArray.cpp
+    src/rekuai/Renderer/Texture.h
+    src/rekuai/Renderer/Texture.cpp
 
     src/rekuai/Components/Components.h
     src/rekuai/Components/EntityManager.h
@@ -63,21 +72,14 @@ add_library(${PROJECT_NAME}
     src/rekuai/Events/Signal.h
     src/rekuai/Components/Scene.h
     src/rekuai/Components/Scene.cpp
-    src/rekuai/Renderer/Material.h
-    src/rekuai/Renderer/TextureArray.h
-    src/rekuai/Renderer/Texture.h
-    src/rekuai/Renderer/Texture.cpp
 
     vendor/tinyobjloader/tiny_obj_loader.h
     vendor/tinyobjloader/tiny_obj_loader.cpp
     vendor/stb_image/stb_image.h
     vendor/stb_image/stb_image.cpp
 
-    src/rekuai/Renderer/TextureArray.cpp
     vendor/stb_image/stb_image_resize.h
     vendor/stb_image/stb_image_resize.cpp
-    src/rekuai/Renderer/TextureManager.h
-    src/rekuai/Renderer/TextureManager.cpp
 )
 
 set(MY_LIBS

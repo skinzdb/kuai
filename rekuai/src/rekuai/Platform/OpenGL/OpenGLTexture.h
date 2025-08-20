@@ -1,22 +1,38 @@
 #pragma once
 
+#include "rekuai/Renderer/Texture.h"
+#include <string>
+
 namespace kuai {
 	/** \class Texture
 	*	\brief A 2D texture that can support transparency.
 	*/
-	class Texture {
+	class OpenGLTexture : public Texture 
+	{
 	public:
-		virtual ~Texture() = default;
+		/**
+		* Creates default blank texture.
+		*/
+		OpenGLTexture();
+		/**
+		* Loads texture from image file.
+		*/
+		OpenGLTexture(const std::string& filename);
+		virtual ~OpenGLTexture() override;
 
-		virtual uint32_t get_width() const = 0;
-		virtual uint32_t get_height() const = 0;
+		virtual uint32_t get_width() const override { return width; }
+		virtual uint32_t get_height() const override { return height; }
+		
+		virtual void bind(uint32_t active_tex) const override;
+		
+		virtual uint32_t get_id() const override { return id; }
 
-		virtual void bind() const = 0;
-		virtual void unbind() const = 0;
-	};
+	private:
+		uint32_t id;
 
-	class Texture2D : public Texture {
-	public:
-	    static std::shared_ptr<Texture2D> create(const std::string& filename);
+		uint32_t width;
+		uint32_t height;
+
+		TextureFormat format;
 	};
 }

@@ -12,7 +12,8 @@
 
 namespace kuai {
 
-	enum RenderFlag {
+	enum RenderFlag 
+	{
 		NEVER,
 		LT,
 		EQ,
@@ -26,13 +27,15 @@ namespace kuai {
 		STENCIL
 	};
 
-	enum RenderPass : uint8_t {
+	enum RenderPass : uint8_t 
+	{
 	    Opaque = 0,
 		Transparent = 1,
 		Shadow = 2
 	};
 
-	struct SortKey {
+	struct SortKey 
+	{
 	    uint64_t value = 0;
 
         SortKey(RenderPass pass, uint16_t prog, uint16_t material, uint16_t mesh, uint8_t depth_bucket) {
@@ -44,7 +47,8 @@ namespace kuai {
         }
 	};
 
-	struct RenderCmd {
+	struct RenderCmd 
+	{
         SortKey key;
         RenderPass pass;
         uint32_t program_id;

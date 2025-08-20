@@ -1,18 +1,25 @@
 #include "kpch.h"
-#include "rekuai/Renderer/RendererAPI.h"
 #include "Texture.h"
 
+#ifdef KU_VULKAN
+
+#endif
+
+#ifdef KU_OPENGL
+	#include "rekuai/Platform/OpenGL/OpenGLTexture.h"
+#endif
+
 namespace kuai {
-    std::shared_ptr<Texture2D> Texture2D::create(const std::string& filename) {
-        switch (RendererAPI::getAPI()) {
-            case RendererAPI::API::None:
-                return nullptr;
+    std::shared_ptr<Texture> Texture::create(const std::string& filename) 
+    {
+	    #ifdef KU_VULKAN
 
-            case RendererAPI::API::OpenGL:
-                return nullptr;
+		#endif
 
-            case RendererAPI::API::Vulkan:
-                return nullptr;
-        }
+		#ifdef KU_OPENGL
+        	return std::make_shared<OpenGLTexture>(filename);
+		#endif
+
+		return nullptr;
     }
 }

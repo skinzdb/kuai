@@ -10,7 +10,8 @@
 #endif
 
 namespace kuai {
-    std::shared_ptr<Framebuffer> Framebuffer::create(uint32_t width, uint32_t height, uint32_t samples, uint32_t attachments) {
+    std::shared_ptr<Framebuffer> Framebuffer::create(uint32_t width, uint32_t height, uint32_t samples, uint32_t attachments) 
+    {
         #ifdef KU_VULKAN
             return nullptr;
         #endif 

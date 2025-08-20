@@ -14,7 +14,8 @@ namespace kuai {
 
 	// Vertex Buffer *********************************************************
 
-    std::unique_ptr<VertexBuffer> VertexBuffer::create(uint32_t size) {
+    std::unique_ptr<VertexBuffer> VertexBuffer::create(uint32_t size) 
+    {
         #ifdef KU_VULKAN
             return std::make_unique<VulkanBuffer>(size);
         #endif
@@ -26,7 +27,8 @@ namespace kuai {
         return nullptr;
     }
 
-    std::unique_ptr<VertexBuffer> VertexBuffer::create(const float* vertices, uint32_t size) {
+    std::unique_ptr<VertexBuffer> VertexBuffer::create(const float* vertices, uint32_t size) 
+    {
         #ifdef KU_VULKAN
             return std::make_unique<VulkanBuffer>(size);
         #endif
@@ -38,7 +40,8 @@ namespace kuai {
         return nullptr;
     }
 
-    std::unique_ptr<IndexBuffer> IndexBuffer::create(const uint32_t* indices, uint32_t count) {
+    std::unique_ptr<IndexBuffer> IndexBuffer::create(const uint32_t* indices, uint32_t count)
+    {
         #ifdef KU_VULKAN
             // return std::make_unique<VulkanIndexBuffer>(indices, count);
         #endif
@@ -50,7 +53,8 @@ namespace kuai {
         return nullptr;
     }
 
-    std::unique_ptr<VertexArray> VertexArray::create() {
+    std::unique_ptr<VertexArray> VertexArray::create() 
+    {
         #ifdef KU_VULKAN
             // return std::make_unique<VulkanVertexArray>();
         #endif
@@ -62,7 +66,8 @@ namespace kuai {
         return nullptr;
     }
 
-    std::unique_ptr<IndirectBuffer> IndirectBuffer::create(const std::vector<IndirectCommand>& commands) {
+    std::unique_ptr<IndirectBuffer> IndirectBuffer::create(const std::vector<IndirectCommand>& commands) 
+    {
         #ifdef KU_VULKAN
             // return std::make_unique<VulkanIndirectBuffer>(commands);
         #endif

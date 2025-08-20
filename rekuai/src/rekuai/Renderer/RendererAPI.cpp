@@ -13,7 +13,8 @@ namespace kuai {
 
     RendererAPI::API RendererAPI::api = RendererAPI::API::Vulkan;
 
-    std::unique_ptr<RendererAPI> RendererAPI::create() {
+    std::unique_ptr<RendererAPI> RendererAPI::create() 
+    {
         #ifdef KU_VULKAN
             return std::make_unique<VulkanAPI>();
         #endif

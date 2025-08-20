@@ -16,7 +16,8 @@ namespace kuai {
     
     std::unordered_map<uint32_t, std::shared_ptr<Shader>> Shader::shader_map{};
 
-    std::shared_ptr<Shader> Shader::create(const std::string &vert_src, const std::string &frag_src) {
+    std::shared_ptr<Shader> Shader::create(const std::string &vert_src, const std::string &frag_src) 
+    {
         #ifdef KU_VULKAN
             auto shader = std::make_shared<VulkanShader>(vert_src, frag_src);
             shader_map[shader->get_id()] = shader;
@@ -32,7 +33,8 @@ namespace kuai {
         return nullptr;
     }
 
-    std::shared_ptr<Shader> Shader::get(uint32_t prog_id) {
+    std::shared_ptr<Shader> Shader::get(uint32_t prog_id)
+    {
         return shader_map.at(prog_id);
     }
 }

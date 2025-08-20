@@ -3,7 +3,8 @@
 #include "tiny_obj_loader.h"
 
 namespace kuai {
-    Mesh::Mesh(const std::vector<Vertex>& vertex_data, const std::vector<uint32_t>& indices) {
+    Mesh::Mesh(const std::vector<Vertex>& vertex_data, const std::vector<uint32_t>& indices) 
+	{
         auto vertex_buf = VertexBuffer::create(vertex_data.size());
 		vertex_buf->set_layout(BufferLayout {
             BufferElement(ShaderDataType::VEC3, "positions"),
