@@ -2,10 +2,9 @@
 
 #include "Entity.h"
 #include "Components.h"
-#include "rekuai/Renderer/Renderer.h"
 
 namespace kuai {
-	Scene::Scene() : ecs(new ECS())
+	Scene::Scene() : ecs(std::make_unique<EntityComponentSystem>())
 	{
 		ecs->register_component<Transform>();
 		ecs->register_component<MeshRenderer>();
@@ -13,8 +12,8 @@ namespace kuai {
 
 		auto render_sys = ecs->register_system<MeshRenderer, Transform>();
 
-		render_sys->each([](float dt, EntityId entity, MeshRenderer& mesh_renderer, Transform& transform) {
-
+		render_sys->each([&](float dt, EntityId entity, MeshRenderer& mesh_renderer, Transform& transform) {
+		    auto poo = ecs->get_component<MeshRenderer>(entity);
 		});
 
 		render_sys->on_insert([](EntityId entity, MeshRenderer& mesh_renderer, Transform& transform) {
@@ -28,12 +27,11 @@ namespace kuai {
 
 	Scene::~Scene()
 	{
-		delete ecs;
 	}
 
 	void Scene::update(float dt)
 	{
-	    
+
 	}
 
 	Entity& Scene::create_entity()

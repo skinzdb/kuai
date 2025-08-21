@@ -139,7 +139,7 @@ namespace kuai {
         create_logical_device();
         create_swap_chain();
         create_image_views();
-        create_graphics_pipeline();
+        // create_graphics_pipeline();
     }
 
     void VulkanAPI::clear() {
@@ -496,6 +496,11 @@ namespace kuai {
     }
 
     void VulkanAPI::create_graphics_pipeline() {
+        // auto vertShaderCode = readFile("shaders/vert.spv");
+        // auto fragShaderCode = readFile("shaders/frag.spv");
+
+        // VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
+        // VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
 
     }
 

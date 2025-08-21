@@ -2,11 +2,13 @@
 
 #include "rekuai/Renderer/Shader.h"
 
+#include "vulkan/vulkan_core.h"
+
 namespace kuai {
     class VulkanShader : public Shader {
 
     public:
-       	VulkanShader(const std::string& vert_src, const std::string& frag_src);
+       	VulkanShader(VkDevice device, const std::string& vert_src, const std::string& frag_src);
 		virtual ~VulkanShader();
 
 		virtual void create_uniform(const std::string& name) override;
@@ -27,6 +29,15 @@ namespace kuai {
 		virtual uint32_t get_id() const override { return shader_id; }
 
 	private:
+
+    VkShaderModule create_shader_module(const std::vector<char>& code);
+
+	private:
 	    uint32_t shader_id;
+
+		VkShaderModule vert;
+		VkShaderModule frag;
+
+		VkDevice device;
     };
 }

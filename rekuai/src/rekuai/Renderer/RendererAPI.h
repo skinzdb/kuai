@@ -6,13 +6,14 @@ namespace kuai {
     class RendererAPI
     {
     public:
-        enum class API 
+        enum class API
         {
             None = 0,
             OpenGL = 1,
             Vulkan = 2
         };
 
+        RendererAPI() { instance = this; }
     	virtual ~RendererAPI() = default;
 
         virtual void init() = 0;
@@ -22,9 +23,14 @@ namespace kuai {
 
         virtual void draw_indexed(const std::shared_ptr<VertexArray>& vertex_array, uint32_t index_count) = 0;
 
+    public:
+        static RendererAPI* get() { return instance; }
         static API getAPI() { return api; }
+
         static std::unique_ptr<RendererAPI> create();
+
     private:
+    	static RendererAPI* instance;
         static API api;
     };
 }

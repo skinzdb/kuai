@@ -34,6 +34,8 @@ namespace kuai {
 
         ~VulkanAPI();
 
+        VkDevice get_device() const { return device; }
+
     private:
         void create_instance();
         void setup_debug_messenger();

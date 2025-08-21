@@ -3,7 +3,6 @@
 #include "rekuai/Core/Core.h"
 
 #include "EntityManager.h"
-#include "ComponentManager.h"
 #include "System.h"
 
 namespace kuai {
@@ -15,16 +14,9 @@ namespace kuai {
 	{
 	public:
 		SystemManager() = default;
-		~SystemManager()
-		{
-			for (const auto& pair : systems)
-			{
-				delete pair.second;
-			}
-		}
 
 		template<typename... Cs>
-		System<Cs...>* register_system(ComponentManager* component_manager)
+		std::shared_ptr<System<Cs...>> register_system(std::shared_ptr<ComponentManager> component_manager)
 		{
 			ComponentMask system_mask = 0;
 
@@ -35,7 +27,7 @@ namespace kuai {
 
 			KU_CORE_ASSERT(systems.find(system_mask) == systems.end(), "Registering a system more than once");
 
-			auto system = new System<Cs...>();
+			auto system = std::make_shared<System<Cs...>>();
 			system->component_manager = component_manager;
 			systems.insert({ system_mask, system });
 			return system;
@@ -77,6 +69,6 @@ namespace kuai {
 
 	private:
 		// Maps system masks to systems
-		std::unordered_map<ComponentMask, SystemBase*> systems;
+		std::unordered_map<ComponentMask, std::shared_ptr<ISystem>> systems;
 	};
 }

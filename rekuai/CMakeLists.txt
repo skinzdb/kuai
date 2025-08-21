@@ -43,6 +43,13 @@ add_library(${PROJECT_NAME}
     src/rekuai/platform/OpenGL/OpenGLTextureArray.h
     src/rekuai/platform/OpenGL/OpenGLTextureArray.cpp
 
+    src/rekuai/platform/Vulkan/VulkanAPI.h
+    src/rekuai/platform/Vulkan/VulkanAPI.cpp
+    src/rekuai/platform/Vulkan/VulkanBuffer.h
+    src/rekuai/platform/Vulkan/VulkanBuffer.cpp
+    src/rekuai/platform/Vulkan/VulkanShader.h
+    src/rekuai/platform/Vulkan/VulkanShader.cpp
+
     src/rekuai/Renderer/Renderer.h
     src/rekuai/Renderer/Renderer.cpp
     src/rekuai/Renderer/RendererAPI.h
@@ -64,7 +71,7 @@ add_library(${PROJECT_NAME}
     src/rekuai/Components/Components.h
     src/rekuai/Components/EntityManager.h
     src/rekuai/Components/ComponentManager.h
-    src/rekuai/Components/ECS.h
+    src/rekuai/Components/EntityComponentSystem.h
     src/rekuai/Components/System.h
     src/rekuai/Components/SystemManager.h
     src/rekuai/Components/Entity.h
@@ -92,15 +99,6 @@ set(MY_DEFS GLFW_INCLUDE_NONE)
 find_package(Vulkan)
 
 if(Vulkan_FOUND)
-    add_library(${PROJECT_NAME}
-        src/rekuai/platform/Vulkan/VulkanAPI.h
-        src/rekuai/platform/Vulkan/VulkanAPI.cpp
-        src/rekuai/platform/Vulkan/VulkanBuffer.h
-        src/rekuai/platform/Vulkan/VulkanBuffer.cpp
-        src/rekuai/platform/Vulkan/VulkanShader.h
-        src/rekuai/platform/Vulkan/VulkanShader.cpp
-    )
-
     # Vulkan include dirs
     target_include_directories(${PROJECT_NAME} PUBLIC vendor/vulkan)
 
@@ -126,7 +124,7 @@ if (WIN32)
         _CRT_SECURE_NO_WARNINGS
     )
 elseif(APPLE)
-    set(MY_DEFS ${PROJECT_NAME} KU_PLATFORM_APPLE)
+    set(MY_DEFS ${MY_DEFS} KU_PLATFORM_APPLE)
 else()
 
 endif()

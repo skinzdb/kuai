@@ -22,32 +22,32 @@ namespace kuai {
 	{
 	}
 
-	void Renderer::submit(const RenderCmd &cmd) 
+	void Renderer::submit(const RenderCmd &cmd)
     {
 	    render_queue.push_back(cmd);
 	}
 
 	void Renderer::update() {
 	    std::vector<RenderCmd> opaque, transparent;
-        for (auto& cmd : render_queue) 
+        for (auto& cmd : render_queue)
         {
-            if (cmd.pass == RenderPass::Opaque) 
+            if (cmd.pass == RenderPass::Opaque)
             {
                 opaque.push_back(cmd);
-            } 
-            else if (cmd.pass == RenderPass::Transparent) 
+            }
+            else if (cmd.pass == RenderPass::Transparent)
             {
                 transparent.push_back(cmd);
             }
         }
 
-	    std::sort(opaque.begin(), opaque.end(), [](const RenderCmd& x, const RenderCmd& y) 
+	    std::sort(opaque.begin(), opaque.end(), [](const RenderCmd& x, const RenderCmd& y)
         {
 			return x.key.value < y.key.value;
 		});
 
 		// Transparent: depth-first (descending); stable-sort by state to reduce flicker
-        std::stable_sort(transparent.begin(), transparent.end(), [](const RenderCmd& x, const RenderCmd& y) 
+        std::stable_sort(transparent.begin(), transparent.end(), [](const RenderCmd& x, const RenderCmd& y)
         {
             // Here we rely on the depth bucket in the low 8 bits; you can store real depth separately
             uint8_t da = uint8_t(x.key.value & 0xFFu);
@@ -56,7 +56,7 @@ namespace kuai {
             return x.key.value < y.key.value; // tie-break by state
         });
 
-       	struct BoundState 
+       	struct BoundState
         {
             uint32_t program_id = 0;
             uint32_t vao_id = 0;
@@ -66,9 +66,9 @@ namespace kuai {
         } state;
 
         // Opaque render pass
-        for (const RenderCmd& cmd : opaque) 
+        for (const RenderCmd& cmd : opaque)
         {
-            if (state.program_id != cmd.program_id) 
+            if (state.program_id != cmd.program_id)
             {
                 state.shader = Shader::get(cmd.program_id);
                 state.shader->bind();
@@ -78,8 +78,8 @@ namespace kuai {
             if (cmd.instanced)
             {
 
-            } 
-            else 
+            }
+            else
             {
                 state.shader->set_uniform("model_matrix", cmd.model);
 

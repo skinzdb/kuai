@@ -4,10 +4,10 @@
 
 namespace kuai {
 
-	class SystemBase
+	class ISystem
 	{
 	public:
-		virtual ~SystemBase() = default;
+		virtual ~ISystem() = default;
 
 		virtual void update(float dt) = 0;
 		virtual void insert(EntityId entity) = 0;
@@ -17,7 +17,7 @@ namespace kuai {
 		std::vector<EntityId>::iterator end() { return entities.end(); }
 
 	protected:
-		ComponentManager* component_manager;
+		std::shared_ptr<ComponentManager> component_manager;
 
 		std::vector<EntityId> entities;
 
@@ -25,7 +25,7 @@ namespace kuai {
 	};
 
 	template <typename ...Cs>
-	class System : public SystemBase
+	class System : public ISystem
 	{
 		using UpdateFn = std::function<void(float, EntityId, Cs&...)>;
 		using InOutFn = std::function<void(EntityId, Cs&...)>;

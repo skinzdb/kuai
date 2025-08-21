@@ -1,35 +1,37 @@
 #include "Shader.h"
 
+#include "rekuai/Renderer/RendererAPI.h"
+
 #ifdef KU_VULKAN
+    #include "rekuai/Platform/Vulkan/VulkanAPI.h"
     #include "rekuai/Platform/Vulkan/VulkanShader.h"
-#endif 
+#endif
 
 #ifdef KU_OPENGL
     #include "rekuai/Platform/OpenGL/OpenGLShader.h"
-#endif 
-
-#include "rekuai/Renderer/RendererAPI.h"
+#endif
 
 namespace kuai {
-    std::unordered_map<std::string, uint32_t> OpenGLShader::ubos{};
-	std::unordered_map<std::string, uint32_t> OpenGLShader::ubo_offsets{};
-    
+    std::unordered_map<std::string, uint32_t> Shader::ubos{};
+	std::unordered_map<std::string, uint32_t> Shader::ubo_offsets{};
+
     std::unordered_map<uint32_t, std::shared_ptr<Shader>> Shader::shader_map{};
 
-    std::shared_ptr<Shader> Shader::create(const std::string &vert_src, const std::string &frag_src) 
+    std::shared_ptr<Shader> Shader::create(const std::string &vert_src, const std::string &frag_src)
     {
         #ifdef KU_VULKAN
-            auto shader = std::make_shared<VulkanShader>(vert_src, frag_src);
+            VulkanAPI* vk_api = reinterpret_cast<VulkanAPI*>(RendererAPI::get());
+            auto shader = std::make_shared<VulkanShader>(vk_api->get_device(), vert_src, frag_src);
             shader_map[shader->get_id()] = shader;
             return shader;
-        #endif 
+        #endif
 
         #ifdef KU_OPENGL
             auto shader = std::make_shared<OpenGLShader>(vert_src, frag_src);
             shader_map[shader->get_id()] = shader;
             return shader;
-        #endif 
-       
+        #endif
+
         return nullptr;
     }
 

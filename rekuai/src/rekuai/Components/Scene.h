@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ECS.h"
+#include "EntityComponentSystem.h"
+#include <memory>
 
 namespace kuai {
 	class Entity;
@@ -16,7 +17,7 @@ namespace kuai {
 		Entity& create_entity();
 
 	private:
-		ECS* ecs;
+		std::unique_ptr<EntityComponentSystem> ecs;
 		std::vector<Entity> entities;
 
 		friend class Entity;

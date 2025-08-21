@@ -8,15 +8,14 @@
     #include "rekuai/Platform/OpenGL/OpenGLBuffer.h"
 #endif
 
-#include "rekuai/Renderer/RendererAPI.h"
-
 namespace kuai {
 
 	// Vertex Buffer *********************************************************
 
-    std::unique_ptr<VertexBuffer> VertexBuffer::create(uint32_t size) 
+    std::unique_ptr<VertexBuffer> VertexBuffer::create(uint32_t size)
     {
         #ifdef KU_VULKAN
+            KU_CORE_ERROR("Vulkan VertexBuffer NOT IMPLEMENTED!");
             return std::make_unique<VulkanBuffer>(size);
         #endif
 
@@ -27,9 +26,10 @@ namespace kuai {
         return nullptr;
     }
 
-    std::unique_ptr<VertexBuffer> VertexBuffer::create(const float* vertices, uint32_t size) 
+    std::unique_ptr<VertexBuffer> VertexBuffer::create(const float* vertices, uint32_t size)
     {
         #ifdef KU_VULKAN
+            KU_CORE_ERROR("Vulkan VertexBuffer NOT IMPLEMENTED!");
             return std::make_unique<VulkanBuffer>(size);
         #endif
 
@@ -43,6 +43,7 @@ namespace kuai {
     std::unique_ptr<IndexBuffer> IndexBuffer::create(const uint32_t* indices, uint32_t count)
     {
         #ifdef KU_VULKAN
+            KU_CORE_ERROR("Vulkan IndexBuffer NOT IMPLEMENTED!");
             // return std::make_unique<VulkanIndexBuffer>(indices, count);
         #endif
 
@@ -53,9 +54,10 @@ namespace kuai {
         return nullptr;
     }
 
-    std::unique_ptr<VertexArray> VertexArray::create() 
+    std::unique_ptr<VertexArray> VertexArray::create()
     {
         #ifdef KU_VULKAN
+            KU_CORE_ERROR("Vulkan VertexArray NOT IMPLEMENTED!");
             // return std::make_unique<VulkanVertexArray>();
         #endif
 
@@ -66,9 +68,10 @@ namespace kuai {
         return nullptr;
     }
 
-    std::unique_ptr<IndirectBuffer> IndirectBuffer::create(const std::vector<IndirectCommand>& commands) 
+    std::unique_ptr<IndirectBuffer> IndirectBuffer::create(const std::vector<IndirectCommand>& commands)
     {
         #ifdef KU_VULKAN
+            KU_CORE_ERROR("Vulkan IndirectBuffer NOT IMPLEMENTED!");
             // return std::make_unique<VulkanIndirectBuffer>(commands);
         #endif
 
