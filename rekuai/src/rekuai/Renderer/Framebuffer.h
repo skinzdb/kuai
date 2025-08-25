@@ -18,8 +18,8 @@ namespace kuai {
     public:
         virtual ~Framebuffer() = default;
 
-        const uint32_t get_depth_attachment();
-        const std::vector<uint32_t>& get_col_attachments();
+        virtual uint32_t get_depth_attachment();
+        virtual const std::vector<uint32_t>& get_col_attachments();
 
         virtual void bind() = 0;
         virtual void unbind() = 0;

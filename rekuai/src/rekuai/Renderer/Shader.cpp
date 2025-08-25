@@ -20,7 +20,7 @@ namespace kuai {
     std::shared_ptr<Shader> Shader::create(const std::string &vert_src, const std::string &frag_src)
     {
         #ifdef KU_VULKAN
-            VulkanAPI* vk_api = reinterpret_cast<VulkanAPI*>(RendererAPI::get());
+            VulkanAPI* vk_api = static_cast<VulkanAPI*>(RendererAPI::get());
             auto shader = std::make_shared<VulkanShader>(vk_api->get_device(), vert_src, frag_src);
             shader_map[shader->get_id()] = shader;
             return shader;

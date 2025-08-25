@@ -42,6 +42,7 @@ namespace kuai {
 				update(elapsedTime);
 			}
 
+			Renderer::update();
 			window->update();
 		}
 	}

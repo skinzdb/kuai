@@ -34,6 +34,8 @@ namespace kuai {
 
         ~VulkanAPI();
 
+        void set_shader_modules(VkShaderModule vert, VkShaderModule frag);
+
         VkDevice get_device() const { return device; }
 
     private:
@@ -44,7 +46,13 @@ namespace kuai {
         void create_logical_device();
         void create_swap_chain();
         void create_image_views();
+        void create_render_pass();
         void create_graphics_pipeline();
+        void create_framebuffers();
+        void create_command_pool();
+        void create_command_buffer();
+        void record_command_buffer(VkCommandBuffer buf, uint32_t image_idx);
+        void create_sync_objects();
         bool is_device_suitable(const VkPhysicalDevice& device);
         QueueFamilyIndices find_queue_families(const VkPhysicalDevice& device);
         SwapChainSupportDetails query_swap_chain_support(const VkPhysicalDevice& device);
@@ -54,7 +62,7 @@ namespace kuai {
         VkDebugUtilsMessengerEXT debug_messenger;
         VkSurfaceKHR surface;
         VkPhysicalDevice physical_device = VK_NULL_HANDLE;
-        VkDevice device;
+        VkDevice device; // logical device
 
         VkQueue graphics_queue;
         VkQueue present_queue;
@@ -64,6 +72,21 @@ namespace kuai {
         VkFormat swap_chain_image_format;
         VkExtent2D swap_chain_extent;
         std::vector<VkImageView> swap_chain_image_views;
+
+        VkPipelineShaderStageCreateInfo shader_stages[2];
+        VkRenderPass render_pass;
+        VkPipelineLayout pipeline_layout;
+        VkPipeline graphics_pipeline;
+
+        std::vector<VkFramebuffer> swap_chain_framebuffers;
+
+        VkCommandPool command_pool;
+        VkCommandBuffer command_buf;
+
+        VkSemaphore img_available_semaphore;
+        VkSemaphore render_finished_semaphore;
+        VkFence in_flight_fence;
+
     };
 
 }

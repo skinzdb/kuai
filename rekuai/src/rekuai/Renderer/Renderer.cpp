@@ -28,6 +28,9 @@ namespace kuai {
 	}
 
 	void Renderer::update() {
+	    api->draw_indexed({}, 0);
+		return;
+
 	    std::vector<RenderCmd> opaque, transparent;
         for (auto& cmd : render_queue)
         {
