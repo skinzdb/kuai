@@ -148,7 +148,7 @@ namespace kuai {
         create_render_pass();
         create_framebuffers();
         create_command_pool();
-        create_command_buffer();
+        create_command_buffers();
         create_sync_objects();
     }
 
@@ -164,34 +164,34 @@ namespace kuai {
 
     void VulkanAPI::draw_indexed(const std::shared_ptr<VertexArray>& vertex_array, uint32_t index_count)
     {
-        vkWaitForFences(device, 1, &in_flight_fence, VK_TRUE, UINT64_MAX);
+        vkWaitForFences(device, 1, &in_flight_fences[current_frame], VK_TRUE, UINT64_MAX);
 
-        vkResetFences(device, 1, &in_flight_fence);
+        vkResetFences(device, 1, &in_flight_fences[current_frame]);
 
         uint32_t imageIndex;
-        vkAcquireNextImageKHR(device, swap_chain, UINT64_MAX, img_available_semaphore, VK_NULL_HANDLE, &imageIndex);
+        vkAcquireNextImageKHR(device, swap_chain, UINT64_MAX, img_available_semaphores[current_frame], VK_NULL_HANDLE, &imageIndex);
 
-        vkResetCommandBuffer(command_buf, 0);
+        vkResetCommandBuffer(command_bufs[current_frame], 0);
 
-        record_command_buffer(command_buf, imageIndex);
+        record_command_buffer(command_bufs[current_frame], imageIndex);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        VkSemaphore waitSemaphores[] = {img_available_semaphore};
+        VkSemaphore waitSemaphores[] = {img_available_semaphores[current_frame]};
         VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
         submitInfo.pWaitDstStageMask = waitStages;
 
         submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &command_buf;
+        submitInfo.pCommandBuffers = &command_bufs[current_frame];
 
-        VkSemaphore signalSemaphores[] = {render_finished_semaphore};
+        VkSemaphore signalSemaphores[] = {render_finished_semaphores[current_frame]};
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
-        if (vkQueueSubmit(graphics_queue, 1, &submitInfo, in_flight_fence) != VK_SUCCESS) {
+        if (vkQueueSubmit(graphics_queue, 1, &submitInfo, in_flight_fences[current_frame]) != VK_SUCCESS) {
             KU_CORE_ERROR("(Vulkan) Failed to submit draw command buffer");
         }
 
@@ -209,6 +209,8 @@ namespace kuai {
         presentInfo.pResults = nullptr; // Optional
 
         vkQueuePresentKHR(present_queue, &presentInfo);
+
+        current_frame = (current_frame + 1) % swap_chain_images.size();
     }
 
     void VulkanAPI::create_instance()
@@ -848,15 +850,17 @@ namespace kuai {
         }
     }
 
-    void VulkanAPI::create_command_buffer()
+    void VulkanAPI::create_command_buffers()
     {
+        command_bufs.resize(swap_chain_images.size());
+
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.commandPool = command_pool;
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = 1;
+        allocInfo.commandBufferCount = static_cast<uint32_t>(command_bufs.size());
 
-        if (vkAllocateCommandBuffers(device, &allocInfo, &command_buf) != VK_SUCCESS) {
+        if (vkAllocateCommandBuffers(device, &allocInfo, command_bufs.data()) != VK_SUCCESS) {
             KU_CORE_CRITICAL("(Vulkan) Failed to create command buffers");
             exit(1);
         }
@@ -864,6 +868,10 @@ namespace kuai {
 
     void VulkanAPI::create_sync_objects()
     {
+        img_available_semaphores.resize(swap_chain_images.size());
+        render_finished_semaphores.resize(swap_chain_images.size());
+        in_flight_fences.resize(swap_chain_images.size());
+
         VkSemaphoreCreateInfo semaphoreInfo{};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -871,12 +879,15 @@ namespace kuai {
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &img_available_semaphore) != VK_SUCCESS ||
-            vkCreateSemaphore(device, &semaphoreInfo, nullptr, &render_finished_semaphore) != VK_SUCCESS ||
-            vkCreateFence(device, &fenceInfo, nullptr, &in_flight_fence) != VK_SUCCESS)
+        for (size_t i = 0; i < swap_chain_images.size(); i++)
         {
-            KU_CORE_CRITICAL("(Vulkan) Failed to create synchronisation primitives");
-            exit(1);
+            if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &img_available_semaphores[i]) != VK_SUCCESS ||
+                vkCreateSemaphore(device, &semaphoreInfo, nullptr, &render_finished_semaphores[i]) != VK_SUCCESS ||
+                vkCreateFence(device, &fenceInfo, nullptr, &in_flight_fences[i]) != VK_SUCCESS)
+            {
+                KU_CORE_CRITICAL("(Vulkan) Failed to create synchronisation primitives");
+                exit(1);
+            }
         }
     }
 
@@ -884,9 +895,12 @@ namespace kuai {
     {
         vkDeviceWaitIdle(device);
 
-        vkDestroySemaphore(device, img_available_semaphore, nullptr);
-        vkDestroySemaphore(device, render_finished_semaphore, nullptr);
-        vkDestroyFence(device, in_flight_fence, nullptr);
+        for (size_t i = 0; i < swap_chain_images.size(); i++)
+        {
+            vkDestroySemaphore(device, render_finished_semaphores[i], nullptr);
+            vkDestroySemaphore(device, img_available_semaphores[i], nullptr);
+            vkDestroyFence(device, in_flight_fences[i], nullptr);
+        }
 
         vkDestroyCommandPool(device, command_pool, nullptr);
 

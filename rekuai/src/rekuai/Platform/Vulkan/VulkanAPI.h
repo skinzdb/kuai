@@ -50,7 +50,7 @@ namespace kuai {
         void create_graphics_pipeline();
         void create_framebuffers();
         void create_command_pool();
-        void create_command_buffer();
+        void create_command_buffers();
         void record_command_buffer(VkCommandBuffer buf, uint32_t image_idx);
         void create_sync_objects();
         bool is_device_suitable(const VkPhysicalDevice& device);
@@ -81,12 +81,13 @@ namespace kuai {
         std::vector<VkFramebuffer> swap_chain_framebuffers;
 
         VkCommandPool command_pool;
-        VkCommandBuffer command_buf;
+        std::vector<VkCommandBuffer> command_bufs;
 
-        VkSemaphore img_available_semaphore;
-        VkSemaphore render_finished_semaphore;
-        VkFence in_flight_fence;
+        std::vector<VkSemaphore> img_available_semaphores;
+        std::vector<VkSemaphore> render_finished_semaphores;
+        std::vector<VkFence> in_flight_fences;
 
+        uint32_t current_frame = 0;
     };
 
 }

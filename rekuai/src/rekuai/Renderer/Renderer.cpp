@@ -15,7 +15,7 @@ namespace kuai {
 
 	void Renderer::cleanup()
 	{
-
+	    api.reset(); // destruct render API before destructing GLFW
 	}
 
 	void Renderer::set_camera(const Camera& camera)
