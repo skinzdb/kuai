@@ -26,15 +26,13 @@ namespace kuai {
 		virtual void bind() const override;
 		virtual void unbind() const override;
 
-		virtual uint32_t get_id() const override { return shader_id; }
+		virtual uint32_t get_id() const override { return 0; }
 
 	private:
 
     VkShaderModule create_shader_module(const std::vector<char>& code);
 
 	private:
-	    uint32_t shader_id;
-
 		VkShaderModule vert;
 		VkShaderModule frag;
 

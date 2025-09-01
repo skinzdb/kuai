@@ -19,7 +19,12 @@ elseif (APPLE)
     )
 endif()
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../rekuai ${CMAKE_CURRENT_BINARY_DIR}/rekuai)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../rekuai
+    ${CMAKE_CURRENT_BINARY_DIR}/rekuai)
+
+add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                       ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC "${PROJECT_BINARY_DIR}"

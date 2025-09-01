@@ -2,9 +2,9 @@
 #include "rekuai/Core/App.h"
 #include "rekuai/Core/Log.h"
 #include "rekuai/Core/Window.h"
+#include "vulkan/vulkan_core.h"
 
 #include <set>
-#include <vector>
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -166,13 +166,23 @@ namespace kuai {
     {
         vkWaitForFences(device, 1, &in_flight_fences[current_frame], VK_TRUE, UINT64_MAX);
 
+        uint32_t imageIndex;
+        VkResult result = vkAcquireNextImageKHR(device, swap_chain, UINT64_MAX,
+            img_available_semaphores[current_frame], VK_NULL_HANDLE, &imageIndex);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            recreate_swap_chain();
+            return;
+        }
+        else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+        {
+            KU_CORE_ERROR("(Vulkan) Failed to acquire swap chain image");
+        }
+
         vkResetFences(device, 1, &in_flight_fences[current_frame]);
 
-        uint32_t imageIndex;
-        vkAcquireNextImageKHR(device, swap_chain, UINT64_MAX, img_available_semaphores[current_frame], VK_NULL_HANDLE, &imageIndex);
-
         vkResetCommandBuffer(command_bufs[current_frame], 0);
-
         record_command_buffer(command_bufs[current_frame], imageIndex);
 
         VkSubmitInfo submitInfo{};
@@ -208,7 +218,16 @@ namespace kuai {
 
         presentInfo.pResults = nullptr; // Optional
 
-        vkQueuePresentKHR(present_queue, &presentInfo);
+        result = vkQueuePresentKHR(present_queue, &presentInfo);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+        {
+            recreate_swap_chain();
+        }
+        else if (result != VK_SUCCESS)
+        {
+            KU_CORE_ERROR("(Vulkan) Failed to submit draw command buffer");
+        }
 
         current_frame = (current_frame + 1) % swap_chain_images.size();
     }
@@ -568,6 +587,32 @@ namespace kuai {
         swap_chain_extent = extent;
     }
 
+    void VulkanAPI::recreate_swap_chain()
+    {
+        vkDeviceWaitIdle(device);
+
+        cleanup_swap_chain();
+
+        create_swap_chain();
+        create_image_views();
+        create_framebuffers();
+    }
+
+    void VulkanAPI::cleanup_swap_chain()
+    {
+        for (auto framebuffer : swap_chain_framebuffers)
+        {
+            vkDestroyFramebuffer(device, framebuffer, nullptr);
+        }
+
+        for (auto imageView : swap_chain_image_views)
+        {
+            vkDestroyImageView(device, imageView, nullptr);
+        }
+
+        vkDestroySwapchainKHR(device, swap_chain, nullptr);
+    }
+
     void VulkanAPI::create_image_views() {
         swap_chain_image_views.resize(swap_chain_images.size());
 
@@ -664,15 +709,46 @@ namespace kuai {
         shader_stages[0] = vertShaderStageInfo;
         shader_stages[1] = fragShaderStageInfo;
 
+        // create_graphics_pipeline();
+    }
+
+    void VulkanAPI::add_vertex_buffer(VkBuffer vertex_buf,
+        VkVertexInputBindingDescription binding_description,
+        const std::vector<VkVertexInputAttributeDescription>& attr_descriptions)
+    {
+        vertex_bufs.push_back(vertex_buf);
+        binding_descriptions.push_back(binding_description);
+        this->attr_descriptions.insert(
+            this->attr_descriptions.end(), attr_descriptions.begin(), attr_descriptions.end());
+
         create_graphics_pipeline();
+    }
+
+    uint32_t VulkanAPI::get_memory_type(uint32_t filter, VkMemoryPropertyFlags properties)
+    {
+        VkPhysicalDeviceMemoryProperties memProperties;
+        vkGetPhysicalDeviceMemoryProperties(physical_device, &memProperties);
+
+        for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+            if ((filter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+                return i;
+            }
+        }
+
+        KU_CORE_CRITICAL("(Vulkan) Failed to find suitable memory type");
+        exit(1);
     }
 
     void VulkanAPI::create_graphics_pipeline()
     {
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        vertexInputInfo.vertexBindingDescriptionCount = 0;
-        vertexInputInfo.vertexAttributeDescriptionCount = 0;
+        vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(binding_descriptions.size());
+        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attr_descriptions.size());
+        vertexInputInfo.pVertexBindingDescriptions = binding_descriptions.data();
+        vertexInputInfo.pVertexAttributeDescriptions = attr_descriptions.data();
+        // vertexInputInfo.vertexBindingDescriptionCount = 0;
+        // vertexInputInfo.vertexAttributeDescriptionCount = 0;
 
         VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
         inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -826,6 +902,12 @@ namespace kuai {
 
         vkCmdBindPipeline(buf, VK_PIPELINE_BIND_POINT_GRAPHICS, graphics_pipeline);
 
+        if (!vertex_bufs.empty())
+        {
+            VkDeviceSize offsets[] = {0};
+            vkCmdBindVertexBuffers(buf, 0, 1, vertex_bufs.data(), offsets);
+        }
+
         VkViewport viewport{};
         viewport.x = 0.0f;
         viewport.y = 0.0f;
@@ -895,6 +977,8 @@ namespace kuai {
     {
         vkDeviceWaitIdle(device);
 
+        cleanup_swap_chain();
+
         for (size_t i = 0; i < swap_chain_images.size(); i++)
         {
             vkDestroySemaphore(device, render_finished_semaphores[i], nullptr);
@@ -904,20 +988,10 @@ namespace kuai {
 
         vkDestroyCommandPool(device, command_pool, nullptr);
 
-        for (auto framebuffer : swap_chain_framebuffers) {
-            vkDestroyFramebuffer(device, framebuffer, nullptr);
-        }
-
         vkDestroyPipeline(device, graphics_pipeline, nullptr);
         vkDestroyPipelineLayout(device, pipeline_layout, nullptr);
         vkDestroyRenderPass(device, render_pass, nullptr);
 
-        for (auto imageView : swap_chain_image_views)
-        {
-            vkDestroyImageView(device, imageView, nullptr);
-        }
-
-        vkDestroySwapchainKHR(device, swap_chain, nullptr);
         vkDestroyDevice(device, nullptr);
 
         if (enableValidationLayers)

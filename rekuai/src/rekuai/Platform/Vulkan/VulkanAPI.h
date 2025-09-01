@@ -5,6 +5,7 @@
 
 #include "rekuai/Renderer/Buffer.h"
 #include "rekuai/Renderer/RendererAPI.h"
+#include "vulkan/vulkan_core.h"
 
 namespace kuai {
 
@@ -35,7 +36,11 @@ namespace kuai {
         ~VulkanAPI();
 
         void set_shader_modules(VkShaderModule vert, VkShaderModule frag);
+        void add_vertex_buffer(VkBuffer vertex_buf,
+            VkVertexInputBindingDescription binding_description,
+            const std::vector<VkVertexInputAttributeDescription>& attr_descriptions);
 
+        uint32_t get_memory_type(uint32_t filter, VkMemoryPropertyFlags properties);
         VkDevice get_device() const { return device; }
 
     private:
@@ -45,6 +50,8 @@ namespace kuai {
         void pick_physical_device();
         void create_logical_device();
         void create_swap_chain();
+        void recreate_swap_chain();
+        void cleanup_swap_chain();
         void create_image_views();
         void create_render_pass();
         void create_graphics_pipeline();
@@ -88,6 +95,11 @@ namespace kuai {
         std::vector<VkFence> in_flight_fences;
 
         uint32_t current_frame = 0;
+
+        // Vertex buffers
+        std::vector<VkVertexInputBindingDescription> binding_descriptions;
+        std::vector<VkVertexInputAttributeDescription> attr_descriptions;
+        std::vector<VkBuffer> vertex_bufs;
     };
 
 }

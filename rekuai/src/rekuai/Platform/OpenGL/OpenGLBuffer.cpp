@@ -52,11 +52,6 @@ namespace kuai {
 		glBindBuffer(GL_ARRAY_BUFFER, buf_id);
 	}
 
-	void OpenGLBuffer::unbind() const
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-	}
-
 	void OpenGLBuffer::set_data(const void* data, uint32_t size)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, buf_id);
@@ -88,11 +83,6 @@ namespace kuai {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_id);
 	}
 
-	void OpenGLIndexBuffer::unbind() const
-	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	}
-
 	// Indirect Buffer ********************************************************
 
 	OpenGLIndirectBuffer::OpenGLIndirectBuffer(const std::vector<IndirectCommand>& commands)
@@ -113,11 +103,6 @@ namespace kuai {
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, buf_id);
 	}
 
-	void OpenGLIndirectBuffer::unbind() const
-	{
-		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
-	}
-
 	// Vertex Array ***********************************************************
 
 	OpenGLVertexArray::OpenGLVertexArray()
@@ -133,11 +118,6 @@ namespace kuai {
 	void OpenGLVertexArray::bind() const
 	{
 		glBindVertexArray(vao_id);
-	}
-
-	void OpenGLVertexArray::unbind() const
-	{
-		glBindVertexArray(0);
 	}
 
 	void OpenGLVertexArray::add_vertex_buffer(std::unique_ptr<VertexBuffer> buf)

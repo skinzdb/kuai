@@ -1,21 +1,41 @@
 #include "Mesh.h"
+#include "rekuai/Core/Core.h"
+#include "rekuai/Renderer/Buffer.h"
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/hash.hpp"
 
 #include "tiny_obj_loader.h"
+#include <unordered_map>
+
+namespace std {
+   template<> struct hash<kuai::Vertex> {
+       size_t operator()(kuai::Vertex const& vert) const {
+           return hash<glm::mat3>()(glm::mat3(
+               vert.pos[0], vert.pos[1], vert.pos[2],
+               vert.normal[0], vert.normal[1], vert.normal[2],
+               vert.tex_coords[0], vert.tex_coords[1], 0
+           ));
+       }
+   };
+}
 
 namespace kuai {
-    Mesh::Mesh(const std::vector<Vertex>& vertex_data, const std::vector<uint32_t>& indices) 
+    void Mesh::init(const std::vector<Vertex>& vertex_data, const std::vector<uint32_t>& indices)
 	{
-        auto vertex_buf = VertexBuffer::create(vertex_data.size());
+        auto vertex_buf = VertexBuffer::create(sizeof(Vertex) * vertex_data.size());
 		vertex_buf->set_layout(BufferLayout {
             BufferElement(ShaderDataType::VEC3, "positions"),
             BufferElement(ShaderDataType::VEC3, "normals"),
             BufferElement(ShaderDataType::VEC2, "tex_coords")
 		});
-		vertex_buf->set_data(&vertex_data[0], vertex_data.size());
+		vertex_buf->set_data(vertex_data.data(), sizeof(Vertex) * vertex_data.size());
+
+		vertex_array = VertexArray::create();
 		vertex_array->add_vertex_buffer(std::move(vertex_buf));
 
-		auto index_buf = IndexBuffer::create(&indices[0], indices.size());
-		vertex_array->set_index_buffer(std::move(index_buf));
+		// auto index_buf = IndexBuffer::create(indices.data(), indices.size());
+		// vertex_array->set_index_buffer(std::move(index_buf));
     }
 
 	Mesh::Mesh(const std::vector<float>& positions,
@@ -48,7 +68,7 @@ namespace kuai {
 			}
 		}
 
-		Mesh(vertex_data, indices);
+		init(vertex_data, indices);
 	}
 
 	Mesh::Mesh(const std::string& filename)
@@ -64,39 +84,62 @@ namespace kuai {
 		if (!err.empty())
 		{
 			KU_CORE_ERROR(err);
+			return;
 		}
 		if (!warn.empty())
 		{
 			KU_CORE_WARN(warn);
+			return;
 		}
 
-		auto vertex_data = std::vector<Vertex>();
-		std::map<Vertex, uint32_t> unique_vertices{};
-		auto indices = std::vector<uint32_t>();
+		std::vector<Vertex> vertex_data{};
+		std::vector<uint32_t> indices{};
+		std::unordered_map<Vertex, uint32_t> unique_vertices{};
 
-		for (const auto& shape : shapes) {
-            for (const auto& idx : shape.mesh.indices) {
-				Vertex vert = Vertex {
-				  attrib.vertices[3 * idx.vertex_index + 0],
-			      attrib.vertices[3 * idx.vertex_index + 1],
-				  attrib.vertices[3 * idx.vertex_index + 2],
-				  attrib.normals[3 * idx.normal_index + 0],
-				  attrib.normals[3 * idx.normal_index + 1],
-				  attrib.normals[3 * idx.normal_index + 2],
-			      attrib.texcoords[2 * idx.texcoord_index + 0],
-			      attrib.texcoords[2 * idx.texcoord_index + 1]
-				};
+		for (int i = 0; i < shapes.size(); i ++) {
+            tinyobj::shape_t &shape = shapes[i];
+            tinyobj::mesh_t &mesh = shape.mesh;
 
-				if (unique_vertices.count(vert) == 0) {
+            for (int j = 0; j < mesh.indices.size() / 3; j++) {
+                tinyobj::index_t idx = mesh.indices[j];
+
+                float pos[3] = {
+                    attrib.vertices[idx.vertex_index * 3],
+                    attrib.vertices[idx.vertex_index * 3 + 1],
+                    attrib.vertices[idx.vertex_index * 3 + 2]
+                };
+
+                float normal[3];
+                if (idx.normal_index >= 0)
+                {
+                    normal[0] = attrib.normals[idx.normal_index * 3];
+                    normal[1] = attrib.normals[idx.normal_index * 3 + 1];
+                    normal[2] = attrib.normals[idx.normal_index * 3 + 2];
+                }
+
+                float tex_coords[2];
+                if (idx.texcoord_index >= 0)
+                {
+                    tex_coords[0] = attrib.texcoords[idx.texcoord_index * 2];
+                    tex_coords[1] = attrib.texcoords[idx.texcoord_index * 2 + 1];
+                }
+
+                auto vert = Vertex {
+                    pos[0], pos[1], pos[2],
+                    normal[0], normal[1], normal[2],
+                    tex_coords[0], tex_coords[1]
+                };
+
+               	if (unique_vertices.count(vert) == 0) {
 				    unique_vertices[vert] = static_cast<uint32_t>(vertex_data.size());
 					vertex_data.push_back(vert);
 				}
 
 				indices.push_back(unique_vertices[vert]);
-			}
-		}
+            }
+	    }
 
-		Mesh(vertex_data, indices);
+		init(vertex_data, indices);
 	}
 
 	Mesh::~Mesh()

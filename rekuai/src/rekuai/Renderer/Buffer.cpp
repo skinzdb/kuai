@@ -1,6 +1,7 @@
 #include "Buffer.h"
 
 #ifdef KU_VULKAN
+    #include "rekuai/Platform/Vulkan/VulkanAPI.h"
     #include "rekuai/Platform/Vulkan/VulkanBuffer.h"
 #endif
 
@@ -15,8 +16,7 @@ namespace kuai {
     std::unique_ptr<VertexBuffer> VertexBuffer::create(uint32_t size)
     {
         #ifdef KU_VULKAN
-            KU_CORE_ERROR("Vulkan VertexBuffer NOT IMPLEMENTED!");
-            return std::make_unique<VulkanBuffer>(size);
+            return std::make_unique<VulkanBuffer>(static_cast<VulkanAPI*>(RendererAPI::get())->get_device(), size);
         #endif
 
         #ifdef KU_OPENGL
@@ -29,8 +29,7 @@ namespace kuai {
     std::unique_ptr<VertexBuffer> VertexBuffer::create(const float* vertices, uint32_t size)
     {
         #ifdef KU_VULKAN
-            KU_CORE_ERROR("Vulkan VertexBuffer NOT IMPLEMENTED!");
-            return std::make_unique<VulkanBuffer>(size);
+            return std::make_unique<VulkanBuffer>(static_cast<VulkanAPI*>(RendererAPI::get())->get_device(), vertices, size);
         #endif
 
         #ifdef KU_OPENGL
@@ -57,8 +56,7 @@ namespace kuai {
     std::unique_ptr<VertexArray> VertexArray::create()
     {
         #ifdef KU_VULKAN
-            KU_CORE_ERROR("Vulkan VertexArray NOT IMPLEMENTED!");
-            // return std::make_unique<VulkanVertexArray>();
+            return std::make_unique<VulkanVertexArray>(static_cast<VulkanAPI*>(RendererAPI::get())->get_device());
         #endif
 
         #ifdef KU_OPENGL

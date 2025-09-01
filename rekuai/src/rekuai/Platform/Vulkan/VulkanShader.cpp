@@ -28,11 +28,15 @@ namespace kuai {
 
         static_cast<VulkanAPI*>(RendererAPI::get())->set_shader_modules(vert, frag);
 
-        vkDestroyShaderModule(device, vert, nullptr);
-        vkDestroyShaderModule(device, frag, nullptr);
+        // vkDestroyShaderModule(device, vert, nullptr);
+        // vkDestroyShaderModule(device, frag, nullptr);
     }
 
-    VulkanShader::~VulkanShader() {
+    VulkanShader::~VulkanShader()
+    {
+        // Shouldn't be here
+        vkDestroyShaderModule(device, vert, nullptr);
+        vkDestroyShaderModule(device, frag, nullptr);
     }
 
     void VulkanShader::create_uniform(const std::string& name) {

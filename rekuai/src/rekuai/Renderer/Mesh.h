@@ -9,9 +9,9 @@ namespace kuai {
 		float normal[3];
 		float tex_coords[2];
 
-  		bool operator<(const kuai::Vertex& other) const {
-            return pos < other.pos;
-        }
+		bool operator==(const Vertex& other) const {
+            return pos == other.pos && normal == other.normal && tex_coords == other.tex_coords;
+		}
 	};
 
 	/** \class Mesh
@@ -32,14 +32,12 @@ namespace kuai {
 			 const std::vector<float>& tex_coords,
 			 const std::vector<uint32_t>& indices
 		);
-
 		Mesh(const std::string& filename);
-
-		Mesh(const std::vector<Vertex>& vertex_data, const std::vector<uint32_t>& indices);
-
-		virtual ~Mesh();
+	    ~Mesh();
 
 	private:
+	    void init(const std::vector<Vertex>& vertex_data, const std::vector<uint32_t>& indices);
+
 	    std::unique_ptr<VertexArray> vertex_array;
 	};
 }

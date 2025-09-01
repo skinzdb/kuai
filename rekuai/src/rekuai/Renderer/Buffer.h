@@ -98,19 +98,14 @@ namespace kuai {
         virtual ~VertexBuffer() = default;
 
         virtual void bind() const = 0;
-        virtual void unbind() const = 0;
 
         virtual void set_data(const void* data, uint32_t size) = 0;
 
-        virtual BufferLayout& get_layout() { return layout; }
-        virtual void set_layout(const BufferLayout& layout) { this->layout = layout; }
+        virtual BufferLayout& get_layout() = 0;
+        virtual void set_layout(const BufferLayout& layout) = 0;
 
         static std::unique_ptr<VertexBuffer> create(uint32_t size);
         static std::unique_ptr<VertexBuffer> create(const float* vertices, uint32_t size);
-
-    private:
-        uint32_t buf_id;
-        BufferLayout layout;
     };
 
     class IndexBuffer
@@ -119,7 +114,6 @@ namespace kuai {
         virtual ~IndexBuffer() = default;
 
         virtual void bind() const = 0;
-        virtual void unbind() const = 0;
 
         virtual uint32_t get_count() const = 0;
 
@@ -141,7 +135,6 @@ namespace kuai {
         virtual ~IndirectBuffer() = default;
 
         virtual void bind() const = 0;
-        virtual void unbind() const = 0;
 
         virtual uint32_t get_count() const = 0;
 
@@ -154,7 +147,6 @@ namespace kuai {
         virtual ~VertexArray() = default;
 
         virtual void bind() const = 0;
-        virtual void unbind() const = 0;
 
         virtual void add_vertex_buffer(std::unique_ptr<VertexBuffer> buf) = 0;
         virtual void set_index_buffer(std::unique_ptr<IndexBuffer> buf) = 0;

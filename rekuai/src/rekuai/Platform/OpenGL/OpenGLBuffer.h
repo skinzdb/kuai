@@ -12,7 +12,6 @@ namespace kuai {
         ~OpenGLBuffer();
 
         void bind() const override;
-        void unbind() const override;
 
         void set_data(const void* data, uint32_t size) override;
         void reset(const void* data, uint32_t size);
@@ -32,7 +31,6 @@ namespace kuai {
         ~OpenGLIndexBuffer();
 
         void bind() const override;
-        void unbind() const override;
 
         uint32_t get_count() const override { return count; }
 
@@ -48,7 +46,6 @@ namespace kuai {
         ~OpenGLIndirectBuffer();
 
         virtual void bind() const override;
-        virtual void unbind() const override;
 
         virtual uint32_t get_count() const override { return count; }
 
@@ -64,7 +61,6 @@ namespace kuai {
         ~OpenGLVertexArray();
 
         void bind() const override;
-        void unbind() const override;
 
         void add_vertex_buffer(std::unique_ptr<VertexBuffer> buf) override;
         void set_index_buffer(std::unique_ptr<IndexBuffer> buf) override;

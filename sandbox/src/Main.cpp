@@ -1,4 +1,5 @@
 #include "rekuai/Core/Log.h"
+#include <memory>
 using namespace std;
 
 #include "kuai.h"
@@ -7,8 +8,8 @@ using namespace std;
 
 using namespace kuai;
 
-std::string read_file(const std::string& filename) {
-    std::ifstream file(filename, std::ios::ate | std::ios::binary);
+string read_file(const string& filename) {
+    ifstream file(filename, ios::ate | ios::binary);
 
     if (!file.is_open()) {
         KU_CORE_ERROR("Failed to open file {}", filename);
@@ -16,15 +17,39 @@ std::string read_file(const std::string& filename) {
     }
 
     size_t file_size = (size_t) file.tellg();
-    std::vector<char> buffer(file_size);
+    vector<char> buffer(file_size);
 
     file.seekg(0);
     file.read(buffer.data(), file_size);
 
     file.close();
 
-    return std::string(buffer.begin(), buffer.end());
+    return string(buffer.begin(), buffer.end());
 }
+
+const std::vector<float> vertices = {
+    0.0f, -0.5f, 0.0f,
+    0.5f, 0.5f, 0.0f,
+    -0.5f, 0.5f, 0.0f
+};
+
+const std::vector<float> normals = {
+    0.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 0.0f
+};
+
+const std::vector<float> tex_coords = {
+    0.0f, 0.0f,
+    0.0f, 0.0f,
+    0.0f, 0.0f
+};
+
+const std::vector<uint32_t> indices = {
+    0, 0,
+    0, 0,
+    0, 0
+};
 
 class MyApp : public App
 {
@@ -42,7 +67,8 @@ public:
 		auto frag_code = read_file("frag.spv");
 
 		auto shader = Shader::create(vert_code, frag_code);
-		// Mesh mesh = Mesh("C:/Users/David/Documents/cube.obj");
+
+		mesh = make_unique<Mesh>(vertices, normals, tex_coords, indices);
 		// //auto& material = Material(shader);
 
 		// test.add_component<Transform>();
@@ -90,6 +116,8 @@ public:
 
 private:
 	unique_ptr<Scene> scene;
+
+	unique_ptr<Mesh> mesh;
 };
 
 App* kuai::create_app()
