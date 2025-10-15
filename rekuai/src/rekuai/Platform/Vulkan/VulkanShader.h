@@ -5,8 +5,8 @@
 #include "vulkan/vulkan_core.h"
 
 namespace kuai {
-    class VulkanShader : public Shader {
-
+    class VulkanShader : public Shader
+    {
     public:
        	VulkanShader(VkDevice device, const std::string& vert_src, const std::string& frag_src);
 		virtual ~VulkanShader();
@@ -27,15 +27,15 @@ namespace kuai {
 		virtual void unbind() const override;
 
 		virtual uint32_t get_id() const override { return 0; }
-
 	private:
-
-    VkShaderModule create_shader_module(const std::vector<char>& code);
+        VkShaderModule create_shader_module(const std::vector<char>& code);
 
 	private:
 		VkShaderModule vert;
 		VkShaderModule frag;
 
 		VkDevice device;
+
+		friend class VulkanAPI;
     };
 }

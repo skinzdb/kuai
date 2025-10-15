@@ -1,7 +1,6 @@
 #include "VulkanShader.h"
-#include "VulkanAPI.h"
 #include "rekuai/Core/Log.h"
-#include "rekuai/Renderer/RendererAPI.h"
+#include "vulkan/vulkan_core.h"
 
 namespace kuai {
 
@@ -21,22 +20,16 @@ namespace kuai {
         return shaderModule;
     }
 
-    VulkanShader::VulkanShader(VkDevice device, const std::string& vert_src, const std::string& frag_src) : device(device)
+    VulkanShader::VulkanShader(VkDevice device, const std::string& vert_src, const std::string& frag_src)
+        : device(device)
     {
         vert = create_shader_module(std::vector<char>(vert_src.begin(), vert_src.end()));
         frag = create_shader_module(std::vector<char>(frag_src.begin(), frag_src.end()));
-
-        static_cast<VulkanAPI*>(RendererAPI::get())->set_shader_modules(vert, frag);
-
-        // vkDestroyShaderModule(device, vert, nullptr);
-        // vkDestroyShaderModule(device, frag, nullptr);
     }
 
     VulkanShader::~VulkanShader()
     {
-        // Shouldn't be here
-        vkDestroyShaderModule(device, vert, nullptr);
-        vkDestroyShaderModule(device, frag, nullptr);
+
     }
 
     void VulkanShader::create_uniform(const std::string& name) {

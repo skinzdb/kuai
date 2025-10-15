@@ -1,5 +1,4 @@
 #include "Mesh.h"
-#include "rekuai/Core/Core.h"
 #include "rekuai/Renderer/Buffer.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -32,10 +31,10 @@ namespace kuai {
 		vertex_buf->set_data(vertex_data.data(), sizeof(Vertex) * vertex_data.size());
 
 		vertex_array = VertexArray::create();
-		vertex_array->add_vertex_buffer(std::move(vertex_buf));
+		vertex_array->add_vertex_buffer(vertex_buf);
 
-		// auto index_buf = IndexBuffer::create(indices.data(), indices.size());
-		// vertex_array->set_index_buffer(std::move(index_buf));
+		auto index_buf = IndexBuffer::create(indices.data(), indices.size());
+		vertex_array->set_index_buffer(index_buf);
     }
 
 	Mesh::Mesh(const std::vector<float>& positions,

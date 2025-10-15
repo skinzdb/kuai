@@ -9,7 +9,7 @@ namespace kuai {
         OpenGLFramebuffer(uint32_t width, uint32_t height, uint32_t samples, uint32_t attachments);
         ~OpenGLFramebuffer();
 
-        const uint32_t get_depth_attachment();
+        uint32_t get_depth_attachment();
         const std::vector<uint32_t>& get_col_attachments();
 
         void bind();

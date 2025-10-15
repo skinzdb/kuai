@@ -35,13 +35,6 @@ namespace kuai {
 		glBufferData(buf_id, size, nullptr, GL_DYNAMIC_DRAW);
 	}
 
-	OpenGLBuffer::OpenGLBuffer(const float* vertices, uint32_t size)
-	{
-		glCreateBuffers(1, &buf_id);
-		glBindBuffer(GL_ARRAY_BUFFER, buf_id);
-		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
-	}
-
 	OpenGLBuffer::~OpenGLBuffer()
 	{
 		glDeleteBuffers(1, &buf_id);
@@ -120,7 +113,7 @@ namespace kuai {
 		glBindVertexArray(vao_id);
 	}
 
-	void OpenGLVertexArray::add_vertex_buffer(std::unique_ptr<VertexBuffer> buf)
+	void OpenGLVertexArray::add_vertex_buffer(std::shared_ptr<VertexBuffer> buf)
 	{
 		KU_CORE_ASSERT(buf->get_layout().get_elements().size(), "Vertex buffer has no layout.");
 
@@ -187,14 +180,14 @@ namespace kuai {
 			}
 		}
 
-		vertex_bufs.push_back(std::move(buf));
+		vertex_bufs.push_back(buf);
 	}
 
-	void OpenGLVertexArray::set_index_buffer(std::unique_ptr<IndexBuffer> buf)
+	void OpenGLVertexArray::set_index_buffer(std::shared_ptr<IndexBuffer> buf)
 	{
 		glBindVertexArray(vao_id);
 		buf->bind();
 
-		index_buf = std::move(buf);
+		index_buf = buf;
 	}
 }

@@ -1,7 +1,7 @@
 #include "Renderer.h"
+#include "rekuai/Core/Log.h"
 #include "rekuai/Renderer/Buffer.h"
 #include "rekuai/Renderer/RendererAPI.h"
-#include <memory>
 
 namespace kuai {
 
@@ -13,6 +13,11 @@ namespace kuai {
 	    api->init();
 	}
 
+	void Renderer::stop()
+	{
+	    api->stop();
+	}
+
 	void Renderer::cleanup()
 	{
 	    api.reset(); // destruct render API before destructing GLFW
@@ -22,15 +27,16 @@ namespace kuai {
 	{
 	}
 
-	void Renderer::submit(const RenderCmd &cmd)
+	void Renderer::submit(std::shared_ptr<Shader> shader, std::shared_ptr<Mesh> mesh, const glm::mat4& model)
     {
-	    render_queue.push_back(cmd);
+        //shader->bind();
+        //shader->set_uniform("model_matrix", model);
+        api->draw_indexed(mesh->vertex_array, mesh->vertex_array->get_index_count());
 	}
 
 	void Renderer::update() {
-	    api->draw_indexed({}, 0);
-		return;
 
+	    return;
 	    std::vector<RenderCmd> opaque, transparent;
         for (auto& cmd : render_queue)
         {
@@ -84,10 +90,13 @@ namespace kuai {
             }
             else
             {
-                state.shader->set_uniform("model_matrix", cmd.model);
-
-                // api->draw_indexed(const std::shared_ptr<VertexArray> &vertex_array, 0)
+                //cmd.mesh_id
+                // state.shader->set_uniform("model_matrix", cmd.model);
+                //
+                // api->draw_indexed(shader, {}, 0);
             }
         }
+
+        render_queue.clear();
 	}
 }

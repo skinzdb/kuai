@@ -2,16 +2,17 @@
 
 #include "rekuai/Renderer/Buffer.h"
 #include "vulkan/vulkan_core.h"
+#include <cstdint>
 
 namespace kuai {
     class VulkanBuffer : public VertexBuffer
     {
     public:
-        VulkanBuffer(VkDevice device, uint32_t size);
-        VulkanBuffer(VkDevice device, const float* vertices, uint32_t size);
+        VulkanBuffer(VkDevice device, VkPhysicalDevice physical_device, VkCommandPool command_pool,
+           VkQueue graphics_queue, uint32_t size);
         ~VulkanBuffer();
 
-        virtual void bind() const override;
+        virtual void bind() const override {}
 
         virtual void set_data(const void* data, uint32_t size) override;
 
@@ -23,24 +24,53 @@ namespace kuai {
 
         VkBuffer buf;
         VkDeviceMemory buf_memory;
-        VkDevice device;
+
+        VkDevice ctx_device;
+        VkPhysicalDevice ctx_physical_device;
+        VkCommandPool command_pool;
+        VkQueue graphics_queue;
+
+        friend class VulkanVertexArray;
+    };
+
+    class VulkanIndexBuffer : public IndexBuffer
+    {
+    public:
+        VulkanIndexBuffer(VkDevice device, VkPhysicalDevice physical_device, VkCommandPool command_pool,
+            VkQueue graphics_queue, const uint32_t* indices, uint32_t count);
+        ~VulkanIndexBuffer();
+
+        virtual void bind() const override {}
+        void bind(VkCommandBuffer cmd_buf) const;
+
+        virtual uint32_t get_count() const override { return count; }
+
+    private:
+        VkBuffer buf;
+        VkDeviceMemory buf_memory;
+
+        uint32_t count;
+
+        VkDevice ctx_device;
     };
 
     class VulkanVertexArray : public VertexArray
     {
     public:
-        VulkanVertexArray(VkDevice device);
-        ~VulkanVertexArray();
+        virtual void bind() const override {}
+        void bind(VkCommandBuffer cmd_buf) const;
 
-        virtual void bind() const;
+        virtual void add_vertex_buffer(std::shared_ptr<VertexBuffer> buf) override;
+        virtual void set_index_buffer(std::shared_ptr<IndexBuffer> buf) override;
 
-        virtual void add_vertex_buffer(std::unique_ptr<VertexBuffer> buf);
-        virtual void set_index_buffer(std::unique_ptr<IndexBuffer> buf);
-
-        virtual uint32_t get_index_count() const { return index_buf->get_count(); }
+        virtual uint32_t get_index_count() const override { return index_buf->get_count(); }
 
     private:
-        std::vector<std::unique_ptr<VertexBuffer>> vertex_bufs;
-        std::unique_ptr<IndexBuffer> index_buf;
+        std::vector<std::shared_ptr<VulkanBuffer>> vertex_bufs;
+        std::vector<VkBuffer> vk_vertex_bufs;
+
+        std::shared_ptr<VulkanIndexBuffer> index_buf;
+
+        friend class VulkanCommand;
     };
 }

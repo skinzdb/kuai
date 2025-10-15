@@ -8,7 +8,6 @@ namespace kuai {
     {
     public:
         OpenGLBuffer(uint32_t size);
-        OpenGLBuffer(const float* vertices, uint32_t size);
         ~OpenGLBuffer();
 
         void bind() const override;
@@ -62,14 +61,14 @@ namespace kuai {
 
         void bind() const override;
 
-        void add_vertex_buffer(std::unique_ptr<VertexBuffer> buf) override;
-        void set_index_buffer(std::unique_ptr<IndexBuffer> buf) override;
+        void add_vertex_buffer(std::shared_ptr<VertexBuffer> buf) override;
+        void set_index_buffer(std::shared_ptr<IndexBuffer> buf) override;
 
         uint32_t get_index_count() const override { return index_buf->get_count(); }
 
     private:
-        std::vector<std::unique_ptr<VertexBuffer>> vertex_bufs;
-        std::unique_ptr<IndexBuffer> index_buf;
+        std::vector<std::shared_ptr<VertexBuffer>> vertex_bufs;
+        std::shared_ptr<IndexBuffer> index_buf;
 
         uint32_t vao_id;
         uint32_t index = 0;

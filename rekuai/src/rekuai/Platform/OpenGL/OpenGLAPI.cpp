@@ -2,7 +2,6 @@
 
 #include "glad/glad.h"
 #include "rekuai/Renderer/Buffer.h"
-#include <cstdint>
 
 namespace kuai {
     void OpenGLAPI::init() {
@@ -14,6 +13,10 @@ namespace kuai {
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    void OpenGLAPI::stop() {
+
     }
 
     OpenGLAPI::~OpenGLAPI() {
@@ -31,7 +34,7 @@ namespace kuai {
 		// 	glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)0, cmd_count, sizeof(IndirectCommand));
 		// }
 
-    void OpenGLAPI::draw_indexed(const std::shared_ptr<VertexArray>& vertex_array, uint32_t index_count) {
+    void OpenGLAPI::draw_indexed(std::shared_ptr<VertexArray> vertex_array, uint32_t index_count) {
         vertex_array->bind();
         uint32_t count = index_count ? index_count : vertex_array->get_index_count();
         glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);

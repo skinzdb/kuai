@@ -38,6 +38,8 @@ namespace kuai {
 	private:
 	    void init(const std::vector<Vertex>& vertex_data, const std::vector<uint32_t>& indices);
 
-	    std::unique_ptr<VertexArray> vertex_array;
+	    std::shared_ptr<VertexArray> vertex_array;
+
+		friend class Renderer;
 	};
 }

@@ -104,8 +104,7 @@ namespace kuai {
         virtual BufferLayout& get_layout() = 0;
         virtual void set_layout(const BufferLayout& layout) = 0;
 
-        static std::unique_ptr<VertexBuffer> create(uint32_t size);
-        static std::unique_ptr<VertexBuffer> create(const float* vertices, uint32_t size);
+        static std::shared_ptr<VertexBuffer> create(uint32_t size);
     };
 
     class IndexBuffer
@@ -117,7 +116,7 @@ namespace kuai {
 
         virtual uint32_t get_count() const = 0;
 
-        static std::unique_ptr<IndexBuffer> create(const uint32_t* indices, uint32_t count);
+        static std::shared_ptr<IndexBuffer> create(const uint32_t* indices, uint32_t count);
     };
 
     struct IndirectCommand
@@ -148,11 +147,11 @@ namespace kuai {
 
         virtual void bind() const = 0;
 
-        virtual void add_vertex_buffer(std::unique_ptr<VertexBuffer> buf) = 0;
-        virtual void set_index_buffer(std::unique_ptr<IndexBuffer> buf) = 0;
+        virtual void add_vertex_buffer(std::shared_ptr<VertexBuffer> buf) = 0;
+        virtual void set_index_buffer(std::shared_ptr<IndexBuffer> buf) = 0;
 
         virtual uint32_t get_index_count() const = 0;
 
-        static std::unique_ptr<VertexArray> create();
+        static std::shared_ptr<VertexArray> create();
     };
 }

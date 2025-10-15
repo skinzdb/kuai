@@ -2,17 +2,15 @@
 
 #include "glm/glm.hpp"
 
-#include "Framebuffer.h"
 #include "Mesh.h"
-#include "Material.h"
+#include "Shader.h"
 
 #include "RendererAPI.h"
 #include "rekuai/Components/Components.h"
-#include <cstdint>
 
 namespace kuai {
 
-	enum RenderFlag 
+	enum RenderFlag
 	{
 		NEVER,
 		LT,
@@ -27,14 +25,14 @@ namespace kuai {
 		STENCIL
 	};
 
-	enum RenderPass : uint8_t 
+	enum RenderPass : uint8_t
 	{
 	    Opaque = 0,
 		Transparent = 1,
 		Shadow = 2
 	};
 
-	struct SortKey 
+	struct SortKey
 	{
 	    uint64_t value = 0;
 
@@ -47,7 +45,7 @@ namespace kuai {
         }
 	};
 
-	struct RenderCmd 
+	struct RenderCmd
 	{
         SortKey key;
         RenderPass pass;
@@ -71,10 +69,11 @@ namespace kuai {
 	{
 	public:
 		static void init();
+		static void stop();
 		static void cleanup();
 
 		static void set_camera(const Camera& camera);
-		static void submit(const RenderCmd& cmd);
+		static void submit(std::shared_ptr<Shader> shader, std::shared_ptr<Mesh> mesh, const glm::mat4& model);
 		static void update();
 
 	private:
