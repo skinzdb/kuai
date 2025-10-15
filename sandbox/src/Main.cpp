@@ -33,10 +33,8 @@ public:
 
 	MyApp()
 	{
-
-
 //		auto cam = scene->create_entity();
-		test = create_entity();
+		auto test = create_entity();
 
 		// cam->add_component<Camera>(60, get_window().get_width(), get_window().get_height(), 0.1f, 100.0f);
 
@@ -89,7 +87,6 @@ public:
 	}
 
 private:
-    std::shared_ptr<Entity> test;
 };
 
 App* kuai::create_app()

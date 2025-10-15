@@ -141,7 +141,7 @@ namespace kuai {
 
     void VulkanIndexBuffer::bind(VkCommandBuffer cmd_buf) const
     {
-        vkCmdBindIndexBuffer(cmd_buf, buf, 0, VK_INDEX_TYPE_UINT16);
+        vkCmdBindIndexBuffer(cmd_buf, buf, 0, VK_INDEX_TYPE_UINT32);
     }
 
     void VulkanVertexArray::bind(VkCommandBuffer cmd_buf) const
