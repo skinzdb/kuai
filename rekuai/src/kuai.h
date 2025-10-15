@@ -16,5 +16,4 @@
 #include "rekuai/Renderer/Material.h"
 
 #include "rekuai/Components/Components.h"
-#include "rekuai/Components/Scene.h"
 #include "rekuai/Components/Entity.h"

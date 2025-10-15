@@ -36,27 +36,30 @@ namespace kuai {
 		void on_remove(const InOutFn& action) { remove_fn = action; }
 
 	private:
-		void update(float dt)
+		virtual void update(float dt) override
 		{
 			for (auto entity : entities)
 			{
-				update_fn(dt, entity, component_manager->get_component<Cs>(entity)...);
+			    if (update_fn)
+				{
+					update_fn(dt, entity, component_manager->get_component<Cs>(entity)...);
+				}
 			}
 		}
 
-		void insert(EntityId entity)
+		virtual void insert(EntityId entity) override
 		{
 			entities.push_back(entity);
-			insert_fn(entity, component_manager->get_component<Cs>(entity)...);
+			//insert_fn(entity, component_manager->get_component<Cs>(entity)...);
 		}
 
-		void remove(EntityId entity)
+		virtual void remove(EntityId entity) override
 		{
 			size_t orig = entities.size();
 			entities.erase(std::remove(entities.begin(), entities.end(), entity), entities.end());
 			if (entities.size() != orig)
 			{
-				remove_fn(entity, component_manager->get_component<Cs>(entity)...);
+				//remove_fn(entity, component_manager->get_component<Cs>(entity)...);
 			}
 		}
 

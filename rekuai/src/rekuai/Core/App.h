@@ -1,5 +1,7 @@
 #pragma once
 
+#include "rekuai/Components/EntityComponentSystem.h"
+#include "rekuai/Components/Entity.h"
 #include "rekuai/Events/Event.h"
 #include "rekuai/Events/AppEvent.h"
 
@@ -21,6 +23,8 @@ namespace kuai {
 		* Starts the application mainloop which in turn updates all layers.
 		*/
 		void run();
+
+		std::shared_ptr<Entity> create_entity();
 
 		virtual void update(float dt) = 0;
 
@@ -45,6 +49,7 @@ namespace kuai {
 
 	private:
 		std::unique_ptr<Window> window;
+		std::shared_ptr<EntityComponentSystem> ecs;
 		Timer timer;
 		bool running = true;
 		bool minimised = false;

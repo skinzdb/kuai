@@ -47,8 +47,20 @@ add_library(${PROJECT_NAME}
     src/rekuai/platform/Vulkan/VulkanAPI.cpp
     src/rekuai/platform/Vulkan/VulkanBuffer.h
     src/rekuai/platform/Vulkan/VulkanBuffer.cpp
+    src/rekuai/platform/Vulkan/VulkanCommand.h
+    src/rekuai/platform/Vulkan/VulkanCommand.cpp
+    src/rekuai/platform/Vulkan/VulkanContext.h
+    src/rekuai/platform/Vulkan/VulkanContext.cpp
+    src/rekuai/platform/Vulkan/VulkanPipeline.h
+    src/rekuai/platform/Vulkan/VulkanPipeline.cpp
+    src/rekuai/platform/Vulkan/VulkanRenderPass.h
+    src/rekuai/platform/Vulkan/VulkanRenderPass.cpp
     src/rekuai/platform/Vulkan/VulkanShader.h
     src/rekuai/platform/Vulkan/VulkanShader.cpp
+    src/rekuai/platform/Vulkan/VulkanSwapChain.h
+    src/rekuai/platform/Vulkan/VulkanSwapChain.cpp
+    src/rekuai/platform/Vulkan/VulkanUtils.h
+    src/rekuai/platform/Vulkan/VulkanUtils.cpp
 
     src/rekuai/Renderer/Renderer.h
     src/rekuai/Renderer/Renderer.cpp
@@ -77,8 +89,6 @@ add_library(${PROJECT_NAME}
     src/rekuai/Components/Entity.h
 
     src/rekuai/Events/Signal.h
-    src/rekuai/Components/Scene.h
-    src/rekuai/Components/Scene.cpp
 
     vendor/tinyobjloader/tiny_obj_loader.h
     vendor/tinyobjloader/tiny_obj_loader.cpp
@@ -108,7 +118,9 @@ if(Vulkan_FOUND)
         Vulkan::Vulkan
     )
 
-    set(MY_DEFS ${MY_DEFS} KU_VULKAN)
+    set(MY_DEFS ${MY_DEFS}
+        KU_VULKAN
+    )
 else()
     set(MY_DEFS ${MY_DEFS} KU_OPENGL)
 endif()
@@ -130,6 +142,7 @@ else()
 endif()
 
 message(STATUS "${MY_DEFS}")
+
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${MY_DEFS})
 
 target_precompile_headers(${PROJECT_NAME}

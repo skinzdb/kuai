@@ -1,54 +1,30 @@
-#include "rekuai/Core/Log.h"
-#include <memory>
-using namespace std;
-
 #include "kuai.h"
-
-#include "glm/glm.hpp"
 
 using namespace kuai;
 
-string read_file(const string& filename) {
-    ifstream file(filename, ios::ate | ios::binary);
-
-    if (!file.is_open()) {
-        KU_CORE_ERROR("Failed to open file {}", filename);
-        return "";
-    }
-
-    size_t file_size = (size_t) file.tellg();
-    vector<char> buffer(file_size);
-
-    file.seekg(0);
-    file.read(buffer.data(), file_size);
-
-    file.close();
-
-    return string(buffer.begin(), buffer.end());
-}
-
 const std::vector<float> vertices = {
-    0.0f, -0.5f, 0.0f,
+    -0.5f, -0.5f, 0.0f,
+    0.5f, -0.5f, 0.0f,
     0.5f, 0.5f, 0.0f,
     -0.5f, 0.5f, 0.0f
 };
 
 const std::vector<float> normals = {
-    0.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 0.0f
+    1.0f, 0.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    0.0f, 0.0f, 1.0f,
+    1.0f, 1.0f, 1.0f
 };
 
 const std::vector<float> tex_coords = {
+    0.0f, 0.0f,
     0.0f, 0.0f,
     0.0f, 0.0f,
     0.0f, 0.0f
 };
 
 const std::vector<uint32_t> indices = {
-    0, 0,
-    0, 0,
-    0, 0
+    0, 1, 2, 2, 3, 0
 };
 
 class MyApp : public App
@@ -57,23 +33,17 @@ public:
 
 	MyApp()
 	{
-		scene = make_unique<Scene>();
-		Entity cam = scene->create_entity();
-		Entity test = scene->create_entity();
 
-		cam.add_component<Camera>(60, get_window().get_width(), get_window().get_height(), 0.1f, 100.0f);
 
-		auto vert_code = read_file("vert.spv");
-		auto frag_code = read_file("frag.spv");
+//		auto cam = scene->create_entity();
+		test = create_entity();
 
-		auto shader = Shader::create(vert_code, frag_code);
+		// cam->add_component<Camera>(60, get_window().get_width(), get_window().get_height(), 0.1f, 100.0f);
 
-		mesh = make_unique<Mesh>(vertices, normals, tex_coords, indices);
-		// //auto& material = Material(shader);
+		auto mesh = std::make_shared<Mesh>(vertices, normals, tex_coords, indices);
 
-		// test.add_component<Transform>();
-		//test.add_component<MeshRenderer>(mesh, material);
-
+		test->add_component<Transform>();
+		test->add_component<MeshRenderer>(mesh, std::make_shared<Material>());
 
 		//default material
 
@@ -106,7 +76,6 @@ public:
 
 	void update(float dt)
 	{
-
 	}
 
 	void input(Event& e)
@@ -114,10 +83,13 @@ public:
 
 	}
 
-private:
-	unique_ptr<Scene> scene;
+	~MyApp()
+	{
 
-	unique_ptr<Mesh> mesh;
+	}
+
+private:
+    std::shared_ptr<Entity> test;
 };
 
 App* kuai::create_app()

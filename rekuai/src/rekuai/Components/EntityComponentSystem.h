@@ -7,6 +7,7 @@
 #include "ComponentManager.h"
 #include "SystemManager.h"
 
+#include "rekuai/Core/Log.h"
 #include "rekuai/Events/Event.h"
 
 namespace kuai {
@@ -89,11 +90,11 @@ namespace kuai {
 		{
 			component_manager->add_component<T>(id, std::forward<Args>(args)...);
 
-			auto componentMask = entity_manager->get_component_mask(id);
-			componentMask |= BIT(component_manager->get_component_type<T>());
+			auto component_mask = entity_manager->get_component_mask(id);
+			component_mask |= BIT(component_manager->get_component_type<T>());
 
-			entity_manager->set_component_mask(id, componentMask);
-			sys_manager->on_component_mask_changed(id, componentMask);
+			entity_manager->set_component_mask(id, component_mask);
+			sys_manager->on_component_mask_changed(id, component_mask);
 		}
 
 		template<typename T>
@@ -101,11 +102,11 @@ namespace kuai {
 		{
 			component_manager->remove_component<T>(id);
 
-			auto componentMask = entity_manager->get_component_mask(id);
-			componentMask &= BIT(component_manager->get_component_type<T>()) ^ std::numeric_limits<ComponentMask>::max();
+			auto component_mask = entity_manager->get_component_mask(id);
+			component_mask &= BIT(component_manager->get_component_type<T>()) ^ std::numeric_limits<ComponentMask>::max();
 
-			entity_manager->set_component_mask(id, componentMask);
-			sys_manager->on_component_mask_changed(id, componentMask);
+			entity_manager->set_component_mask(id, component_mask);
+			sys_manager->on_component_mask_changed(id, component_mask);
 		}
 
 		template<typename T>
@@ -146,6 +147,11 @@ namespace kuai {
 		void subscribe_system(void (handler)(EventType&))
 		{
 			event_bus->subscribe<T>(handler);
+		}
+
+		void update(float dt)
+		{
+            sys_manager->update(dt);
 		}
 
 	private:

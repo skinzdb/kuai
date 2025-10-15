@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/glm.hpp"
 #include "glm/gtx/quaternion.hpp"
@@ -27,6 +26,8 @@ namespace kuai {
 		glm::vec3 up() { return glm::rotate(glm::quat(rot), glm::vec3(0.0f, 1.0f, 0.0f)); }
 		glm::vec3 right() { return glm::rotate(glm::quat(rot), glm::vec3(1.0f, 0.0f, 0.0f)); }
 		glm::vec3 forward() { return glm::rotate(glm::quat(rot), glm::vec3(0.0f, 0.0f, -1.0f)); }
+
+		glm::mat4 get_model_matrix() const { return model_matrix; }
 
 		bool operator==(const Transform& other) const
 		{

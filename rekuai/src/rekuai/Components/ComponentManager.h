@@ -56,24 +56,24 @@ namespace kuai {
 			last_idx--;
 		}
 
-		T& get(EntityId entity)
+		T& get(EntityId id)
 		{
-			KU_CORE_ASSERT(entity_to_idx.find(entity) != entity_to_idx.end(), "Retrieving component that does not exist");
+			KU_CORE_ASSERT(entity_to_idx.find(id) != entity_to_idx.end(), "Retrieving component that does not exist");
 
-			return components[entity_to_idx[entity]]; // Return reference to entity's component
+			return components[entity_to_idx[id]]; // Return reference to entity's component
 		}
 
-		bool has(EntityId entity)
+		bool has(EntityId id)
 		{
-			return entity_to_idx.find(entity) != entity_to_idx.end();
+			return entity_to_idx.find(id) != entity_to_idx.end();
 		}
 
-		virtual void on_entity_destroyed(EntityId entity) override
+		virtual void on_entity_destroyed(EntityId id) override
 		{
 			// If entity owns this component type
-			if (entity_to_idx.find(entity) != entity_to_idx.end())
+			if (entity_to_idx.find(id) != entity_to_idx.end())
 			{
-				remove(entity);
+				remove(id);
 			}
 		}
 
@@ -103,9 +103,11 @@ namespace kuai {
 			const char* ty_name = typeid(T).name();
 
 			KU_CORE_ASSERT(component_types.find(ty_name) == component_types.end(), "Registering a component type more than once")
+            KU_CORE_INFO("Registered component {}", ty_name);
 
-			component_types.emplace(ty_name, next_component_type++);	// Increment for next component
+			component_types.emplace(ty_name, next_component_type);
 			component_containers.emplace(ty_name, new ComponentContainer<T>());
+			next_component_type++;
 		}
 
 		template<typename T, typename... Args>
@@ -154,7 +156,7 @@ namespace kuai {
 		std::unordered_map<const char*, IComponentContainer*> component_containers;
 
 		// Component type to be assigned to next registered component
-		ComponentType next_component_type = 1;
+		ComponentType next_component_type = 0;
 
 		template<typename T>
 		ComponentContainer<T>* get_component_container()

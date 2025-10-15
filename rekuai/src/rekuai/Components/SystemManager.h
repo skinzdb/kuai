@@ -22,7 +22,7 @@ namespace kuai {
 
 			for (const auto mask : { component_manager->get_component_type<Cs>()... })
 			{
-				system_mask |= mask;
+				system_mask |= BIT(mask);
 			}
 
 			KU_CORE_ASSERT(systems.find(system_mask) == systems.end(), "Registering a system more than once");

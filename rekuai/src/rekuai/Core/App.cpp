@@ -20,14 +20,30 @@ namespace kuai {
 		window->set_event_callback(std::bind(&App::on_event, this, std::placeholders::_1));
 		running = true;
 
+		ecs = std::make_shared<EntityComponentSystem>();
+        ecs->register_component<Transform>();
+        ecs->register_component<MeshRenderer>();
+
+        auto render_sys = ecs->register_system<MeshRenderer, Transform>();
+        render_sys->each([](float dt, EntityId id, MeshRenderer& mesh_renderer, Transform& transform) {
+            Renderer::submit(nullptr, mesh_renderer.mesh, transform.get_model_matrix());
+        });
+
 		Renderer::init();
 		//AudioManager::init();
 	}
 
 	App::~App()
 	{
+	    Renderer::stop();
+	    ecs.reset();
 	    Renderer::cleanup();
 		//AudioManager::cleanup();
+	}
+
+	std::shared_ptr<Entity> App::create_entity()
+	{
+	    return std::make_shared<Entity>(ecs);
 	}
 
 	void App::run()
@@ -36,6 +52,8 @@ namespace kuai {
 		{
 			float elapsedTime = timer.get_elapsed(); // Time since last frame
 			//KU_CORE_INFO("FPS: {0}", 1.0f / elapsedTime);
+
+			ecs->update(elapsedTime);
 
 			if (!minimised)
 			{
