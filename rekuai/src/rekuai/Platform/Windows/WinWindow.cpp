@@ -55,6 +55,11 @@ namespace kuai {
 		window = glfwCreateWindow((int)props.width, (int)props.height, props.title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(window);
 
+		#ifdef KU_OPENGL
+		    int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress); // Initialise Glad
+			KU_CORE_ASSERT(status, "Failed to initialise Glad");
+		#endif
+
 		glfwSetWindowUserPointer(window, &data); // We can store anything in this user pointer, set it to reference of WindowData struct
 		set_vsync(true);
 

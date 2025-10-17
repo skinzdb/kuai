@@ -2,7 +2,7 @@
 
 #include "rekuai/Renderer/Buffer.h"
 #include "rekuai/Renderer/RendererAPI.h"
-#include <cstdint>
+#include "OpenGLShader.h"
 
 namespace kuai {
     class OpenGLAPI : public RendererAPI {
@@ -17,5 +17,8 @@ namespace kuai {
         // virtual void draw_indirect() override;
 
         ~OpenGLAPI();
+
+    private:
+        std::shared_ptr<OpenGLShader> shader;
     };
 }

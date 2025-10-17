@@ -10,7 +10,7 @@
 #endif
 
 namespace kuai {
-    std::shared_ptr<Texture> Texture::create(const std::string& filename) 
+    std::shared_ptr<Texture> Texture::create(const std::string& filename)
     {
 	    #ifdef KU_VULKAN
 
@@ -20,6 +20,6 @@ namespace kuai {
         	return std::make_shared<OpenGLTexture>(filename);
 		#endif
 
-		return nullptr;
+		exit(1);
     }
 }

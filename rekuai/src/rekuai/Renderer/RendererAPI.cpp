@@ -25,6 +25,6 @@ namespace kuai {
         #endif
 
         KU_CORE_CRITICAL("Could not find suitable renderer API");
-        return nullptr;
+        exit(1);
     }
 }

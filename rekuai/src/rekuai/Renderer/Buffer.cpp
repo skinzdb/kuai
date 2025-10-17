@@ -25,7 +25,7 @@ namespace kuai {
             return std::make_shared<OpenGLBuffer>(size);
         #endif
 
-        return nullptr;
+        exit(1);
     }
 
     std::shared_ptr<IndexBuffer> IndexBuffer::create(const uint32_t* indices, uint32_t count)
@@ -40,7 +40,7 @@ namespace kuai {
             return std::make_unique<OpenGLIndexBuffer>(indices, count);
         #endif
 
-        return nullptr;
+        exit(1);
     }
 
     std::shared_ptr<VertexArray> VertexArray::create()
@@ -53,7 +53,7 @@ namespace kuai {
             return std::make_shared<OpenGLVertexArray>();
         #endif
 
-        return nullptr;
+        exit(1);
     }
 
     std::unique_ptr<IndirectBuffer> IndirectBuffer::create(const std::vector<IndirectCommand>& commands)
@@ -67,6 +67,6 @@ namespace kuai {
             return std::make_unique<OpenGLIndirectBuffer>(commands);
         #endif
 
-        return nullptr;
+        exit(1);
     }
 }

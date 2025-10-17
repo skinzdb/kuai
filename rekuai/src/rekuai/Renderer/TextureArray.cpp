@@ -21,6 +21,6 @@ namespace kuai {
         	return std::shared_ptr<OpenGLTextureArray>();
 		#endif
 
-		return nullptr;
+		exit(1);
     }
 }

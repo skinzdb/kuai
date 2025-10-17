@@ -52,6 +52,7 @@ namespace kuai {
             case ShaderDataType::MAT4:  return 4; // (4 * Vec4)
             case ShaderDataType::NONE:  return 0;
             }
+            return 0;
         }
     };
 

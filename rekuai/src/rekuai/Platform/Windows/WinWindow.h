@@ -2,7 +2,12 @@
 
 #include "rekuai/Core/Window.h"
 
-#define GLFW_INCLUDE_VULKAN
+#ifdef KU_VULKAN
+    #define GLFW_INCLUDE_VULKAN
+#endif
+#ifdef KU_OPENGL
+    #include <glad/glad.h>
+#endif
 #include <GLFW/glfw3.h>
 
 // @cond

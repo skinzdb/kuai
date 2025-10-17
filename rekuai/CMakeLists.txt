@@ -21,6 +21,8 @@ add_library(${PROJECT_NAME}
     src/rekuai/Core/Log.cpp
     src/rekuai/Core/MouseBtnCodes.h
     src/rekuai/Core/Timer.h
+    src/rekuai/Core/Util.h
+    src/rekuai/Core/Util.cpp
     src/rekuai/Core/Window.h
 
     src/rekuai/Events/AppEvent.h
@@ -28,39 +30,20 @@ add_library(${PROJECT_NAME}
     src/rekuai/Events/KeyEvent.h
     src/rekuai/Events/MouseEvent.h
 
-    src/rekuai/platform/Windows/wininput.cpp
-    src/rekuai/platform/Windows/winwindow.h
-    src/rekuai/platform/Windows/winwindow.cpp
+    src/rekuai/Platform/Windows/WinInput.cpp
+    src/rekuai/Platform/Windows/WinWindow.h
+    src/rekuai/Platform/Windows/WinWindow.cpp
 
-    src/rekuai/platform/OpenGL/OpenGLAPI.h
-    src/rekuai/platform/OpenGL/OpenGLAPI.cpp
-    src/rekuai/platform/OpenGL/OpenGLBuffer.h
-    src/rekuai/platform/OpenGL/OpenGLBuffer.cpp
-    src/rekuai/platform/OpenGL/OpenGLShader.h
-    src/rekuai/platform/OpenGL/OpenGLShader.cpp
-    src/rekuai/platform/OpenGL/OpenGLTexture.h
-    src/rekuai/platform/OpenGL/OpenGLTexture.cpp
-    src/rekuai/platform/OpenGL/OpenGLTextureArray.h
-    src/rekuai/platform/OpenGL/OpenGLTextureArray.cpp
-
-    src/rekuai/platform/Vulkan/VulkanAPI.h
-    src/rekuai/platform/Vulkan/VulkanAPI.cpp
-    src/rekuai/platform/Vulkan/VulkanBuffer.h
-    src/rekuai/platform/Vulkan/VulkanBuffer.cpp
-    src/rekuai/platform/Vulkan/VulkanCommand.h
-    src/rekuai/platform/Vulkan/VulkanCommand.cpp
-    src/rekuai/platform/Vulkan/VulkanContext.h
-    src/rekuai/platform/Vulkan/VulkanContext.cpp
-    src/rekuai/platform/Vulkan/VulkanPipeline.h
-    src/rekuai/platform/Vulkan/VulkanPipeline.cpp
-    src/rekuai/platform/Vulkan/VulkanRenderPass.h
-    src/rekuai/platform/Vulkan/VulkanRenderPass.cpp
-    src/rekuai/platform/Vulkan/VulkanShader.h
-    src/rekuai/platform/Vulkan/VulkanShader.cpp
-    src/rekuai/platform/Vulkan/VulkanSwapChain.h
-    src/rekuai/platform/Vulkan/VulkanSwapChain.cpp
-    src/rekuai/platform/Vulkan/VulkanUtils.h
-    src/rekuai/platform/Vulkan/VulkanUtils.cpp
+    src/rekuai/Platform/OpenGL/OpenGLAPI.h
+    src/rekuai/Platform/OpenGL/OpenGLAPI.cpp
+    src/rekuai/Platform/OpenGL/OpenGLBuffer.h
+    src/rekuai/Platform/OpenGL/OpenGLBuffer.cpp
+    src/rekuai/Platform/OpenGL/OpenGLShader.h
+    src/rekuai/Platform/OpenGL/OpenGLShader.cpp
+    src/rekuai/Platform/OpenGL/OpenGLTexture.h
+    src/rekuai/Platform/OpenGL/OpenGLTexture.cpp
+    src/rekuai/Platform/OpenGL/OpenGLTextureArray.h
+    src/rekuai/Platform/OpenGL/OpenGLTextureArray.cpp
 
     src/rekuai/Renderer/Renderer.h
     src/rekuai/Renderer/Renderer.cpp
@@ -121,6 +104,27 @@ if(Vulkan_FOUND)
     set(MY_DEFS ${MY_DEFS}
         KU_VULKAN
     )
+
+    add_library(${PROJECT_NAME}
+        src/rekuai/Platform/Vulkan/VulkanAPI.h
+        src/rekuai/Platform/Vulkan/VulkanBuffer.h
+        src/rekuai/Platform/Vulkan/VulkanBuffer.cpp
+        src/rekuai/Platform/Vulkan/VulkanCommand.h
+        src/rekuai/Platform/Vulkan/VulkanCommand.cpp
+        src/rekuai/Platform/Vulkan/VulkanContext.h
+        src/rekuai/Platform/Vulkan/VulkanContext.cpp
+        src/rekuai/Platform/Vulkan/VulkanPipeline.h
+        src/rekuai/Platform/Vulkan/VulkanPipeline.cpp
+        src/rekuai/Platform/Vulkan/VulkanRenderPass.h
+        src/rekuai/Platform/Vulkan/VulkanRenderPass.cpp
+        src/rekuai/Platform/Vulkan/VulkanShader.h
+        src/rekuai/Platform/Vulkan/VulkanShader.cpp
+        src/rekuai/Platform/Vulkan/VulkanSwapChain.h
+        src/rekuai/Platform/Vulkan/VulkanSwapChain.cpp
+        src/rekuai/Platform/Vulkan/VulkanUtils.h
+        src/rekuai/Platform/Vulkan/VulkanUtils.cpp
+        src/rekuai/Platform/Vulkan/VulkanAPI.cpp
+    )
 else()
     set(MY_DEFS ${MY_DEFS} KU_OPENGL)
 endif()
@@ -137,8 +141,10 @@ if (WIN32)
     )
 elseif(APPLE)
     set(MY_DEFS ${MY_DEFS} KU_PLATFORM_APPLE)
-else()
-
+elseif(UNIX)
+    set(MY_DEFS ${MY_DEFS}
+        KU_PLATFORM_LINUX
+    )
 endif()
 
 message(STATUS "${MY_DEFS}")
@@ -149,8 +155,8 @@ target_precompile_headers(${PROJECT_NAME}
     PUBLIC src/kpch.h
 )
 
-add_subdirectory(vendor/glfw)
-add_subdirectory(vendor/glad)
+add_subdirectory(vendor/GLFW)
+add_subdirectory(vendor/Glad)
 add_subdirectory(vendor/glm)
 
 target_include_directories(${PROJECT_NAME}

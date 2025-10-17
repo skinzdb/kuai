@@ -1,10 +1,8 @@
 #include "kpch.h"
 #include "App.h"
-#include "Log.h"
 
 #include "rekuai/Renderer/Renderer.h"
 
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 namespace kuai {
@@ -30,6 +28,7 @@ namespace kuai {
         });
 
 		Renderer::init();
+		Renderer::set_viewport(0, 0, window->get_width(), window->get_height());
 		//AudioManager::init();
 	}
 

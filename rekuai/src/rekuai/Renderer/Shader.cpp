@@ -32,7 +32,7 @@ namespace kuai {
             return shader;
         #endif
 
-        return nullptr;
+        exit(1);
     }
 
     std::shared_ptr<Shader> Shader::get(uint32_t prog_id)

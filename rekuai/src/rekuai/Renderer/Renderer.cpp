@@ -23,16 +23,27 @@ namespace kuai {
 	    api.reset(); // destruct render API before destructing GLFW
 	}
 
+    void Renderer::set_viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+    {
+        api->set_viewport(x, y, width, height);
+    }
+
 	void Renderer::set_camera(const Camera& camera)
 	{
 	}
 
 	void Renderer::submit(std::shared_ptr<Shader> shader, std::shared_ptr<Mesh> mesh, const glm::mat4& model)
     {
+        api->clear();
         //shader->bind();
         //shader->set_uniform("model_matrix", model);
         api->draw_indexed(mesh->vertex_array, mesh->vertex_array->get_index_count());
 	}
+
+    void Renderer::clear()
+    {
+        api->clear();
+    }
 
 	void Renderer::update() {
 

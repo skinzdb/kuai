@@ -1,6 +1,7 @@
 #include "VulkanAPI.h"
 
 #include "rekuai/Core/Log.h"
+#include "rekuai/Core/Util.h"
 #include "rekuai/Platform/Vulkan/VulkanBuffer.h"
 #include "rekuai/Platform/Vulkan/VulkanCommand.h"
 #include "rekuai/Platform/Vulkan/VulkanContext.h"
@@ -15,25 +16,6 @@
 #include <GLFW/glfw3.h>
 
 namespace kuai {
-    std::string read_file(const std::string& filename) {
-        std::ifstream file(filename, std::ios::ate | std::ios::binary);
-
-        if (!file.is_open()) {
-            KU_CORE_ERROR("Failed to open file {}", filename);
-            return "";
-        }
-
-        size_t file_size = (size_t) file.tellg();
-        std::vector<char> buffer(file_size);
-
-        file.seekg(0);
-        file.read(buffer.data(), file_size);
-
-        file.close();
-
-        return std::string(buffer.begin(), buffer.end());
-    }
-
     void VulkanAPI::init()
     {
         context = std::make_shared<VulkanContext>("Hello World!", "kuai");

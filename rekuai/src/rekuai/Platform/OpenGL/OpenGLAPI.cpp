@@ -2,8 +2,29 @@
 
 #include "glad/glad.h"
 #include "rekuai/Renderer/Buffer.h"
+#include "rekuai/Core/Util.h"
 
 namespace kuai {
+	void OpenGLMessageCallback(
+		unsigned source,
+		unsigned type,
+		unsigned id,
+		unsigned severity,
+		int length,
+		const char* message,
+		const void* userParam)
+	{
+		switch (severity)
+		{
+			case GL_DEBUG_SEVERITY_HIGH:         KU_CORE_CRITICAL(message); return;
+			case GL_DEBUG_SEVERITY_MEDIUM:       KU_CORE_ERROR(message); return;
+			case GL_DEBUG_SEVERITY_LOW:          KU_CORE_WARN(message); return;
+			case GL_DEBUG_SEVERITY_NOTIFICATION: KU_CORE_TRACE(message); return;
+		}
+		
+		KU_CORE_ASSERT(false, "Unknown severity level");
+	}
+
     void OpenGLAPI::init() {
        	glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
@@ -13,13 +34,28 @@ namespace kuai {
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        // #ifdef KU_DEBUG
+            glEnable(GL_DEBUG_OUTPUT);
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+            glDebugMessageCallback(OpenGLMessageCallback, nullptr);
+            
+            glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
+	    // #endif
+
+		std::string vert_src = read_file("shader.vert");
+		std::string frag_src = read_file("shader.frag");
+		shader = std::make_shared<OpenGLShader>(vert_src, frag_src);
+        shader->bind();
     }
 
-    void OpenGLAPI::stop() {
+    void OpenGLAPI::stop() 
+    {
 
     }
 
-    OpenGLAPI::~OpenGLAPI() {
+    OpenGLAPI::~OpenGLAPI() 
+    {
 
     }
 
@@ -34,7 +70,8 @@ namespace kuai {
 		// 	glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)0, cmd_count, sizeof(IndirectCommand));
 		// }
 
-    void OpenGLAPI::draw_indexed(std::shared_ptr<VertexArray> vertex_array, uint32_t index_count) {
+    void OpenGLAPI::draw_indexed(std::shared_ptr<VertexArray> vertex_array, uint32_t index_count)
+    {
         vertex_array->bind();
         uint32_t count = index_count ? index_count : vertex_array->get_index_count();
         glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);

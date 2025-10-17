@@ -31,8 +31,7 @@ namespace kuai {
 	OpenGLBuffer::OpenGLBuffer(uint32_t size)
 	{
 		glCreateBuffers(1, &buf_id);
-		glBindBuffer(GL_ARRAY_BUFFER, buf_id);
-		glBufferData(buf_id, size, nullptr, GL_DYNAMIC_DRAW);
+		glNamedBufferStorage(buf_id, size, nullptr, GL_DYNAMIC_STORAGE_BIT);
 	}
 
 	OpenGLBuffer::~OpenGLBuffer()
