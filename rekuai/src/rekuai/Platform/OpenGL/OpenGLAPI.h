@@ -13,12 +13,9 @@ namespace kuai {
 
         virtual void set_viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
 
-        virtual void draw_indexed(std::shared_ptr<VertexArray> vertex_array, uint32_t index_count) override;
+        virtual void draw_indexed(uint32_t index_count) override;
         // virtual void draw_indirect() override;
 
         ~OpenGLAPI();
-
-    private:
-        std::shared_ptr<OpenGLShader> shader;
     };
 }

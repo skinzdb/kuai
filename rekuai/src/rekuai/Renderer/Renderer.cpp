@@ -35,9 +35,12 @@ namespace kuai {
 	void Renderer::submit(std::shared_ptr<Shader> shader, std::shared_ptr<Mesh> mesh, const glm::mat4& model)
     {
         api->clear();
-        //shader->bind();
+        
+        shader->bind();
+        mesh->vertex_array->bind();
+
         //shader->set_uniform("model_matrix", model);
-        api->draw_indexed(mesh->vertex_array, mesh->vertex_array->get_index_count());
+        api->draw_indexed(mesh->vertex_array->get_index_count());
 	}
 
     void Renderer::clear()

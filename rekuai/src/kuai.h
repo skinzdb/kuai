@@ -14,6 +14,7 @@
 
 #include "rekuai/Renderer/Mesh.h"
 #include "rekuai/Renderer/Material.h"
+#include "rekuai/Renderer/Shader.h"
 
 #include "rekuai/Components/Components.h"
 #include "rekuai/Components/Entity.h"

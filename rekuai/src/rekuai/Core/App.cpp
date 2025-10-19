@@ -24,7 +24,7 @@ namespace kuai {
 
         auto render_sys = ecs->register_system<MeshRenderer, Transform>();
         render_sys->each([](float dt, EntityId id, MeshRenderer& mesh_renderer, Transform& transform) {
-            Renderer::submit(nullptr, mesh_renderer.mesh, transform.get_model_matrix());
+            Renderer::submit(mesh_renderer.material->get_shader(), mesh_renderer.mesh, transform.get_model_matrix());
         });
 
 		Renderer::init();

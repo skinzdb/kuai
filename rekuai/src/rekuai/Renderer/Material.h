@@ -1,12 +1,19 @@
 #pragma once
 
+#include "Shader.h"
+
 namespace kuai {
 	class Material
 	{
 	public:
-		Material()
+		Material(std::shared_ptr<Shader> shader) : shader(shader)
 		{
 		}
+
+		std::shared_ptr<Shader> get_shader() { return shader; }
+
+	private:
+		std::shared_ptr<Shader> shader;
 	};
 
 	// class BasicMaterial : public Material

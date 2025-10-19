@@ -21,8 +21,6 @@ set(MY_FILES
     src/rekuai/Core/Log.cpp
     src/rekuai/Core/MouseBtnCodes.h
     src/rekuai/Core/Timer.h
-    src/rekuai/Core/Util.h
-    src/rekuai/Core/Util.cpp
     src/rekuai/Core/Window.h
 
     src/rekuai/Events/AppEvent.h

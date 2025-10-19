@@ -1,31 +1,37 @@
 #pragma once
 
-#include "rekuai/Platform/Vulkan/VulkanPipeline.h"
+#include "rekuai/Platform/Vulkan/VulkanShader.h"
 #include "rekuai/Platform/Vulkan/VulkanSwapChain.h"
 #include "rekuai/Renderer/Buffer.h"
+
 #include "vulkan/vulkan_core.h"
+#include <functional>
 
 namespace kuai {
 
     class VulkanCommand
     {
     public:
-        VulkanCommand(VkDevice device, VkPhysicalDevice physical_device, std::shared_ptr<VulkanSwapChain> swap_chain);
+        VulkanCommand(VkDevice device, VkPhysicalDevice physical_device, VkSurfaceKHR surface, size_t swap_chain_images);
 
         void record(VkDevice device, std::shared_ptr<VulkanSwapChain> swap_chain,
-            std::shared_ptr<VulkanPipeline> pipeline,
-            VkRenderPass render_pass, VkCommandBuffer buf, uint32_t image_idx,
-            std::shared_ptr<VertexArray> vertex_array);
+                    VkRenderPass render_pass, uint32_t current_frame, uint32_t image_idx, uint32_t index_count);
 
         void cleanup(VkDevice device);
 
-    private:
-        void create_command_pool(VkDevice device, VkPhysicalDevice physical_device, VkSurfaceKHR surface);
-        void create_command_buffers(VkDevice device, std::shared_ptr<VulkanSwapChain> swap_chain);
+        void set_shader_bind_fn(const std::function<void(VkCommandBuffer)>& fn) { shader_bind_fn = fn; }
+        void set_vertex_array_bind_fn(const std::function<void(VkCommandBuffer)>& fn) { vertex_array_bind_fn = fn; }
 
     private:
-        VkCommandPool command_pool;
-        std::vector<VkCommandBuffer> command_bufs;
+        void create_command_pool(VkDevice device, VkPhysicalDevice physical_device, VkSurfaceKHR surface);
+        void create_command_buffers(VkDevice device, size_t swap_chain_images);
+
+    private:
+        VkCommandPool pool;
+        std::vector<VkCommandBuffer> cmd_bufs;
+
+        std::function<void(VkCommandBuffer)> shader_bind_fn;
+        std::function<void(VkCommandBuffer)> vertex_array_bind_fn;
 
         friend class VulkanAPI;
     };

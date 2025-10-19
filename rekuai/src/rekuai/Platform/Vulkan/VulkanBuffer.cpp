@@ -1,10 +1,9 @@
+#include "kpch.h"
+
 #include "VulkanBuffer.h"
 
-#include "rekuai/Core/Log.h"
 #include "rekuai/Platform/Vulkan/VulkanUtils.h"
-#include "rekuai/Renderer/Buffer.h"
-#include "vulkan/vulkan_core.h"
-#include <cstdint>
+#include "VulkanAPI.h"
 
 namespace kuai {
 
@@ -139,16 +138,15 @@ namespace kuai {
         vkFreeMemory(ctx_device, buf_memory, nullptr);
     }
 
-    void VulkanIndexBuffer::bind(VkCommandBuffer cmd_buf) const
+    void VulkanVertexArray::bind() const
     {
-        vkCmdBindIndexBuffer(cmd_buf, buf, 0, VK_INDEX_TYPE_UINT32);
-    }
+        VulkanAPI* vk_api = static_cast<VulkanAPI*>(RendererAPI::get());
 
-    void VulkanVertexArray::bind(VkCommandBuffer cmd_buf) const
-    {
-        VkDeviceSize offsets[] = {0};
-        vkCmdBindVertexBuffers(cmd_buf, 0, vk_vertex_bufs.size(), vk_vertex_bufs.data(), offsets);
-        index_buf->bind(cmd_buf);
+        vk_api->set_vertex_array_bind_fn([this](VkCommandBuffer cmd_buf) {
+            VkDeviceSize offsets[] = {0};
+            vkCmdBindVertexBuffers(cmd_buf, 0, vk_vertex_bufs.size(), vk_vertex_bufs.data(), offsets);
+            vkCmdBindIndexBuffer(cmd_buf, index_buf->buf, 0, VK_INDEX_TYPE_UINT32);
+        });
     }
 
     void VulkanVertexArray::add_vertex_buffer(std::shared_ptr<VertexBuffer> buf)

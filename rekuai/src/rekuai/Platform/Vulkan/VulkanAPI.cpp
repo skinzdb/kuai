@@ -1,16 +1,7 @@
 #include "VulkanAPI.h"
 
+#include "rekuai/Core/App.h"
 #include "rekuai/Core/Log.h"
-#include "rekuai/Core/Util.h"
-#include "rekuai/Platform/Vulkan/VulkanBuffer.h"
-#include "rekuai/Platform/Vulkan/VulkanCommand.h"
-#include "rekuai/Platform/Vulkan/VulkanContext.h"
-#include "rekuai/Platform/Vulkan/VulkanPipeline.h"
-#include "rekuai/Platform/Vulkan/VulkanRenderPass.h"
-#include "rekuai/Platform/Vulkan/VulkanShader.h"
-#include "rekuai/Platform/Vulkan/VulkanSwapChain.h"
-#include "rekuai/Renderer/Buffer.h"
-#include "vulkan/vulkan_core.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -18,40 +9,35 @@
 namespace kuai {
     void VulkanAPI::init()
     {
+        // Create Vulkan instance
         context = std::make_shared<VulkanContext>("Hello World!", "kuai");
 
         // Make window surface
-        swap_chain = std::make_shared<VulkanSwapChain>();
-        swap_chain->create_surface(context->instance);
+        GLFWwindow *window = reinterpret_cast<GLFWwindow*>(App::get().get_window().get_native_window());
+        VkResult result = glfwCreateWindowSurface(context->instance, window, nullptr, &surface);
+        if (result != VK_SUCCESS)
+        {
+            KU_CORE_CRITICAL("(Vulkan) Failed to create window surface, {}", result);
+            exit(1);
+        }
 
         // Device selection and creation
-        context->pick_physical_device(swap_chain->surface);
-        context->create_logical_device(swap_chain->surface);
+        context->pick_physical_device(surface);
+        context->create_logical_device(surface);
 
         // Swap chain, render pass and framebuffer creation
-        swap_chain->create(context->device, context->physical_device);
+        swap_chain = std::make_shared<VulkanSwapChain>();
+        swap_chain->create(context->device, context->physical_device, surface);
         swap_chain->create_image_views(context->device);
-        render_pass = std::make_shared<VulkanRenderPass>(context->device, swap_chain->swap_chain_image_format);
-        swap_chain->create_framebuffers(context->device, render_pass->render_pass);
+        render_pass = std::make_shared<VulkanRenderPass>(context->device, swap_chain->image_format);
+        swap_chain->create_framebuffers(context->device, render_pass->pass);
 
-        // In-built shader
-        std::string vert_src = read_file("vert.spv");
-        std::string frag_src = read_file("frag.spv");
-        shader = std::make_shared<VulkanShader>(context->device, vert_src, frag_src);
-
-        // Graphics pipeline
-        pipeline = std::make_shared<VulkanPipeline>();
-        pipeline->set_shaders(shader->vert, shader->frag);
-        pipeline->set_vertex_layout(BufferLayout {
-            { ShaderDataType::VEC3, "positions" },
-            { ShaderDataType::VEC3, "normals" },
-            { ShaderDataType::VEC2, "tex_coords" }
-        });
-        pipeline->create(context->device, render_pass->render_pass);
-        vkDestroyShaderModule(context->device, shader->vert, nullptr);
-        vkDestroyShaderModule(context->device, shader->frag, nullptr);
-
-        command = std::make_shared<VulkanCommand>(context->device, context->physical_device, swap_chain);
+        command = std::make_shared<VulkanCommand>(
+            context->device, 
+            context->physical_device, 
+            surface, 
+            swap_chain->images.size()
+        );
 
         create_sync_objects();
     }
@@ -71,17 +57,17 @@ namespace kuai {
 
     }
 
-    void VulkanAPI::draw_indexed(std::shared_ptr<VertexArray> vertex_array, uint32_t index_count)
+    void VulkanAPI::draw_indexed(uint32_t index_count)
     {
         vkWaitForFences(context->device, 1, &in_flight_fences[current_frame], VK_TRUE, UINT64_MAX);
 
-        uint32_t imageIndex;
-        VkResult result = vkAcquireNextImageKHR(context->device, swap_chain->swap_chain, UINT64_MAX,
-            img_available_semaphores[current_frame], VK_NULL_HANDLE, &imageIndex);
+        uint32_t img_idx;
+        VkResult result = vkAcquireNextImageKHR(context->device, swap_chain->chain, UINT64_MAX,
+            img_available_semaphores[current_frame], VK_NULL_HANDLE, &img_idx);
 
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
-            swap_chain->recreate(context->device, context->physical_device, render_pass->render_pass);
+            swap_chain->recreate(context->device, context->physical_device, surface, render_pass->pass);
             return;
         }
         else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
@@ -91,9 +77,8 @@ namespace kuai {
 
         vkResetFences(context->device, 1, &in_flight_fences[current_frame]);
 
-        vkResetCommandBuffer(command->command_bufs[current_frame], 0);
-        command->record(context->device, swap_chain, pipeline, render_pass->render_pass,
-            command->command_bufs[current_frame], imageIndex, vertex_array);
+        vkResetCommandBuffer(command->cmd_bufs[current_frame], 0);
+        command->record(context->device, swap_chain, render_pass->pass, current_frame, img_idx, index_count);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -105,9 +90,9 @@ namespace kuai {
         submitInfo.pWaitDstStageMask = waitStages;
 
         submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &command->command_bufs[current_frame];
+        submitInfo.pCommandBuffers = &command->cmd_bufs[current_frame];
 
-        VkSemaphore signalSemaphores[] = {render_finished_semaphores[imageIndex]};
+        VkSemaphore signalSemaphores[] = {render_finished_semaphores[img_idx]};
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
@@ -121,10 +106,10 @@ namespace kuai {
         presentInfo.waitSemaphoreCount = 1;
         presentInfo.pWaitSemaphores = signalSemaphores;
 
-        VkSwapchainKHR swapChains[] = {swap_chain->swap_chain};
+        VkSwapchainKHR swapChains[] = {swap_chain->chain};
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = swapChains;
-        presentInfo.pImageIndices = &imageIndex;
+        presentInfo.pImageIndices = &img_idx;
 
         presentInfo.pResults = nullptr; // Optional
 
@@ -132,21 +117,21 @@ namespace kuai {
 
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
         {
-            swap_chain->recreate(context->device, context->physical_device, render_pass->render_pass);
+            swap_chain->recreate(context->device, context->physical_device, surface, render_pass->pass);
         }
         else if (result != VK_SUCCESS)
         {
             KU_CORE_ERROR("(Vulkan) Failed to submit draw command buffer");
         }
 
-        current_frame = (current_frame + 1) % swap_chain->swap_chain_images.size();
+        current_frame = (current_frame + 1) % swap_chain->images.size();
     }
 
     void VulkanAPI::create_sync_objects()
     {
-        img_available_semaphores.resize(swap_chain->swap_chain_images.size());
-        render_finished_semaphores.resize(swap_chain->swap_chain_images.size());
-        in_flight_fences.resize(swap_chain->swap_chain_images.size());
+        img_available_semaphores.resize(swap_chain->images.size());
+        render_finished_semaphores.resize(swap_chain->images.size());
+        in_flight_fences.resize(swap_chain->images.size());
 
         VkSemaphoreCreateInfo semaphoreInfo{};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -155,7 +140,7 @@ namespace kuai {
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        for (size_t i = 0; i < swap_chain->swap_chain_images.size(); i++)
+        for (size_t i = 0; i < swap_chain->images.size(); i++)
         {
             if (vkCreateSemaphore(context->device, &semaphoreInfo, nullptr, &img_available_semaphores[i]) != VK_SUCCESS ||
                 vkCreateSemaphore(context->device, &semaphoreInfo, nullptr, &render_finished_semaphores[i]) != VK_SUCCESS ||
@@ -171,11 +156,9 @@ namespace kuai {
     {
         swap_chain->cleanup(context->device);
 
-        pipeline->cleanup(context->device);
-
         render_pass->cleanup(context->device);
 
-        for (size_t i = 0; i < swap_chain->swap_chain_images.size(); i++)
+        for (size_t i = 0; i < swap_chain->images.size(); i++)
         {
             vkDestroySemaphore(context->device, render_finished_semaphores[i], nullptr);
             vkDestroySemaphore(context->device, img_available_semaphores[i], nullptr);
@@ -186,7 +169,7 @@ namespace kuai {
 
         context->cleanup_devices();
 
-        swap_chain->cleanup_surface(context->instance);
+        vkDestroySurfaceKHR(context->instance, surface, nullptr);
 
         context->cleanup_instance();
     }

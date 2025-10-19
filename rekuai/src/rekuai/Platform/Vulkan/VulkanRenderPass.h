@@ -11,7 +11,7 @@ namespace kuai {
         void cleanup(VkDevice device);
 
     private:
-        VkRenderPass render_pass;
+        VkRenderPass pass;
 
         friend class VulkanAPI;
     };

@@ -2,7 +2,6 @@
 
 #include "glad/glad.h"
 #include "rekuai/Renderer/Buffer.h"
-#include "rekuai/Core/Util.h"
 
 namespace kuai {
 	void OpenGLMessageCallback(
@@ -42,11 +41,6 @@ namespace kuai {
             
             glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
 	    // #endif
-
-		std::string vert_src = read_file("shader.vert");
-		std::string frag_src = read_file("shader.frag");
-		shader = std::make_shared<OpenGLShader>(vert_src, frag_src);
-        shader->bind();
     }
 
     void OpenGLAPI::stop() 
@@ -70,11 +64,9 @@ namespace kuai {
 		// 	glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)0, cmd_count, sizeof(IndirectCommand));
 		// }
 
-    void OpenGLAPI::draw_indexed(std::shared_ptr<VertexArray> vertex_array, uint32_t index_count)
+    void OpenGLAPI::draw_indexed(uint32_t index_count)
     {
-        vertex_array->bind();
-        uint32_t count = index_count ? index_count : vertex_array->get_index_count();
-        glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
     }
 
     void OpenGLAPI::clear() {

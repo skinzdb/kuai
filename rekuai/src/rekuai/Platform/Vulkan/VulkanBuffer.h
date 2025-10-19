@@ -41,7 +41,6 @@ namespace kuai {
         ~VulkanIndexBuffer();
 
         virtual void bind() const override {}
-        void bind(VkCommandBuffer cmd_buf) const;
 
         virtual uint32_t get_count() const override { return count; }
 
@@ -52,13 +51,14 @@ namespace kuai {
         uint32_t count;
 
         VkDevice ctx_device;
+
+        friend class VulkanVertexArray;
     };
 
     class VulkanVertexArray : public VertexArray
     {
     public:
-        virtual void bind() const override {}
-        void bind(VkCommandBuffer cmd_buf) const;
+        virtual void bind() const override;
 
         virtual void add_vertex_buffer(std::shared_ptr<VertexBuffer> buf) override;
         virtual void set_index_buffer(std::shared_ptr<IndexBuffer> buf) override;

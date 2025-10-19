@@ -2,7 +2,7 @@
 
 #include "rekuai/Renderer/Shader.h"
 
-#include "vulkan/vulkan_core.h"
+#include <vulkan/vulkan.h>
 
 namespace kuai {
     class VulkanShader : public Shader
@@ -27,15 +27,15 @@ namespace kuai {
 		virtual void unbind() const override;
 
 		virtual uint32_t get_id() const override { return 0; }
-	private:
-        VkShaderModule create_shader_module(const std::vector<char>& code);
 
 	private:
-		VkShaderModule vert;
-		VkShaderModule frag;
+		VkShaderEXT shaders[2]; // vertex: shaders[0], fragment: shaders[1] 
 
 		VkDevice device;
 
+        PFN_vkCmdBindShadersEXT bind_shaders_fn;
+
 		friend class VulkanAPI;
+		friend class VulkanCommand;
     };
 }

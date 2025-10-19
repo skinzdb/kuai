@@ -22,7 +22,7 @@ namespace kuai {
         #ifdef KU_VULKAN
             VulkanAPI* vk_api = static_cast<VulkanAPI*>(RendererAPI::get());
             auto shader = std::make_shared<VulkanShader>(vk_api->get_device(), vert_src, frag_src);
-            shader_map[shader->get_id()] = shader;
+            // shader_map[shader->get_id()] = shader;
             return shader;
         #endif
 

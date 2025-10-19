@@ -1,3 +1,5 @@
+#include "kpch.h"
+
 #include "VulkanContext.h"
 #include "rekuai/Platform/Vulkan/VulkanUtils.h"
 #include "vulkan/vulkan_core.h"
@@ -14,7 +16,8 @@ namespace kuai {
     };
 
     const std::vector<const char*> device_exts = {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+        VK_EXT_SHADER_OBJECT_EXTENSION_NAME
 
         #ifdef KU_PLATFORM_APPLE
             ,"VK_KHR_portability_subset"
@@ -172,7 +175,7 @@ namespace kuai {
         appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
         appInfo.pEngineName = engine_name.c_str();
         appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.apiVersion = VK_API_VERSION_1_0;
+        appInfo.apiVersion = VK_API_VERSION_1_3;
 
         VkInstanceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -312,6 +315,12 @@ namespace kuai {
 
         createInfo.enabledExtensionCount   = static_cast<uint32_t>(device_exts.size());
         createInfo.ppEnabledExtensionNames = device_exts.data();
+
+        // Add shader object extension feature
+        VkPhysicalDeviceShaderObjectFeaturesEXT shaderFeatures{};
+        shaderFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_OBJECT_FEATURES_EXT;
+        shaderFeatures.shaderObject = true;
+        createInfo.pNext = &shaderFeatures;
 
         if (enable_validation)
         {

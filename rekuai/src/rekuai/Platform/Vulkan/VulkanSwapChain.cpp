@@ -7,38 +7,7 @@
 
 namespace kuai {
 
-    void VulkanSwapChain::recreate(VkDevice device, VkPhysicalDevice physical_device, VkRenderPass render_pass)
-    {
-        vkDeviceWaitIdle(device);
-
-        cleanup(device);
-
-        create(device, physical_device);
-        create_image_views(device);
-        create_framebuffers(device, render_pass);
-    }
-
-    void VulkanSwapChain::cleanup(VkDevice device)
-    {
-        for (auto framebuffer : swap_chain_framebuffers)
-        {
-            vkDestroyFramebuffer(device, framebuffer, nullptr);
-        }
-
-        for (auto image_view : swap_chain_image_views)
-        {
-            vkDestroyImageView(device, image_view, nullptr);
-        }
-
-        vkDestroySwapchainKHR(device, swap_chain, nullptr);
-    }
-
-    void VulkanSwapChain::cleanup_surface(VkInstance instance)
-    {
-        vkDestroySurfaceKHR(instance, surface, nullptr);
-    }
-
-    VkSurfaceFormatKHR choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& available_formats)
+    VkSurfaceFormatKHR choose_surface_format(const std::vector<VkSurfaceFormatKHR>& available_formats)
     {
         for (const auto& availableFormat : available_formats)
         {
@@ -51,7 +20,7 @@ namespace kuai {
         return available_formats[0];
     }
 
-    VkPresentModeKHR choose_swap_present_mode(const std::vector<VkPresentModeKHR>& available_present_modes)
+    VkPresentModeKHR choose_present_mode(const std::vector<VkPresentModeKHR>& available_present_modes)
     {
         for (const auto& availablePresentMode : available_present_modes) {
             if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
@@ -62,7 +31,7 @@ namespace kuai {
         return VK_PRESENT_MODE_FIFO_KHR;
     }
 
-    VkExtent2D choose_swap_extent(const VkSurfaceCapabilitiesKHR& capabilities)
+    VkExtent2D choose_extent(const VkSurfaceCapabilitiesKHR& capabilities)
     {
         if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
         {
@@ -86,26 +55,13 @@ namespace kuai {
         }
     }
 
-    void VulkanSwapChain::create_surface(VkInstance instance)
-    {
-        GLFWwindow *window = reinterpret_cast<GLFWwindow*>(App::get().get_window().get_native_window());
-
-        VkResult result = glfwCreateWindowSurface(instance, window, nullptr, &surface);
-
-        if (result != VK_SUCCESS)
-        {
-            KU_CORE_CRITICAL("(Vulkan) Failed to create window surface, {}", result);
-            exit(1);
-        }
-    }
-
-    void VulkanSwapChain::create(VkDevice device, VkPhysicalDevice physical_device)
+    void VulkanSwapChain::create(VkDevice device, VkPhysicalDevice physical_device, VkSurfaceKHR surface)
     {
         SwapChainSupportDetails support_details = VulkanUtils::query_swap_chain_support(physical_device, surface);
 
-        VkSurfaceFormatKHR surfaceFormat = choose_swap_surface_format(support_details.formats);
-        VkPresentModeKHR presentMode = choose_swap_present_mode(support_details.present_modes);
-        VkExtent2D extent = choose_swap_extent(support_details.capabilities);
+        VkSurfaceFormatKHR surfaceFormat = choose_surface_format(support_details.formats);
+        VkPresentModeKHR presentMode = choose_present_mode(support_details.present_modes);
+        VkExtent2D chosen_extent = choose_extent(support_details.capabilities);
 
         uint32_t imageCount = support_details.capabilities.minImageCount + 1;
         if (support_details.capabilities.maxImageCount > 0 && imageCount > support_details.capabilities.maxImageCount)
@@ -120,7 +76,7 @@ namespace kuai {
         createInfo.minImageCount = imageCount;
         createInfo.imageFormat = surfaceFormat.format;
         createInfo.imageColorSpace = surfaceFormat.colorSpace;
-        createInfo.imageExtent = extent;
+        createInfo.imageExtent = chosen_extent;
         createInfo.imageArrayLayers = 1;
         createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
@@ -147,31 +103,58 @@ namespace kuai {
 
         createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-        if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &swap_chain) != VK_SUCCESS)
+        if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &chain) != VK_SUCCESS)
         {
             KU_CORE_CRITICAL("(Vulkan) Failed to create swap chain");
             exit(1);
         }
 
-        vkGetSwapchainImagesKHR(device, swap_chain, &imageCount, nullptr);
-        swap_chain_images.resize(imageCount);
-        vkGetSwapchainImagesKHR(device, swap_chain, &imageCount, swap_chain_images.data());
+        vkGetSwapchainImagesKHR(device, chain, &imageCount, nullptr);
+        images.resize(imageCount);
+        vkGetSwapchainImagesKHR(device, chain, &imageCount, images.data());
 
-        swap_chain_image_format = surfaceFormat.format;
-        swap_chain_extent = extent;
+        image_format = surfaceFormat.format;
+        extent = chosen_extent;
+
+    }
+
+    void VulkanSwapChain::recreate(VkDevice device, VkPhysicalDevice physical_device, VkSurfaceKHR surface, VkRenderPass render_pass)
+    {
+        vkDeviceWaitIdle(device);
+
+        cleanup(device);
+
+        create(device, physical_device, surface);
+        create_image_views(device);
+        create_framebuffers(device, render_pass);
+    }
+
+    void VulkanSwapChain::cleanup(VkDevice device)
+    {
+        for (auto framebuffer : framebuffers)
+        {
+            vkDestroyFramebuffer(device, framebuffer, nullptr);
+        }
+
+        for (auto image_view : image_views)
+        {
+            vkDestroyImageView(device, image_view, nullptr);
+        }
+
+        vkDestroySwapchainKHR(device, chain, nullptr);
     }
 
     void VulkanSwapChain::create_image_views(VkDevice device) {
-        swap_chain_image_views.resize(swap_chain_images.size());
+        image_views.resize(images.size());
 
-        for (size_t i = 0; i < swap_chain_images.size(); i++)
+        for (size_t i = 0; i < images.size(); i++)
         {
             VkImageViewCreateInfo createInfo{};
             createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-            createInfo.image = swap_chain_images[i];
+            createInfo.image = images[i];
 
             createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-            createInfo.format = swap_chain_image_format;
+            createInfo.format = image_format;
 
             createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
             createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -184,7 +167,7 @@ namespace kuai {
             createInfo.subresourceRange.baseArrayLayer = 0;
             createInfo.subresourceRange.layerCount = 1;
 
-            if (vkCreateImageView(device, &createInfo, nullptr, &swap_chain_image_views[i]) != VK_SUCCESS)
+            if (vkCreateImageView(device, &createInfo, nullptr, &image_views[i]) != VK_SUCCESS)
             {
                 KU_CORE_CRITICAL("(Vulkan) Failed to create image views");
                 exit(1);
@@ -194,11 +177,11 @@ namespace kuai {
 
     void VulkanSwapChain::create_framebuffers(VkDevice device, VkRenderPass render_pass)
     {
-        swap_chain_framebuffers.resize(swap_chain_image_views.size());
+        framebuffers.resize(image_views.size());
 
-        for (size_t i = 0; i < swap_chain_image_views.size(); i++) {
+        for (size_t i = 0; i < image_views.size(); i++) {
             VkImageView attachments[] = {
-                swap_chain_image_views[i]
+                image_views[i]
             };
 
             VkFramebufferCreateInfo framebufferInfo{};
@@ -206,11 +189,11 @@ namespace kuai {
             framebufferInfo.renderPass = render_pass;
             framebufferInfo.attachmentCount = 1;
             framebufferInfo.pAttachments = attachments;
-            framebufferInfo.width = swap_chain_extent.width;
-            framebufferInfo.height = swap_chain_extent.height;
+            framebufferInfo.width = extent.width;
+            framebufferInfo.height = extent.height;
             framebufferInfo.layers = 1;
 
-            if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swap_chain_framebuffers[i]) != VK_SUCCESS) {
+            if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &framebuffers[i]) != VK_SUCCESS) {
                 KU_CORE_CRITICAL("(Vulkan) Failed to create framebuffer for swap chain");
                 exit(1);
             }

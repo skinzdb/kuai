@@ -1,3 +1,5 @@
+#include "kpch.h"
+
 #include "VulkanRenderPass.h"
 
 namespace kuai {
@@ -42,7 +44,7 @@ namespace kuai {
         renderPassInfo.dependencyCount = 1;
         renderPassInfo.pDependencies = &dependency;
 
-        if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &render_pass) != VK_SUCCESS)
+        if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &pass) != VK_SUCCESS)
         {
             KU_CORE_CRITICAL("(Vulkan) Failed to create render pass");
             exit(1);
@@ -51,6 +53,6 @@ namespace kuai {
 
     void VulkanRenderPass::cleanup(VkDevice device)
     {
-        vkDestroyRenderPass(device, render_pass, nullptr);
+        vkDestroyRenderPass(device, pass, nullptr);
     }
 }
