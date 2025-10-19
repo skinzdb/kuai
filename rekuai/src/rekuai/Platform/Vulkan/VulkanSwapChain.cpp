@@ -90,9 +90,11 @@ namespace kuai {
     {
         GLFWwindow *window = reinterpret_cast<GLFWwindow*>(App::get().get_window().get_native_window());
 
-        if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS)
+        VkResult result = glfwCreateWindowSurface(instance, window, nullptr, &surface);
+
+        if (result != VK_SUCCESS)
         {
-            KU_CORE_CRITICAL("(Vulkan) Failed to create window surface");
+            KU_CORE_CRITICAL("(Vulkan) Failed to create window surface, {}", result);
             exit(1);
         }
     }

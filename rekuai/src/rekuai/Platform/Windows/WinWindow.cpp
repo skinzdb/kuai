@@ -47,8 +47,8 @@ namespace kuai {
 			glfwInitialised = true;
 		}
 
-		#ifdef KU_PLATFORM_APPLE
-		    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		#ifdef KU_VULKAN
+			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 			glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 		#endif
 

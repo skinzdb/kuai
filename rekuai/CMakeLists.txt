@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_library(${PROJECT_NAME}
+set(MY_FILES
     src/kpch.h
     src/kpch.cpp
     src/kuai.h
@@ -33,17 +33,6 @@ add_library(${PROJECT_NAME}
     src/rekuai/Platform/Windows/WinInput.cpp
     src/rekuai/Platform/Windows/WinWindow.h
     src/rekuai/Platform/Windows/WinWindow.cpp
-
-    src/rekuai/Platform/OpenGL/OpenGLAPI.h
-    src/rekuai/Platform/OpenGL/OpenGLAPI.cpp
-    src/rekuai/Platform/OpenGL/OpenGLBuffer.h
-    src/rekuai/Platform/OpenGL/OpenGLBuffer.cpp
-    src/rekuai/Platform/OpenGL/OpenGLShader.h
-    src/rekuai/Platform/OpenGL/OpenGLShader.cpp
-    src/rekuai/Platform/OpenGL/OpenGLTexture.h
-    src/rekuai/Platform/OpenGL/OpenGLTexture.cpp
-    src/rekuai/Platform/OpenGL/OpenGLTextureArray.h
-    src/rekuai/Platform/OpenGL/OpenGLTextureArray.cpp
 
     src/rekuai/Renderer/Renderer.h
     src/rekuai/Renderer/Renderer.cpp
@@ -92,20 +81,8 @@ set(MY_DEFS GLFW_INCLUDE_NONE)
 find_package(Vulkan)
 
 if(Vulkan_FOUND)
-    # Vulkan include dirs
-    target_include_directories(${PROJECT_NAME} PUBLIC vendor/vulkan)
-
-    # Link the libraries to the target
-    set(MY_LIBS
-        ${MY_LIBS}
-        Vulkan::Vulkan
-    )
-
-    set(MY_DEFS ${MY_DEFS}
-        KU_VULKAN
-    )
-
-    add_library(${PROJECT_NAME}
+    add_library(${PROJECT_NAME} 
+        ${MY_FILES}
         src/rekuai/Platform/Vulkan/VulkanAPI.h
         src/rekuai/Platform/Vulkan/VulkanBuffer.h
         src/rekuai/Platform/Vulkan/VulkanBuffer.cpp
@@ -125,7 +102,36 @@ if(Vulkan_FOUND)
         src/rekuai/Platform/Vulkan/VulkanUtils.cpp
         src/rekuai/Platform/Vulkan/VulkanAPI.cpp
     )
+
+    # Vulkan include dirs
+    if(APPLE)
+        target_include_directories(${PROJECT_NAME} PUBLIC vendor/vulkan)
+    endif()
+
+    # Link the libraries to the target
+    set(MY_LIBS
+        ${MY_LIBS}
+        Vulkan::Vulkan
+    )
+
+    set(MY_DEFS ${MY_DEFS}
+        KU_VULKAN
+    )
 else()
+    add_library(${PROJECT_NAME}
+        ${MY_FILES}
+        src/rekuai/Platform/OpenGL/OpenGLAPI.h
+        src/rekuai/Platform/OpenGL/OpenGLAPI.cpp
+        src/rekuai/Platform/OpenGL/OpenGLBuffer.h
+        src/rekuai/Platform/OpenGL/OpenGLBuffer.cpp
+        src/rekuai/Platform/OpenGL/OpenGLShader.h
+        src/rekuai/Platform/OpenGL/OpenGLShader.cpp
+        src/rekuai/Platform/OpenGL/OpenGLTexture.h
+        src/rekuai/Platform/OpenGL/OpenGLTexture.cpp
+        src/rekuai/Platform/OpenGL/OpenGLTextureArray.h
+        src/rekuai/Platform/OpenGL/OpenGLTextureArray.cpp
+    )   
+
     set(MY_DEFS ${MY_DEFS} KU_OPENGL)
 endif()
 
