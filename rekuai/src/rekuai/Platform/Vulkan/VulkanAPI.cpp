@@ -107,7 +107,7 @@ namespace kuai {
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &command->command_bufs[current_frame];
 
-        VkSemaphore signalSemaphores[] = {render_finished_semaphores[current_frame]};
+        VkSemaphore signalSemaphores[] = {render_finished_semaphores[imageIndex]};
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
