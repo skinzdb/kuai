@@ -23,8 +23,9 @@ namespace kuai {
 		virtual void create_uniform_block(const std::string& name, const std::vector<const char*>& members, uint32_t binding) override;
 		virtual void set_uniform_block(const std::string& name, const std::string& member, const void* data, uint32_t size) override;
 
-		virtual void bind() const override;
-		virtual void unbind() const override;
+		virtual void bind() const override {}
+		void bind(VkCommandBuffer cmd_buf) const;
+		virtual void unbind() const override {}
 
 		virtual uint32_t get_id() const override { return 0; }
 
@@ -36,6 +37,5 @@ namespace kuai {
         PFN_vkCmdBindShadersEXT bind_shaders_fn;
 
 		friend class VulkanAPI;
-		friend class VulkanCommand;
     };
 }

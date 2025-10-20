@@ -84,18 +84,9 @@ namespace kuai {
 
     }
 
-    void VulkanShader::bind() const 
+    void VulkanShader::bind(VkCommandBuffer cmd_buf) const 
     {
-        VulkanAPI* vk_api = static_cast<VulkanAPI*>(RendererAPI::get());
-
-        vk_api->set_shader_bind_fn([this](VkCommandBuffer cmd_buf) {
-            VkShaderStageFlagBits shader_stages[2] = { VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_FRAGMENT_BIT };
-            bind_shaders_fn(cmd_buf, 2, shader_stages, shaders);
-        });
+        VkShaderStageFlagBits shader_stages[2] = { VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_FRAGMENT_BIT };
+        bind_shaders_fn(cmd_buf, 2, shader_stages, shaders);
 	}
-
-	void VulkanShader::unbind() const {
-
-	}
-
 }

@@ -64,9 +64,9 @@ namespace kuai {
 		// 	glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*)0, cmd_count, sizeof(IndirectCommand));
 		// }
 
-    void OpenGLAPI::draw_indexed(uint32_t index_count)
+    void OpenGLAPI::draw_indexed(std::shared_ptr<Shader> shader, std::shared_ptr<VertexArray> vertex_array)
     {
-        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, vertex_array->get_index_count(), GL_UNSIGNED_INT, nullptr);
     }
 
     void OpenGLAPI::clear() {

@@ -13,11 +13,12 @@ namespace kuai {
         ~VulkanBuffer();
 
         virtual void bind() const override {}
+        void bind(VkCommandBuffer cmd_buf) const;
 
         virtual void set_data(const void* data, uint32_t size) override;
 
         virtual BufferLayout& get_layout() override { return layout; }
-        virtual void set_layout(const BufferLayout& layout) override { this->layout = layout; }
+        virtual void set_layout(const BufferLayout& layout) override;
 
     private:
         BufferLayout layout;
@@ -25,10 +26,13 @@ namespace kuai {
         VkBuffer buf;
         VkDeviceMemory buf_memory;
 
+        VkVertexInputBindingDescription2EXT binding_description;
+        std::vector<VkVertexInputAttributeDescription2EXT> attr_descriptions;
+
         VkDevice ctx_device;
         VkPhysicalDevice ctx_physical_device;
         VkCommandPool command_pool;
-        VkQueue graphics_queue;
+        VkQueue graphics_queue; // TODO: clean, bad
 
         friend class VulkanVertexArray;
     };
@@ -41,6 +45,7 @@ namespace kuai {
         ~VulkanIndexBuffer();
 
         virtual void bind() const override {}
+        void bind(VkCommandBuffer cmd_buf) const;
 
         virtual uint32_t get_count() const override { return count; }
 
@@ -58,7 +63,8 @@ namespace kuai {
     class VulkanVertexArray : public VertexArray
     {
     public:
-        virtual void bind() const override;
+        virtual void bind() const override {}
+        void bind(VkCommandBuffer cmd_buf) const;
 
         virtual void add_vertex_buffer(std::shared_ptr<VertexBuffer> buf) override;
         virtual void set_index_buffer(std::shared_ptr<IndexBuffer> buf) override;

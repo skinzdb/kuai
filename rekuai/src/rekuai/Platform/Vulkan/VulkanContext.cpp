@@ -17,11 +17,8 @@ namespace kuai {
 
     const std::vector<const char*> device_exts = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-        VK_EXT_SHADER_OBJECT_EXTENSION_NAME
-
-        #ifdef KU_PLATFORM_APPLE
-            ,"VK_KHR_portability_subset"
-        #endif
+        VK_EXT_SHADER_OBJECT_EXTENSION_NAME,
+        VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME
     };
 
     #ifdef NDEBUG
@@ -183,12 +180,6 @@ namespace kuai {
 
         auto extensions = get_required_extensions();
 
-        #ifdef KU_PLATFORM_APPLE
-            extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
-            extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
-            createInfo.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
-        #endif
-
         createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         createInfo.ppEnabledExtensionNames = extensions.data();
 
@@ -321,6 +312,12 @@ namespace kuai {
         shaderFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_OBJECT_FEATURES_EXT;
         shaderFeatures.shaderObject = true;
         createInfo.pNext = &shaderFeatures;
+
+        // Add dynamic rendering extension feature
+        VkPhysicalDeviceDynamicRenderingFeaturesKHR dynamicFeatures{};
+        dynamicFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR;
+        dynamicFeatures.dynamicRendering = true;
+        shaderFeatures.pNext = &dynamicFeatures;
 
         if (enable_validation)
         {

@@ -40,7 +40,7 @@ namespace kuai {
         mesh->vertex_array->bind();
 
         //shader->set_uniform("model_matrix", model);
-        api->draw_indexed(mesh->vertex_array->get_index_count());
+        api->draw_indexed(shader, mesh->vertex_array);
 	}
 
     void Renderer::clear()

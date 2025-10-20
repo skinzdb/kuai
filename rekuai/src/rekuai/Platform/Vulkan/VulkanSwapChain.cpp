@@ -2,6 +2,7 @@
 
 #include "GLFW/glfw3.h"
 
+#include "VulkanFrame.h"
 #include "rekuai/Core/App.h"
 #include "rekuai/Platform/Vulkan/VulkanUtils.h"
 
@@ -54,6 +55,12 @@ namespace kuai {
             return actualExtent;
         }
     }
+
+    VulkanSwapChain::VulkanSwapChain(VkDevice device, VkPhysicalDevice physical_device, VkSurfaceKHR surface)
+    {
+        create(device, physical_device, surface);
+        create_sync_objects(device);
+    }   
 
     void VulkanSwapChain::create(VkDevice device, VkPhysicalDevice physical_device, VkSurfaceKHR surface)
     {
@@ -116,85 +123,130 @@ namespace kuai {
         image_format = surfaceFormat.format;
         extent = chosen_extent;
 
+        // Create frames
+        for (size_t i = 0; i < images.size(); i++) 
+        {
+            frames.push_back(std::make_unique<VulkanFrame>(device, images[i], image_format));
+        }
     }
 
-    void VulkanSwapChain::recreate(VkDevice device, VkPhysicalDevice physical_device, VkSurfaceKHR surface, VkRenderPass render_pass)
+    void VulkanSwapChain::recreate(VkDevice device, VkPhysicalDevice physical_device, VkSurfaceKHR surface)
     {
         vkDeviceWaitIdle(device);
+        
+        frames.clear(); // Destroy image views in frames first
 
-        cleanup(device);
+        vkDestroySwapchainKHR(device, chain, nullptr);
 
         create(device, physical_device, surface);
-        create_image_views(device);
-        create_framebuffers(device, render_pass);
+    }
+
+    void VulkanSwapChain::draw_frame(VkDevice device, VkPhysicalDevice physical_device, 
+            VkQueue graphics_queue, VkQueue present_queue, 
+            VkSurfaceKHR surface, const std::vector<VkCommandBuffer>& cmd_bufs,
+            std::shared_ptr<VulkanShader> shader, std::shared_ptr<VulkanVertexArray> vertex_array)
+    {
+        vkWaitForFences(device, 1, &in_flight_fences[frame_idx], VK_TRUE, UINT64_MAX);
+
+        uint32_t img_idx;
+        VkResult result = vkAcquireNextImageKHR(device, chain, UINT64_MAX,
+            img_available_semaphores[frame_idx], VK_NULL_HANDLE, &img_idx);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            recreate(device, physical_device, surface);
+            return;
+        }
+        else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+        {
+            KU_CORE_ERROR("(Vulkan) Failed to acquire swap chain image");
+        }
+
+        vkResetFences(device, 1, &in_flight_fences[frame_idx]);
+
+        frames[frame_idx]->record(device, cmd_bufs[frame_idx], extent, 6, shader, vertex_array);
+
+        VkSubmitInfo submitInfo{};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+        VkSemaphore waitSemaphores[] = {img_available_semaphores[frame_idx]};
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitDstStageMask = waitStages;
+
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &cmd_bufs[frame_idx];
+
+        VkSemaphore signalSemaphores[] = {render_finished_semaphores[img_idx]};
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+
+        if (vkQueueSubmit(graphics_queue, 1, &submitInfo, in_flight_fences[frame_idx]) != VK_SUCCESS) {
+            KU_CORE_ERROR("(Vulkan) Failed to submit draw command buffer");
+        }
+
+        VkPresentInfoKHR presentInfo{};
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = signalSemaphores;
+
+        VkSwapchainKHR swapChains[] = {chain};
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = swapChains;
+        presentInfo.pImageIndices = &img_idx;
+
+        presentInfo.pResults = nullptr; // Optional
+
+        result = vkQueuePresentKHR(present_queue, &presentInfo);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+        {
+            recreate(device, physical_device, surface);
+        }
+        else if (result != VK_SUCCESS)
+        {
+            KU_CORE_ERROR("(Vulkan) Failed to submit draw command buffer");
+        }
+
+        frame_idx = (frame_idx + 1) % images.size();
     }
 
     void VulkanSwapChain::cleanup(VkDevice device)
     {
-        for (auto framebuffer : framebuffers)
+        for (size_t i = 0; i < images.size(); i++) 
         {
-            vkDestroyFramebuffer(device, framebuffer, nullptr);
+            vkDestroySemaphore(device, render_finished_semaphores[i], nullptr);
+            vkDestroySemaphore(device, img_available_semaphores[i], nullptr);
+            vkDestroyFence(device, in_flight_fences[i], nullptr);
         }
 
-        for (auto image_view : image_views)
-        {
-            vkDestroyImageView(device, image_view, nullptr);
-        }
+        frames.clear();
 
         vkDestroySwapchainKHR(device, chain, nullptr);
     }
 
-    void VulkanSwapChain::create_image_views(VkDevice device) {
-        image_views.resize(images.size());
+    void VulkanSwapChain::create_sync_objects(VkDevice device)
+    {
+        img_available_semaphores.resize(images.size());
+        render_finished_semaphores.resize(images.size());
+        in_flight_fences.resize(images.size());
+
+        VkSemaphoreCreateInfo semaphoreInfo{};
+        semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+        VkFenceCreateInfo fenceInfo{};
+        fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+        fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
         for (size_t i = 0; i < images.size(); i++)
         {
-            VkImageViewCreateInfo createInfo{};
-            createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-            createInfo.image = images[i];
-
-            createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-            createInfo.format = image_format;
-
-            createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-            createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-            createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-            createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-
-            createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            createInfo.subresourceRange.baseMipLevel = 0;
-            createInfo.subresourceRange.levelCount = 1;
-            createInfo.subresourceRange.baseArrayLayer = 0;
-            createInfo.subresourceRange.layerCount = 1;
-
-            if (vkCreateImageView(device, &createInfo, nullptr, &image_views[i]) != VK_SUCCESS)
+            if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &img_available_semaphores[i]) != VK_SUCCESS ||
+                vkCreateSemaphore(device, &semaphoreInfo, nullptr, &render_finished_semaphores[i]) != VK_SUCCESS ||
+                vkCreateFence(device, &fenceInfo, nullptr, &in_flight_fences[i]) != VK_SUCCESS)
             {
-                KU_CORE_CRITICAL("(Vulkan) Failed to create image views");
-                exit(1);
-            }
-        }
-    }
-
-    void VulkanSwapChain::create_framebuffers(VkDevice device, VkRenderPass render_pass)
-    {
-        framebuffers.resize(image_views.size());
-
-        for (size_t i = 0; i < image_views.size(); i++) {
-            VkImageView attachments[] = {
-                image_views[i]
-            };
-
-            VkFramebufferCreateInfo framebufferInfo{};
-            framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-            framebufferInfo.renderPass = render_pass;
-            framebufferInfo.attachmentCount = 1;
-            framebufferInfo.pAttachments = attachments;
-            framebufferInfo.width = extent.width;
-            framebufferInfo.height = extent.height;
-            framebufferInfo.layers = 1;
-
-            if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &framebuffers[i]) != VK_SUCCESS) {
-                KU_CORE_CRITICAL("(Vulkan) Failed to create framebuffer for swap chain");
+                KU_CORE_CRITICAL("(Vulkan) Failed to create synchronisation primitives");
                 exit(1);
             }
         }

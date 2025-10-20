@@ -7,10 +7,11 @@
 
 namespace kuai {
 
-    VulkanCommand::VulkanCommand(VkDevice device, VkPhysicalDevice physical_device, VkSurfaceKHR surface, size_t swap_chain_images) 
+    VulkanCommand::VulkanCommand(VkDevice device, VkPhysicalDevice physical_device, VkSurfaceKHR surface, size_t swap_chain_images)
+        : cmd_bufs(std::vector<VkCommandBuffer>(swap_chain_images))
     {
         create_command_pool(device, physical_device, surface);
-        create_command_buffers(device, swap_chain_images);
+        create_command_bufs(device);
     }
 
     void VulkanCommand::create_command_pool(VkDevice device, VkPhysicalDevice physical_device, VkSurfaceKHR surface)
@@ -29,66 +30,8 @@ namespace kuai {
         }
     }
 
-    void VulkanCommand::record(VkDevice device, std::shared_ptr<VulkanSwapChain> swap_chain,
-                    VkRenderPass render_pass, uint32_t current_frame, uint32_t image_idx, uint32_t index_count)
+    void VulkanCommand::create_command_bufs(VkDevice device)
     {
-        VkCommandBuffer cmd_buf = cmd_bufs[current_frame];
-
-        VkCommandBufferBeginInfo beginInfo{};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        beginInfo.flags = 0; // Optional
-        beginInfo.pInheritanceInfo = nullptr; // Optional
-
-        if (vkBeginCommandBuffer(cmd_buf, &beginInfo) != VK_SUCCESS)
-        {
-            KU_CORE_ERROR("(Vulkan) Failed to begin recording command buffer");
-        }
-
-        VkRenderPassBeginInfo renderPassInfo{};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = render_pass;
-        renderPassInfo.framebuffer = swap_chain->framebuffers[image_idx];
-
-        renderPassInfo.renderArea.offset = {0, 0};
-        renderPassInfo.renderArea.extent = swap_chain->extent;
-
-        VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
-        renderPassInfo.clearValueCount = 1;
-        renderPassInfo.pClearValues = &clearColor;
-
-        vkCmdBeginRenderPass(cmd_buf, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-        VkViewport viewport{};
-        viewport.x = 0.0f;
-        viewport.y = 0.0f;
-        viewport.width = static_cast<float>(swap_chain->extent.width);
-        viewport.height = static_cast<float>(swap_chain->extent.height);
-        viewport.minDepth = 0.0f;
-        viewport.maxDepth = 1.0f;
-        vkCmdSetViewport(cmd_buf, 0, 1, &viewport);
-
-        VkRect2D scissor{};
-        scissor.offset = {0, 0};
-        scissor.extent = swap_chain->extent;
-        vkCmdSetScissor(cmd_buf, 0, 1, &scissor);
-
-        shader_bind_fn(cmd_buf);
-        vertex_array_bind_fn(cmd_buf);
-
-        vkCmdDrawIndexed(cmd_buf, index_count, 1, 0, 0, 0);
-
-        vkCmdEndRenderPass(cmd_buf);
-
-        if (vkEndCommandBuffer(cmd_buf) != VK_SUCCESS)
-        {
-            KU_CORE_ERROR("Failed to record command buffer!");
-        }
-    }
-
-    void VulkanCommand::create_command_buffers(VkDevice device, size_t swap_chain_images)
-    {
-        cmd_bufs.resize(swap_chain_images);
-
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.commandPool = pool;
@@ -105,5 +48,4 @@ namespace kuai {
     {
         vkDestroyCommandPool(device, pool, nullptr);
     }
-
 }

@@ -82,23 +82,20 @@ if(Vulkan_FOUND)
     add_library(${PROJECT_NAME} 
         ${MY_FILES}
         src/rekuai/Platform/Vulkan/VulkanAPI.h
+        src/rekuai/Platform/Vulkan/VulkanAPI.cpp
         src/rekuai/Platform/Vulkan/VulkanBuffer.h
         src/rekuai/Platform/Vulkan/VulkanBuffer.cpp
         src/rekuai/Platform/Vulkan/VulkanCommand.h
         src/rekuai/Platform/Vulkan/VulkanCommand.cpp
         src/rekuai/Platform/Vulkan/VulkanContext.h
         src/rekuai/Platform/Vulkan/VulkanContext.cpp
-        src/rekuai/Platform/Vulkan/VulkanPipeline.h
-        src/rekuai/Platform/Vulkan/VulkanPipeline.cpp
-        src/rekuai/Platform/Vulkan/VulkanRenderPass.h
-        src/rekuai/Platform/Vulkan/VulkanRenderPass.cpp
+        src/rekuai/Platform/Vulkan/VulkanFrame.h
+        src/rekuai/Platform/Vulkan/VulkanFrame.cpp
         src/rekuai/Platform/Vulkan/VulkanShader.h
         src/rekuai/Platform/Vulkan/VulkanShader.cpp
         src/rekuai/Platform/Vulkan/VulkanSwapChain.h
         src/rekuai/Platform/Vulkan/VulkanSwapChain.cpp
         src/rekuai/Platform/Vulkan/VulkanUtils.h
-        src/rekuai/Platform/Vulkan/VulkanUtils.cpp
-        src/rekuai/Platform/Vulkan/VulkanAPI.cpp
     )
 
     # Vulkan include dirs

@@ -89,7 +89,13 @@ namespace kuai {
         vkFreeMemory(ctx_device, buf_memory, nullptr);
     }
 
-    void VulkanBuffer::set_data(const void* data, uint32_t size)
+    void VulkanBuffer::bind(VkCommandBuffer cmd_buf) const
+    {
+        VkDeviceSize offsets[] = {0};
+        vkCmdBindVertexBuffers(cmd_buf, 0, 1, &buf, offsets);
+    }
+
+    void VulkanBuffer::set_data(const void *data, uint32_t size)
     {
         VkBuffer staging_buf;
         VkDeviceMemory staging_buf_memory;
@@ -105,6 +111,34 @@ namespace kuai {
 
         vkDestroyBuffer(ctx_device, staging_buf, nullptr);
         vkFreeMemory(ctx_device, staging_buf_memory, nullptr);
+    }
+
+    void VulkanBuffer::set_layout(const BufferLayout &layout)
+    {
+        this->layout = layout;
+
+        attr_descriptions.clear();
+
+        // Vertex input settings
+        binding_description = VkVertexInputBindingDescription2EXT{};
+        binding_description.sType = VK_STRUCTURE_TYPE_VERTEX_INPUT_BINDING_DESCRIPTION_2_EXT;
+        binding_description.binding = 0;
+        binding_description.stride = layout.get_stride();
+        binding_description.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+        binding_description.divisor = 1;
+
+        size_t i = 0;
+        for (const auto& element : layout)
+        {
+            VkVertexInputAttributeDescription2EXT attr{};
+            attr.sType = VK_STRUCTURE_TYPE_VERTEX_INPUT_ATTRIBUTE_DESCRIPTION_2_EXT;
+            attr.binding = 0;
+            attr.location = static_cast<uint32_t>(i);
+            attr.format = VulkanUtils::get_vulkan_type(element.type);
+            attr.offset = element.offset;
+            attr_descriptions.push_back(attr);
+            i++;
+        }
     }
 
     VulkanIndexBuffer::VulkanIndexBuffer(VkDevice device, VkPhysicalDevice physical_device, VkCommandPool command_pool,
@@ -138,15 +172,24 @@ namespace kuai {
         vkFreeMemory(ctx_device, buf_memory, nullptr);
     }
 
-    void VulkanVertexArray::bind() const
+    void VulkanIndexBuffer::bind(VkCommandBuffer cmd_buf) const
     {
-        VulkanAPI* vk_api = static_cast<VulkanAPI*>(RendererAPI::get());
+        vkCmdBindIndexBuffer(cmd_buf, buf, 0, VK_INDEX_TYPE_UINT32);
+    }
 
-        vk_api->set_vertex_array_bind_fn([this](VkCommandBuffer cmd_buf) {
-            VkDeviceSize offsets[] = {0};
-            vkCmdBindVertexBuffers(cmd_buf, 0, vk_vertex_bufs.size(), vk_vertex_bufs.data(), offsets);
-            vkCmdBindIndexBuffer(cmd_buf, index_buf->buf, 0, VK_INDEX_TYPE_UINT32);
-        });
+    void VulkanVertexArray::bind(VkCommandBuffer cmd_buf) const
+    {
+        // TODO this only works when there's one vertex buffer!!!!!
+        ((PFN_vkCmdSetVertexInputEXT)vkGetDeviceProcAddr(index_buf->ctx_device, "vkCmdSetVertexInputEXT"))(
+            cmd_buf,
+            1,
+            &vertex_bufs[0]->binding_description,
+            vertex_bufs[0]->attr_descriptions.size(),
+            vertex_bufs[0]->attr_descriptions.data()
+        );
+        VkDeviceSize offsets[] = {0};
+        vkCmdBindVertexBuffers(cmd_buf, 0, vk_vertex_bufs.size(), vk_vertex_bufs.data(), offsets);
+        vkCmdBindIndexBuffer(cmd_buf, index_buf->buf, 0, VK_INDEX_TYPE_UINT32);
     }
 
     void VulkanVertexArray::add_vertex_buffer(std::shared_ptr<VertexBuffer> buf)
