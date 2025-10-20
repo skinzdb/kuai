@@ -78,7 +78,7 @@ set(MY_DEFS GLFW_INCLUDE_NONE)
 
 find_package(Vulkan)
 
-if(Vulkan_FOUND)
+if(NOT APPLE AND Vulkan_FOUND)
     add_library(${PROJECT_NAME} 
         ${MY_FILES}
         src/rekuai/Platform/Vulkan/VulkanAPI.h
@@ -97,11 +97,6 @@ if(Vulkan_FOUND)
         src/rekuai/Platform/Vulkan/VulkanSwapChain.cpp
         src/rekuai/Platform/Vulkan/VulkanUtils.h
     )
-
-    # Vulkan include dirs
-    if(APPLE)
-        target_include_directories(${PROJECT_NAME} PUBLIC vendor/vulkan)
-    endif()
 
     # Link the libraries to the target
     set(MY_LIBS
