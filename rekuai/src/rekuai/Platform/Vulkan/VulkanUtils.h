@@ -8,6 +8,8 @@
 
 namespace kuai {
 
+#define GET_EXTENSION_FN(_device, _id) reinterpret_cast<PFN_##_id>(vkGetDeviceProcAddr(_device, #_id))
+
 struct SpirvReflection {
     std::vector<VkDescriptorSetLayoutBinding> bindings;
     std::vector<VkPushConstantRange> push_constants;

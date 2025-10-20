@@ -133,7 +133,7 @@ namespace kuai {
             VkVertexInputAttributeDescription2EXT attr{};
             attr.sType = VK_STRUCTURE_TYPE_VERTEX_INPUT_ATTRIBUTE_DESCRIPTION_2_EXT;
             attr.binding = 0;
-            attr.location = static_cast<uint32_t>(i);
+            attr.location = static_cast<uint32_t>(i); // TODO: Not correct for any attrib larger than vec4
             attr.format = VulkanUtils::get_vulkan_type(element.type);
             attr.offset = element.offset;
             attr_descriptions.push_back(attr);
@@ -180,7 +180,7 @@ namespace kuai {
     void VulkanVertexArray::bind(VkCommandBuffer cmd_buf) const
     {
         // TODO this only works when there's one vertex buffer!!!!!
-        ((PFN_vkCmdSetVertexInputEXT)vkGetDeviceProcAddr(index_buf->ctx_device, "vkCmdSetVertexInputEXT"))(
+        GET_EXTENSION_FN(index_buf->ctx_device, vkCmdSetVertexInputEXT)(
             cmd_buf,
             1,
             &vertex_bufs[0]->binding_description,

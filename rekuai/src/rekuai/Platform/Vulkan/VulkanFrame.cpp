@@ -1,6 +1,7 @@
 #include "kpch.h"
 
 #include "VulkanFrame.h"
+#include "VulkanUtils.h"
 
 namespace kuai {
 
@@ -165,23 +166,15 @@ namespace kuai {
         // Rasterization settings
         vkCmdSetRasterizerDiscardEnable(cmd_buf, false);
         vkCmdSetCullMode(cmd_buf, VK_CULL_MODE_NONE);
-        ((PFN_vkCmdSetPolygonModeEXT)vkGetDeviceProcAddr(device, "vkCmdSetPolygonModeEXT"))(
-            cmd_buf, VK_POLYGON_MODE_FILL
-        );
+        GET_EXTENSION_FN(device, vkCmdSetPolygonModeEXT)(cmd_buf, VK_POLYGON_MODE_FILL);
         vkCmdSetDepthBiasEnable(cmd_buf, false);
 
         // Multisample settings
-        ((PFN_vkCmdSetRasterizationSamplesEXT)vkGetDeviceProcAddr(device, "vkCmdSetRasterizationSamplesEXT"))(
-            cmd_buf, VK_SAMPLE_COUNT_1_BIT
-        );
+        GET_EXTENSION_FN(device, vkCmdSetRasterizationSamplesEXT)(cmd_buf, VK_SAMPLE_COUNT_1_BIT);
 
         VkSampleMask sampleMask = 1;
-        ((PFN_vkCmdSetSampleMaskEXT)vkGetDeviceProcAddr(device, "vkCmdSetSampleMaskEXT"))(
-            cmd_buf, VK_SAMPLE_COUNT_1_BIT, &sampleMask
-        );
-        ((PFN_vkCmdSetAlphaToCoverageEnableEXT)vkGetDeviceProcAddr(device, "vkCmdSetAlphaToCoverageEnableEXT"))(
-            cmd_buf, false
-        );
+        GET_EXTENSION_FN(device, vkCmdSetSampleMaskEXT)(cmd_buf, VK_SAMPLE_COUNT_1_BIT, &sampleMask);
+        GET_EXTENSION_FN(device, vkCmdSetAlphaToCoverageEnableEXT)(cmd_buf, false);
 
         // Depth stencil stetings
         vkCmdSetDepthWriteEnable(cmd_buf, false);
@@ -190,9 +183,7 @@ namespace kuai {
 
         // Color blend settings
         VkBool32 colorBlend = true;
-        ((PFN_vkCmdSetColorBlendEnableEXT)vkGetDeviceProcAddr(device, "vkCmdSetColorBlendEnableEXT"))(
-            cmd_buf, 0, 1, &colorBlend
-        );
+        GET_EXTENSION_FN(device, vkCmdSetColorBlendEnableEXT)(cmd_buf, 0, 1, &colorBlend);
         VkColorBlendEquationEXT colorBlendEquation{};
         colorBlendEquation.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
         colorBlendEquation.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
@@ -200,12 +191,8 @@ namespace kuai {
         colorBlendEquation.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
         colorBlendEquation.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
         colorBlendEquation.alphaBlendOp = VK_BLEND_OP_ADD;
-        ((PFN_vkCmdSetColorBlendEquationEXT)vkGetDeviceProcAddr(device, "vkCmdSetColorBlendEquationEXT"))(
-            cmd_buf, 0, 1, &colorBlendEquation
-        );
+        GET_EXTENSION_FN(device, vkCmdSetColorBlendEquationEXT)(cmd_buf, 0, 1, &colorBlendEquation);
         VkColorComponentFlags colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-        ((PFN_vkCmdSetColorWriteMaskEXT)vkGetDeviceProcAddr(device, "vkCmdSetColorWriteMaskEXT"))(
-            cmd_buf, 0, 1, &colorWriteMask
-        );
+        GET_EXTENSION_FN(device, vkCmdSetColorWriteMaskEXT)(cmd_buf, 0, 1, &colorWriteMask);
     }
 }
