@@ -319,6 +319,13 @@ namespace kuai {
         dynamicFeatures.dynamicRendering = true;
         shaderFeatures.pNext = &dynamicFeatures;
 
+        // Add device descriptor indexing feature
+        VkPhysicalDeviceDescriptorIndexingFeatures descriptorFeatures{};
+        descriptorFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+        descriptorFeatures.descriptorBindingPartiallyBound = true;
+        descriptorFeatures.runtimeDescriptorArray = true;
+        dynamicFeatures.pNext = &descriptorFeatures;
+
         if (enable_validation)
         {
             createInfo.enabledLayerCount = static_cast<uint32_t>(validation_layers.size());

@@ -59,15 +59,16 @@ public:
         std::string frag_src = read_file("frag.spv");
         auto shader = Shader::create(vert_src, frag_src);
 
-//		auto cam = scene->create_entity();
-		auto test = create_entity();
-
-		// cam->add_component<Camera>(60, get_window().get_width(), get_window().get_height(), 0.1f, 100.0f);
-
 		auto mesh = std::make_shared<Mesh>(vertices, normals, tex_coords, indices);
 
+		auto test = create_entity();
+		
 		test->add_component<Transform>();
 		test->add_component<MeshRenderer>(mesh, std::make_shared<Material>(shader));
+		
+		
+		//		auto cam = scene->create_entity();
+		// cam->add_component<Camera>(60, get_window().get_width(), get_window().get_height(), 0.1f, 100.0f);
 
 		//default material
 

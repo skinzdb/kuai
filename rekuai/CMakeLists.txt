@@ -91,6 +91,8 @@ if(NOT APPLE AND Vulkan_FOUND)
         src/rekuai/Platform/Vulkan/VulkanContext.cpp
         src/rekuai/Platform/Vulkan/VulkanFrame.h
         src/rekuai/Platform/Vulkan/VulkanFrame.cpp
+        src/rekuai/Platform/Vulkan/VulkanDescriptor.h
+        src/rekuai/Platform/Vulkan/VulkanDescriptor.cpp
         src/rekuai/Platform/Vulkan/VulkanShader.h
         src/rekuai/Platform/Vulkan/VulkanShader.cpp
         src/rekuai/Platform/Vulkan/VulkanSwapChain.h
