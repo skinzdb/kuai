@@ -58,15 +58,6 @@ namespace kuai {
 				}
 			}
 		}
-
-		void update(float dt)
-		{
-			for (const auto& pair : systems)
-			{
-				pair.second->update(dt);
-			}
-		}
-
 	private:
 		// Maps system masks to systems
 		std::unordered_map<ComponentMask, std::shared_ptr<ISystem>> systems;

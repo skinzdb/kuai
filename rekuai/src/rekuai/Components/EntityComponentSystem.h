@@ -148,12 +148,6 @@ namespace kuai {
 		{
 			event_bus->subscribe<T>(handler);
 		}
-
-		void update(float dt)
-		{
-            sys_manager->update(dt);
-		}
-
 	private:
 		std::unique_ptr<EntityManager> entity_manager;
 		std::shared_ptr<ComponentManager> component_manager;

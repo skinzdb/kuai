@@ -22,10 +22,7 @@ namespace kuai {
         ecs->register_component<Transform>();
         ecs->register_component<MeshRenderer>();
 
-        auto render_sys = ecs->register_system<MeshRenderer, Transform>();
-        render_sys->each([](float dt, EntityId id, MeshRenderer& mesh_renderer, Transform& transform) {
-            Renderer::submit(mesh_renderer.material->get_shader(), mesh_renderer.mesh, transform.get_model_matrix());
-        });
+        render_sys = ecs->register_system<MeshRenderer, Transform>();
 
 		Renderer::init();
 		Renderer::set_viewport(0, 0, window->get_width(), window->get_height());
@@ -35,7 +32,7 @@ namespace kuai {
 	App::~App()
 	{
 	    Renderer::stop();
-	    ecs.reset();
+	    ecs.reset(); // Some components (mesh, shader) contain render components that need to be cleaned up first
 	    Renderer::cleanup();
 		//AudioManager::cleanup();
 	}
@@ -52,12 +49,14 @@ namespace kuai {
 			float elapsedTime = timer.get_elapsed(); // Time since last frame
 			//KU_CORE_INFO("FPS: {0}", 1.0f / elapsedTime);
 
-			ecs->update(elapsedTime);
-
 			if (!minimised)
 			{
 				update(elapsedTime);
 			}
+
+			render_sys->each([](MeshRenderer& mesh_renderer, Transform& transform) {
+            	Renderer::submit(mesh_renderer.material->get_shader(), mesh_renderer.mesh, transform.get_model_matrix());
+        	});
 
 			Renderer::update();
 			window->update();
@@ -88,7 +87,7 @@ namespace kuai {
 		}
 
 		minimised = false;
-		//Renderer::setViewport(0, 0, e.get_width(), e.get_height());
+		Renderer::set_viewport(0, 0, e.get_width(), e.get_height());
 
 		return false;
 	}

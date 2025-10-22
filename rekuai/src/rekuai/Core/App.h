@@ -2,6 +2,7 @@
 
 #include "rekuai/Components/EntityComponentSystem.h"
 #include "rekuai/Components/Entity.h"
+#include "rekuai/Components/Components.h"
 #include "rekuai/Events/Event.h"
 #include "rekuai/Events/AppEvent.h"
 
@@ -50,6 +51,7 @@ namespace kuai {
 	private:
 		std::unique_ptr<Window> window;
 		std::shared_ptr<EntityComponentSystem> ecs;
+		std::shared_ptr<System<MeshRenderer, Transform>> render_sys;
 		Timer timer;
 		bool running = true;
 		bool minimised = false;
