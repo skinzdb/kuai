@@ -2,7 +2,6 @@
 
 #include "VulkanContext.h"
 #include "rekuai/Platform/Vulkan/VulkanUtils.h"
-#include "vulkan/vulkan_core.h"
 
 #include <set>
 
@@ -221,6 +220,11 @@ namespace kuai {
             requiredExtensions.erase(extension.extensionName);
         }
 
+        for (const auto& extension : requiredExtensions)
+        {
+            KU_CORE_WARN("(Vulkan) {} extension not supported", extension);
+        }
+
         return requiredExtensions.empty();
     }
 
@@ -261,6 +265,17 @@ namespace kuai {
 
         for (const auto& device : devices)
         {
+            VkPhysicalDeviceProperties deviceProps{};
+            vkGetPhysicalDeviceProperties(device, &deviceProps);
+
+            
+            KU_CORE_INFO("(Vulkan) Checking GPU device {}, API version: {}.{}.{}", 
+                deviceProps.deviceName, 
+                VK_API_VERSION_MAJOR(deviceProps.apiVersion),
+                VK_API_VERSION_MINOR(deviceProps.apiVersion),
+                VK_API_VERSION_PATCH(deviceProps.apiVersion)
+            );
+
             if (is_device_suitable(device, surface))
             {
                 physical_device = device;
