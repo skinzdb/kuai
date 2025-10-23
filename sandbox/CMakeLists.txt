@@ -9,16 +9,6 @@ add_executable(${PROJECT_NAME}
    src/Main.cpp
 )
 
-if (WIN32)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
-        KU_PLATFORM_WINDOWS
-    )
-elseif (APPLE)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
-        KU_PLATFORM_APPLE
-    )
-endif()
-
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../rekuai
     ${CMAKE_CURRENT_BINARY_DIR}/rekuai)
 
