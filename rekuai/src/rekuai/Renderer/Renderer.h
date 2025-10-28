@@ -25,46 +25,6 @@ namespace kuai {
 		STENCIL
 	};
 
-	enum RenderPass : uint8_t
-	{
-	    Opaque = 0,
-		Transparent = 1,
-		Shadow = 2
-	};
-
-	struct SortKey
-	{
-	    uint64_t value = 0;
-
-        SortKey(RenderPass pass, uint16_t prog, uint16_t material, uint16_t mesh, uint8_t depth_bucket) {
-            value = (uint64_t(pass) << 56)
-                  | (uint64_t(prog) << 40)
-                  | (uint64_t(material) << 24)
-                  | (uint64_t(mesh) << 8)
-                  | depth_bucket;
-        }
-	};
-
-	struct RenderCmd
-	{
-        SortKey key;
-        RenderPass pass;
-        uint32_t program_id;
-        uint32_t material_id;
-        uint32_t mesh_id;
-        bool instanced;
-        glm::mat4 model;
-
-        RenderCmd(RenderPass pass, uint32_t program_id, uint32_t material_id, uint32_t mesh_id, bool instanced, glm::mat4 model) :
-            key(SortKey(pass, uint16_t(program_id), uint16_t(material_id), uint16_t(mesh_id), 0)),
-            pass(pass),
-            program_id(program_id),
-            material_id(material_id),
-            mesh_id(mesh_id),
-            instanced(instanced),
-            model(model) {}
-	};
-
 	class Renderer
 	{
 	public:
@@ -76,11 +36,23 @@ namespace kuai {
 		static void set_viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
 		static void submit(std::shared_ptr<Shader> shader, std::shared_ptr<Mesh> mesh, const glm::mat4& model);
 		static void clear();
-		static void update();
 
 	private:
-	    static std::vector<RenderCmd> render_queue;
-
 		static std::unique_ptr<RendererAPI> api;
+
+		struct SceneData
+		{
+			glm::mat4 view_matrix;
+			glm::mat4 proj_matrix;
+		};
+
+		struct ModelViewProj
+		{
+			glm::mat4 model;
+			glm::mat4 view;
+			glm::mat4 proj;
+		};
+
+		static std::unique_ptr<SceneData> scene_data;
 	};
 }

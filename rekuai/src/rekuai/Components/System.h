@@ -36,7 +36,6 @@ namespace kuai {
 			}
 		}
 
-	private:
 		virtual void insert(EntityId entity) override
 		{
 			entities.push_back(entity);

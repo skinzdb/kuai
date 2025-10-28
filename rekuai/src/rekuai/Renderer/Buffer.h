@@ -153,6 +153,8 @@ namespace kuai {
 
         virtual uint32_t get_index_count() const = 0;
 
+        virtual uint32_t get_id() const = 0;
+
         static std::shared_ptr<VertexArray> create();
     };
 }

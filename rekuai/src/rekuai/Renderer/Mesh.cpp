@@ -83,12 +83,10 @@ namespace kuai {
 		if (!err.empty())
 		{
 			KU_CORE_ERROR(err);
-			return;
 		}
 		if (!warn.empty())
 		{
 			KU_CORE_WARN(warn);
-			return;
 		}
 
 		std::vector<Vertex> vertex_data{};

@@ -50,8 +50,11 @@ namespace kuai {
 
 	private:
 		std::unique_ptr<Window> window;
+
 		std::shared_ptr<EntityComponentSystem> ecs;
 		std::shared_ptr<System<MeshRenderer, Transform>> render_sys;
+		std::shared_ptr<System<Camera, Transform>> camera_sys;
+
 		Timer timer;
 		bool running = true;
 		bool minimised = false;

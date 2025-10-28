@@ -71,6 +71,8 @@ namespace kuai {
 
         virtual uint32_t get_index_count() const override { return index_buf->get_count(); }
 
+        virtual uint32_t get_id() const override { return 0; }
+
     private:
         std::vector<std::shared_ptr<VulkanBuffer>> vertex_bufs;
         std::vector<VkBuffer> vk_vertex_bufs;

@@ -76,7 +76,7 @@ set(MY_LIBS
 
 set(MY_DEFS GLFW_INCLUDE_NONE)
 
-find_package(Vulkan)
+# find_package(Vulkan)
 
 if(NOT APPLE AND Vulkan_FOUND)
     add_library(${PROJECT_NAME} 

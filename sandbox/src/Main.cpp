@@ -1,6 +1,7 @@
-#include "kuai.h"
+﻿#include "kuai.h"
 
 using namespace kuai;
+
 
 const std::vector<float> vertices = {
     -0.5f, -0.5f, 0.0f,
@@ -26,6 +27,7 @@ const std::vector<float> tex_coords = {
 const std::vector<uint32_t> indices = {
     0, 1, 2, 2, 3, 0
 };
+
 
 std::string read_file(const std::string& filename)
 {
@@ -55,9 +57,20 @@ public:
 	MyApp()
 	{
         // Shader object creation
-        std::string vert_src = read_file("vert.spv");
-        std::string frag_src = read_file("frag.spv");
+        std::string vert_src = read_file("shader.vert");
+        std::string frag_src = read_file("shader.frag");
         auto shader = Shader::create(vert_src, frag_src);
+		shader->create_uniform_block("Matrices", {"model", "view", "proj"}, 0);
+
+		auto cam = create_entity();
+		cam->add_component<Transform>();
+		cam->add_component<Camera>(
+			60.0f, 
+			static_cast<float>(get_window().get_width()), 
+			static_cast<float>(get_window().get_height()), 
+			0.1f, 
+			100.0f
+		);
 
 		auto mesh = std::make_shared<Mesh>(vertices, normals, tex_coords, indices);
 
@@ -65,58 +78,26 @@ public:
 		
 		test->add_component<Transform>();
 		test->add_component<MeshRenderer>(mesh, std::make_shared<Material>(shader));
-		
-		
-		//		auto cam = scene->create_entity();
-		// cam->add_component<Camera>(60, get_window().get_width(), get_window().get_height(), 0.1f, 100.0f);
-
-		//default material
-
-		///*signal sketch*/
-
-		//
-		//
-		//fuck = ecs->create_signal<int(int)>();
-		//
-		//fuc
-		//
-
-
-		//
-		//view.each([&fuck](float dt, PlayerComponent comp) {
-		//	if (dt > 100) {
-		//		fuck->publish(65);
-		//	}
-		//});
-
-
-		//
-		//
-
-		//view->each([](float dt, Transform& transform) {
-		//	transform.pos += glm::vec3(dt, 0, 0);
-		//});
-
+		test->get_component<Transform>().calc_model_matrix();
 	}
 
 	void update(float dt)
 	{
 	}
 
-	void input(Event& e)
+	void input(Event &e)
 	{
-
 	}
 
 	~MyApp()
 	{
-
 	}
 
 private:
+
 };
 
-App* kuai::create_app()
+App *kuai::create_app()
 {
 	return new MyApp();
 }

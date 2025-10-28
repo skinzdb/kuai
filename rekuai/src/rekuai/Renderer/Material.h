@@ -12,6 +12,8 @@ namespace kuai {
 
 		std::shared_ptr<Shader> get_shader() { return shader; }
 
+		uint32_t get_id() { return 0; }
+
 	private:
 		std::shared_ptr<Shader> shader;
 	};

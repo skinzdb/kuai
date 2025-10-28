@@ -21,8 +21,10 @@ namespace kuai {
 		ecs = std::make_shared<EntityComponentSystem>();
         ecs->register_component<Transform>();
         ecs->register_component<MeshRenderer>();
+        ecs->register_component<Camera>();
 
         render_sys = ecs->register_system<MeshRenderer, Transform>();
+        camera_sys = ecs->register_system<Camera, Transform>();
 
 		Renderer::init();
 		Renderer::set_viewport(0, 0, window->get_width(), window->get_height());
@@ -54,16 +56,21 @@ namespace kuai {
 				update(elapsedTime);
 			}
 
-			render_sys->each([](MeshRenderer& mesh_renderer, Transform& transform) {
+			camera_sys->each([](Camera &camera, Transform &transform)
+			{
+				Renderer::set_camera(camera);
+			});
+
+			render_sys->each([](MeshRenderer &mesh_renderer, Transform &transform) 
+			{
             	Renderer::submit(mesh_renderer.material->get_shader(), mesh_renderer.mesh, transform.get_model_matrix());
         	});
 
-			Renderer::update();
 			window->update();
 		}
 	}
 
-	void App::on_event(Event& e)
+	void App::on_event(Event &e)
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.dispatch<WindowCloseEvent>(std::bind(&App::on_window_close, this, std::placeholders::_1));
@@ -72,13 +79,13 @@ namespace kuai {
 		input(e);
 	}
 
-	bool App::on_window_close(WindowCloseEvent& e)
+	bool App::on_window_close(WindowCloseEvent &e)
 	{
 		running = false;
 		return true;
 	}
 
-	bool App::on_window_resize(WindowResizeEvent& e)
+	bool App::on_window_resize(WindowResizeEvent &e)
 	{
 		if (e.get_width() == 0 || e.get_height() == 0)
 		{
@@ -91,5 +98,4 @@ namespace kuai {
 
 		return false;
 	}
-
 }

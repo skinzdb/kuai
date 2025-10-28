@@ -7,15 +7,18 @@
 #include "rekuai/Renderer/Mesh.h"
 #include "rekuai/Renderer/Material.h"
 
-namespace kuai {
+#include "EntityManager.h"
 
-	//struct Relationship
-	//{
-	//	EntityId first = null_entity;
-	//	EntityId prev = null_entity;
-	//	EntityId next = null_entity;
-	//	EntityId parent = null_entity;
-	//};
+namespace kuai {
+	struct Parent
+	{
+		EntityId parent = null_entity;
+	};
+
+	struct Child
+	{
+		std::vector<EntityId> children;
+	};
 
 	struct Transform
 	{
@@ -34,7 +37,6 @@ namespace kuai {
 			return pos == other.pos && rot == other.rot && scale == other.scale;
 		}
 
-	private:
 		void calc_model_matrix()
 		{
 			model_matrix = glm::translate(glm::mat4(1.0f), pos) *
@@ -43,7 +45,7 @@ namespace kuai {
 		}
 
 	private:
-		glm::mat4 model_matrix = glm::mat4(1.0f);
+		glm::mat4 model_matrix;
 	};
 
 	struct MeshRenderer
@@ -105,6 +107,8 @@ namespace kuai {
 
 		glm::mat4 view_matrix = glm::mat4();
 		glm::mat4 proj_matrix = glm::mat4();
+
+		friend class Renderer;
 	};
 
 }

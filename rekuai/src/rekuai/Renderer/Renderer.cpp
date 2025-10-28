@@ -1,116 +1,61 @@
+#include "kpch.h"
+
 #include "Renderer.h"
+
 #include "rekuai/Core/Log.h"
 #include "rekuai/Renderer/Buffer.h"
 #include "rekuai/Renderer/RendererAPI.h"
 
-namespace kuai {
-
-	std::vector<RenderCmd> Renderer::render_queue = std::vector<RenderCmd>();
+namespace kuai
+{
 	std::unique_ptr<RendererAPI> Renderer::api = RendererAPI::create();
+	std::unique_ptr<Renderer::SceneData> Renderer::scene_data = std::make_unique<SceneData>();
 
 	void Renderer::init()
 	{
-	    api->init();
+		api->init();
 	}
 
 	void Renderer::stop()
 	{
-	    api->stop();
+		api->stop();
 	}
 
 	void Renderer::cleanup()
 	{
-	    api.reset(); // destruct render API before destructing GLFW
+		api.reset(); // destruct render API before destructing GLFW
 	}
 
-    void Renderer::set_viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
-    {
-        api->set_viewport(x, y, width, height);
-    }
-
-	void Renderer::set_camera(const Camera& camera)
+	void Renderer::set_viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 	{
+		api->set_viewport(x, y, width, height);
 	}
 
-	void Renderer::submit(std::shared_ptr<Shader> shader, std::shared_ptr<Mesh> mesh, const glm::mat4& model)
-    {
-        api->clear();
-        
-        shader->bind();
-        mesh->vertex_array->bind();
-
-        //shader->set_uniform("model_matrix", model);
-        api->draw_indexed(shader, mesh->vertex_array);
+	void Renderer::set_camera(const Camera &camera)
+	{
+		scene_data->proj_matrix = camera.proj_matrix;
+		scene_data->view_matrix = camera.view_matrix;
 	}
 
-    void Renderer::clear()
-    {
-        api->clear();
-    }
+	void Renderer::submit(std::shared_ptr<Shader> shader, std::shared_ptr<Mesh> mesh, const glm::mat4 &model)
+	{
+		api->clear();
 
-	void Renderer::update() {
+		shader->bind();
+		ModelViewProj mvp = {model, scene_data->view_matrix, scene_data->proj_matrix};
+		glm::mat4 asfd = glm::mat4{ 1.0, 0.0, 0.0, 0.0,
+			0.0, 1.0, 0.0, 0.0,
+			0.0, 0.0, 1.0, 0.0,
+			0.0, 0.0, 0.0, 1.0 };
+		shader->set_uniform_block("Matrices", "model", &asfd[0], sizeof(glm::mat4));
+		
+		mesh->vertex_array->bind();
+	
+		api->draw_indexed(shader, mesh->vertex_array);
+	}
 
-	    return;
-	    std::vector<RenderCmd> opaque, transparent;
-        for (auto& cmd : render_queue)
-        {
-            if (cmd.pass == RenderPass::Opaque)
-            {
-                opaque.push_back(cmd);
-            }
-            else if (cmd.pass == RenderPass::Transparent)
-            {
-                transparent.push_back(cmd);
-            }
-        }
-
-	    std::sort(opaque.begin(), opaque.end(), [](const RenderCmd& x, const RenderCmd& y)
-        {
-			return x.key.value < y.key.value;
-		});
-
-		// Transparent: depth-first (descending); stable-sort by state to reduce flicker
-        std::stable_sort(transparent.begin(), transparent.end(), [](const RenderCmd& x, const RenderCmd& y)
-        {
-            // Here we rely on the depth bucket in the low 8 bits; you can store real depth separately
-            uint8_t da = uint8_t(x.key.value & 0xFFu);
-            uint8_t db = uint8_t(y.key.value & 0xFFu);
-            if (da != db) return da > db; // back-to-front
-            return x.key.value < y.key.value; // tie-break by state
-        });
-
-       	struct BoundState
-        {
-            uint32_t program_id = 0;
-            uint32_t vao_id = 0;
-            uint32_t material_id = 0;
-            std::shared_ptr<Shader> shader = nullptr;
-            bool blend = false;
-        } state;
-
-        // Opaque render pass
-        for (const RenderCmd& cmd : opaque)
-        {
-            if (state.program_id != cmd.program_id)
-            {
-                state.shader = Shader::get(cmd.program_id);
-                state.shader->bind();
-                state.program_id = cmd.program_id;
-            }
-
-            if (cmd.instanced)
-            {
-
-            }
-            else
-            {
-                //cmd.mesh_id
-                // state.shader->set_uniform("model_matrix", cmd.model);
-                //
-                // api->draw_indexed(shader, {}, 0);
-            }
-        }
-
-        render_queue.clear();
+	void Renderer::clear()
+	{
+		api->clear();
 	}
 }

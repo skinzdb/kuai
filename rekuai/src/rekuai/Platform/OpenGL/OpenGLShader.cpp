@@ -73,9 +73,10 @@ namespace kuai {
 		glGetActiveUniformBlockiv(id, block_idx, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
 
 		// Get indices of member variables, and then their offsets
-		GLuint* indices = new GLuint[members.size()];
+		GLuint *indices = new GLuint[members.size()];
 		glGetUniformIndices(id, members.size(), &members[0], indices);
-		GLint* offsets = new GLint[members.size()];
+
+		GLint *offsets = new GLint[members.size()];
 		glGetActiveUniformsiv(id, members.size(), indices, GL_UNIFORM_OFFSET, offsets);
 
 		for (size_t i = 0; i < members.size(); i++)

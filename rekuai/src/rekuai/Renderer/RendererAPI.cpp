@@ -12,7 +12,13 @@
 namespace kuai {
 
     RendererAPI* RendererAPI::instance = nullptr;
-    RendererAPI::API RendererAPI::api = RendererAPI::API::Vulkan;
+    #ifdef KU_VULKAN
+        RendererAPI::API RendererAPI::api = RendererAPI::API::Vulkan;
+    #endif
+    
+    #ifdef KU_OPENGL
+        RendererAPI::API RendererAPI::api = RendererAPI::API::OpenGL;
+    #endif
 
     std::unique_ptr<RendererAPI> RendererAPI::create()
     {

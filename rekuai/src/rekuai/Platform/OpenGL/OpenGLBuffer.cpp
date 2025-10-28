@@ -119,8 +119,8 @@ namespace kuai {
 		glBindVertexArray(vao_id);
 		buf->bind();
 
-		auto& layout = buf->get_layout();
-		for (auto& element : layout)
+		auto &layout = buf->get_layout();
+		for (auto &element : layout)
 		{
 			switch (element.type)
 			{
@@ -132,7 +132,7 @@ namespace kuai {
 					element.get_component_count(),
 					GL_INT,
 					layout.get_stride(),
-					reinterpret_cast<const void*>(element.offset)
+					reinterpret_cast<const void *>(element.offset)
 				);
 				index++;
 				break;
@@ -149,7 +149,7 @@ namespace kuai {
 					GL_FLOAT,
 					GL_FALSE,
 					layout.get_stride(),
-					reinterpret_cast<const void*>(element.offset)
+					reinterpret_cast<const void *>(element.offset)
 				);
 				index++;
 				break;
@@ -168,7 +168,7 @@ namespace kuai {
 						GL_FLOAT,
 						GL_FALSE,
 						layout.get_stride(),
-						(const void*)(element.offset + sizeof(float) * count * i)
+						reinterpret_cast<const void *>(element.offset + sizeof(float) * count * i)
 					);
 					glVertexAttribDivisor(index, 1); // Tells vertex attribute to increment once per instance instead of per vertex
 					index++;

@@ -5,7 +5,6 @@
 #include "rekuai/Renderer/Buffer.h"
 
 #include "vulkan/vulkan_core.h"
-#include <functional>
 
 namespace kuai {
 
