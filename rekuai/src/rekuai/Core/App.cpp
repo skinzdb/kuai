@@ -58,6 +58,8 @@ namespace kuai {
 
 			camera_sys->each([](Camera &camera, Transform &transform)
 			{
+				camera.update_view_matrix(transform.pos, transform.rot);
+				camera.update_proj_matrix();
 				Renderer::set_camera(camera);
 			});
 

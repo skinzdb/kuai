@@ -12,7 +12,9 @@ namespace kuai
 
 		bool operator==(const Vertex &other) const
 		{
-			return pos == other.pos && normal == other.normal && tex_coords == other.tex_coords;
+			return pos[0] == other.pos[0] && pos[1] == other.pos[1] && pos[2] == other.pos[2] &&
+				   normal[0] == other.normal[0] && normal[1] == other.normal[1] && normal[2] == other.normal[2] &&
+				   tex_coords[0] == other.tex_coords[0] && tex_coords[1] == other.tex_coords[1];
 		}
 	};
 

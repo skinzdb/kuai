@@ -23,7 +23,7 @@ void main()
 	world_norm = aNormal;
 	tex_coords = aTexCoord;
 
-	gl_Position = world_pos;
+	gl_Position = proj * view * world_pos;
 }
 
 // void main()

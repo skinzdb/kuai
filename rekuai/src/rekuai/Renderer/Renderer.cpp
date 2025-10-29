@@ -42,12 +42,9 @@ namespace kuai
 		api->clear();
 
 		shader->bind();
+		
 		ModelViewProj mvp = {model, scene_data->view_matrix, scene_data->proj_matrix};
-		glm::mat4 asfd = glm::mat4{ 1.0, 0.0, 0.0, 0.0,
-			0.0, 1.0, 0.0, 0.0,
-			0.0, 0.0, 1.0, 0.0,
-			0.0, 0.0, 0.0, 1.0 };
-		shader->set_uniform_block("Matrices", "model", &asfd[0], sizeof(glm::mat4));
+		shader->set_uniform_block("Matrices", "model", &mvp, sizeof(ModelViewProj));
 		
 		mesh->vertex_array->bind();
 	

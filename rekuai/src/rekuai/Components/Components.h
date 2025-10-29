@@ -22,9 +22,9 @@ namespace kuai {
 
 	struct Transform
 	{
-		glm::vec3 pos;
-		glm::vec3 rot;
-		glm::vec3 scale;
+		glm::vec3 pos = glm::vec3(0.0f);
+		glm::vec3 rot = glm::vec3(0.0f);
+		glm::vec3 scale = glm::vec3(1.0f);
 
 		glm::vec3 up() { return glm::rotate(glm::quat(rot), glm::vec3(0.0f, 1.0f, 0.0f)); }
 		glm::vec3 right() { return glm::rotate(glm::quat(rot), glm::vec3(1.0f, 0.0f, 0.0f)); }
@@ -79,7 +79,7 @@ namespace kuai {
 		float z_near;
 		float z_far;
 
-	private:
+	// private:
 		void update_view_matrix(const glm::vec3& pos, const glm::vec3& rot)
 		{
 			view_matrix = glm::translate(glm::mat4(1.0f), pos) * glm::toMat4(glm::quat(rot)); // Rotate then translate, aka TR
