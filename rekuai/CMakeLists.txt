@@ -2,7 +2,7 @@
 
 project(rekuai VERSION 0.1)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -62,11 +62,14 @@ set(MY_FILES
 
     vendor/tinyobjloader/tiny_obj_loader.h
     vendor/tinyobjloader/tiny_obj_loader.cpp
+   
     vendor/stb_image/stb_image.h
     vendor/stb_image/stb_image.cpp
-
     vendor/stb_image/stb_image_resize.h
     vendor/stb_image/stb_image_resize.cpp
+
+    vendor/vk_mem_alloc/vk_mem_alloc.h
+    vendor/vk_mem_alloc/vk_mem_alloc.cpp
 )
 
 set(MY_LIBS
@@ -166,6 +169,7 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC vendor/spdlog/include
     PUBLIC vendor/tinyobjloader
     PUBLIC vendor/stb_image
+    PUBLIC vendor/vk_mem_alloc
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${MY_LIBS})
